@@ -8,25 +8,25 @@ Contact information for this repo:  scott.yanco@yale.edu
 
 the code in this repository anticipates the following minimal directory structure to run:
 
-/project_root
-  |
-  +--/analysis        # *This repository*
-  |   |
-  |   +--/docs   # Supporting documentation (other than README.md)
-  |   |
-  |   +--/src    # Source code
-  |   |
-  |   +--/ctfs   # Control files
-  |
-  +--/raw_data
-  |
-  +--/procedded_data
-  |
-  +--/out
-  |
-  +--/figs
-  |
-  ...
+/project_root  
+  |  
+  +--/analysis        # *This repository*  
+  |   |  
+  |   +--/docs   # Supporting documentation (other than README.md)  
+  |   |  
+  |   +--/src    # Source code  
+  |   |  
+  |   +--/ctfs   # Control files  
+  |  
+  +--/raw_data  
+  |  
+  +--/procedded_data  
+  |  
+  +--/out  
+  |  
+  +--/figs  
+  |  
+  ...  
 
 ## Citation
 This project is led by:
