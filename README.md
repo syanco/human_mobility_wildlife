@@ -6,7 +6,7 @@ Contact information for this repo:  scott.yanco@yale.edu
 
 ## Code Usage
 
-the code in this repository anticipates the following minimal directory structure to run:
+The code in this repository anticipates the following minimal directory structure to run:
 
 ```
 /project_root  
@@ -29,6 +29,8 @@ the code in this repository anticipates the following minimal directory structur
   |  
   ...  
 ```
+
+Data associated with this project are far too large to be stored on GitHub and are currently private anyhow.  Raw data are stored as a [mosey_db](https://github.com/benscarlson/mosey_db), which is a SQLite relational database built to store data from [MoveBank](www.movebank.org). If data become publically available the archive will be described here (or the code to build the mosey_db from MoveBank will be released).
 
 ## Citation
 This project is led by:
