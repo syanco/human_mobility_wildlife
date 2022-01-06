@@ -8,6 +8,7 @@ Contact information for this repo:  scott.yanco@yale.edu
 
 the code in this repository anticipates the following minimal directory structure to run:
 
+```
 /project_root  
   |  
   +--/analysis        # *This repository*  
@@ -27,6 +28,7 @@ the code in this repository anticipates the following minimal directory structur
   +--/figs  
   |  
   ...  
+```
 
 ## Citation
 This project is led by:
