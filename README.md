@@ -4,7 +4,7 @@ Repository containing code for analysis of animal movement in relation to COVID-
 
 This project is led by:
 
-Walter Jetz (PI)^1
+Walter Jetz (PI)<sup>1</sup>
 Ruth Oliver^1
 Diego Ellis-Soto^1
 Scott Yanco^1
