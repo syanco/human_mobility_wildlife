@@ -20,7 +20,7 @@ the code in this repository anticipates the following minimal directory structur
   |  
   +--/raw_data  
   |  
-  +--/procedded_data  
+  +--/processed_data  
   |  
   +--/out  
   |  
