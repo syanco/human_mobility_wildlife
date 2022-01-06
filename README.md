@@ -5,17 +5,17 @@ Repository containing code for analysis of animal movement in relation to COVID-
 This project is led by:
 
 Walter Jetz (PI)<sup>1</sup>
-Ruth Oliver^1
-Diego Ellis-Soto^1
-Scott Yanco^1
-Brett Jesmer^2
+Ruth Oliver<sup>1</sup>
+Diego Ellis-Soto<sup>1</sup>
+Scott Yanco<sup>1</sup>
+Brett Jesmer<sup>1, 2</sup>
 
-^{1}Center for Biodiversity and Global Change
+<sup>1</sup>Center for Biodiversity and Global Change
 Department of Ecology and Evolutionary Biology
 Yale University
 New Haven, CT, USA
 
-^{2}Department of Fish and Wildlife Conservation
+<sup>2</sup>Department of Fish and Wildlife Conservation
 Virginia Tech 
 Blacksburg, VA, USA
 
