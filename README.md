@@ -13,19 +13,19 @@ the code in this repository anticipates the following minimal directory structur
   |  
   +--/analysis        # *This repository*  
   |   |  
-  |   +--/docs   # Supporting documentation (other than README.md)  
+  |   +--/docs        # Supporting documentation (other than README.md)  
   |   |  
-  |   +--/src    # Source code  
+  |   +--/src         # Source code  
   |   |  
-  |   +--/ctfs   # Control files  
+  |   +--/ctfs        # Control files  
   |  
-  +--/raw_data  
+  +--/raw_data        # Raw data stored as a mosey_db
   |  
-  +--/processed_data  
+  +--/processed_data  # Any processed data products
   |  
-  +--/out  
+  +--/out             # Analytical outputs
   |  
-  +--/figs  
+  +--/figs            # Figures produced by this workflow
   |  
   ...  
 ```
