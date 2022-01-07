@@ -44,9 +44,10 @@ cd $wd
 ####----  Prep and Clean Data ----####
 
 # Make a copy of db to be modified
-mv $wd/raw_data/mosey.db $wd/processed_data/mosey_mod.db
+cp $wd/raw_data/mosey.db $wd/processed_data/mosey_mod.db
 
 # Process and clean data:
 #   * add study period annotation
 #   * remove events outside study area
 #   * basic data cleaning
+#   
