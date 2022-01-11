@@ -46,8 +46,11 @@ cd $wd
 # Make a copy of db to be modified
 cp $wd/raw_data/mosey.db $wd/processed_data/mosey_mod.db
 
+#activate spatial env
+conda activate spatial
+
 # Process and clean data:
 #   * add study period annotation
 #   * remove events outside study area
 #   * basic data cleaning
-#   
+Rscript $wd/analysis/src/01-prep_and_clean.r --db $wd/processed_data/mosey_mod.db

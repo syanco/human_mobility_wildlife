@@ -19,7 +19,7 @@
 
 '
 Usage:
-01-prep_and_clean.r [--db=<db>] [--cores=<cores>]
+01-prep_and_clean.r [--db=<db>] 
 01-prep_and_clean.r (-h | --help)
 
 Control files:
@@ -30,7 +30,6 @@ Options:
 -h --help     Show this screen.
 -v --version     Show version.
 -d --db=<db> Path to movement database. Defaults to <wd>/data/move.db
--c --cores=<cores>  The number of cores
 ' -> doc
 
 #---- Input Parameters ----#
@@ -47,10 +46,13 @@ if(interactive()) {
   
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
+  
+  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  
   .dbPF <- makePath(ag$db)
   .nc <- ag$cores
-
-  }
+  
+}
 
 #---- Initialize Environment ----#
 
@@ -65,9 +67,8 @@ suppressWarnings(
   suppressPackageStartupMessages({
     library(DBI)
     library(RSQLite)
-    library(atlastools)
-    library(foreach)
-    library(doMC)
+    library(sf)
+    library(geosphere)
   }))
 
 #Source all files in the auto load funs directory
@@ -94,78 +95,108 @@ evt <- tbl(db,'event')
 
 # Code below can be used to crib the SQL query from `dbplyr`...
 
-# evt %>% 
-#   filter((timestamp > t1 & timestamp < t2) | (timestamp > t3 & timestamp < t4)) %>% 
-#   mutate(yr = strftime('%Y', timestamp),
-#                        trt = case_when(
-#                          timestamp >= !!periods$date[periods$cutpoint == "start_pre-ld_2019"] &
-#                            timestamp < !!periods$date[periods$cutpoint == "start_ld_2019"] ~ "pre-ld_2019",
-#                          timestamp >= !!periods$date[periods$cutpoint == "start_ld_2019"] &
-#                            timestamp < !!periods$date[periods$cutpoint == "start_post-ld_2019"] ~ "ld_2019",
-#                          timestamp >= !!periods$date[periods$cutpoint == "start_post-ld_2019"] &
-#                            timestamp < !!periods$date[periods$cutpoint == "stop_2019"] ~ "post-ld_2019",
-#                          timestamp >= !!periods$date[periods$cutpoint == "start_pre-ld_2020"] &
-#                            timestamp < !!periods$date[periods$cutpoint == "start_ld_2020"] ~ "pre-ld_2020",
-#                          timestamp >= !!periods$date[periods$cutpoint == "start_ld_2020"] &
-#                            timestamp < !!periods$date[periods$cutpoint == "start_post-ld_2020"] ~ "ld_2020",
-#                          timestamp >= !!periods$date[periods$cutpoint == "start_post-ld_2020"] &
-#                            timestamp < !!periods$date[periods$cutpoint == "stop_2020"] ~ "post-ld_2020")
-#                        ) %>% show_query()
+mod <- evt %>%
+  filter((timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2019"] & 
+            timestamp < !!periods$date[periods$cutpoint == "stop_2019"])
+         | (timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2020"] & 
+              timestamp < !!periods$date[periods$cutpoint == "stop_2020"])) %>%
+  mutate(yr = strftime('%Y', timestamp),
+         trt = case_when(
+           timestamp >= !!periods$date[periods$cutpoint == "start_pre-ld_2019"] &
+             timestamp < !!periods$date[periods$cutpoint == "start_ld_2019"] ~ "pre-ld_2019",
+           timestamp >= !!periods$date[periods$cutpoint == "start_ld_2019"] &
+             timestamp < !!periods$date[periods$cutpoint == "start_post-ld_2019"] ~ "ld_2019",
+           timestamp >= !!periods$date[periods$cutpoint == "start_post-ld_2019"] &
+             timestamp < !!periods$date[periods$cutpoint == "stop_2019"] ~ "post-ld_2019",
+           timestamp >= !!periods$date[periods$cutpoint == "start_pre-ld_2020"] &
+             timestamp < !!periods$date[periods$cutpoint == "start_ld_2020"] ~ "pre-ld_2020",
+           timestamp >= !!periods$date[periods$cutpoint == "start_ld_2020"] &
+             timestamp < !!periods$date[periods$cutpoint == "start_post-ld_2020"] ~ "ld_2020",
+           timestamp >= !!periods$date[periods$cutpoint == "start_post-ld_2020"] &
+             timestamp < !!periods$date[periods$cutpoint == "stop_2020"] ~ "post-ld_2020")
+  ) %>% 
+  collect()
 
-# SQLite query to filter out events outside study periods, add a year variable,
-# and a study period variable.  Uses ctf to assign cutpoints
-q <- glue("
-  CREATE TABLE event_mod AS
-    SELECT *, strftime('%Y', `timestamp`) AS `yr`, 
-      CASE
-        WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_pre-ld_2019']}' 
-          AND `timestamp` < '{periods$date[periods$cutpoint == 'start_ld_2019']}') 
-            THEN ('pre-ld_2019')
-        WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_ld_2019']}' 
-          AND `timestamp` < '{periods$date[periods$cutpoint == 'start_post-ld_2019']}') 
-            THEN ('ld_2019')
-        WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_post-ld_2019']}' 
-          AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2019']}') 
-            THEN ('post-ld_2019')
-        WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_pre-ld_2020']}' 
-          AND `timestamp` < '{periods$date[periods$cutpoint == 'start_ld_2020']}') 
-            THEN ('pre-ld_2020')
-        WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_ld_2020']}' 
-          AND `timestamp` < '{periods$date[periods$cutpoint == 'start_post-ld_2020']}') 
-            THEN ('ld_2020')
-        WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_post-ld_2020']}' 
-          AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2020']}') 
-            THEN ('post-ld_2020')
-      END AS `trt`
-    FROM `event`
-      WHERE ((`timestamp` > '{periods$date[periods$cutpoint == 'start_pre-ld_2019']}' 
-        AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2019']}') 
-        OR (`timestamp` > '{periods$date[periods$cutpoint == 'start_pre-ld_2020']}' 
-        AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2020']}'))"
-  )
+dbWriteTable(conn = db, name = "event_mod", value = mod, append = F, overwrite = T)
 
-# Execute the query
-dbExecute(db, q)
+# # SQLite query to filter out events outside study periods, add a year variable,
+# # and a study period variable.  Uses ctf to assign cutpoints
+# q <- glue("
+#   CREATE TABLE event_mod AS
+#     SELECT *, strftime('%Y', `timestamp`) AS `yr`, 
+#       CASE
+#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_pre-ld_2019']}' 
+#           AND `timestamp` < '{periods$date[periods$cutpoint == 'start_ld_2019']}') 
+#             THEN ('pre-ld_2019')
+#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_ld_2019']}' 
+#           AND `timestamp` < '{periods$date[periods$cutpoint == 'start_post-ld_2019']}') 
+#             THEN ('ld_2019')
+#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_post-ld_2019']}' 
+#           AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2019']}') 
+#             THEN ('post-ld_2019')
+#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_pre-ld_2020']}' 
+#           AND `timestamp` < '{periods$date[periods$cutpoint == 'start_ld_2020']}') 
+#             THEN ('pre-ld_2020')
+#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_ld_2020']}' 
+#           AND `timestamp` < '{periods$date[periods$cutpoint == 'start_post-ld_2020']}') 
+#             THEN ('ld_2020')
+#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_post-ld_2020']}' 
+#           AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2020']}') 
+#             THEN ('post-ld_2020')
+#       END AS `trt`
+#     FROM `event`
+#       WHERE ((`timestamp` > '{periods$date[periods$cutpoint == 'start_pre-ld_2019']}' 
+#         AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2019']}') 
+#         OR (`timestamp` > '{periods$date[periods$cutpoint == 'start_pre-ld_2020']}' 
+#         AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2020']}'))"
+# )
 
-# dbRollback(db)
-# dbCommit(db)
+# # Execute the query
+# dbExecute(db, q)
 
 
 #-- Clean Outliers
 
-# Get list of inds
-inds <- tbl(db, 'event_mod') %>% 
-  select(individual_id) %>% 
-  distinct() %>% 
-  collect() %>% 
-  c()
+evt1 <- tbl(db, "event_mod")
 
-registerDoMC(.nc)
-foreach(i = 1:length(inds)) %dopar% {
-  
-  #TODO: fill in with atlas_tools (page 9)
-  
-  )
+cnt <- evt1 %>% 
+  group_by(individual_id) %>% 
+  summarise(n = n())
+
+# get step lengths and turn angles across dataset
+evt_sf <- evt1 %>% 
+  # left_join(cnt) %>% 
+  # filter(n < 3) %>% 
+  as.data.frame() %>% 
+  # group run calcs per individual
+  group_by(individual_id) %>% 
+  arrange(timestamp) %>% 
+  mutate(rn = row_number(),
+         # lead_d = geometry[row_number()+1],
+         lag_lon = dplyr::lag(lon, 1),
+         lag_lat = dplyr::lag(lat, 1),
+         sl = distGeo(cbind(lon,lat), cbind(lag_lon, lag_lat)),
+         bearing = bearing(cbind(lon,lat), cbind(lag_lon, lag_lat)),
+         ta = 180-abs(180 - abs(bearing - dplyr::lag(bearing, 1)) %% 360))
+
+cuts <- evt_sf %>% 
+  as.data.frame() %>% 
+  group_by(individual_id) %>% 
+  summarize(
+    qta = quantile(ta, probs = 0.95, na.rm = T, names = F),
+    qsl = quantile(sl, probs = 0.95, na.rm = T, names = F)
+  ) 
+
+# filter outliers
+out <- evt_sf %>% 
+  # just join the cutpoints back to the dataset
+  left_join(cuts) %>% 
+  # conservative outlier thresh, must be past 95% quant for BOTH sl and TA
+  filter(sl < qsl | ta < qta) %>% 
+  ungroup()
+
+dbWriteTable(conn = db, name = "event_clean", value = out, append = FALSE, overwrite = T)
+
 
 #---- Finalize script ----#
 

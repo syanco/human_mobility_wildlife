@@ -1,5 +1,9 @@
 ## TODO  
-* Export conda env .yml files
+* Export conda env .yml files  
+  * covid  
+  * spatial  
+* Clean comments on script 01
+
 
 ## Major Activity Log
 
@@ -7,6 +11,7 @@
 |:-|:------------|
 |2022-01-05|Initialize repo, docs, etc.|
 |2022-01-07|Start building top-level workflow and cleaning scripts|
+|2022-01-10|Completed process and clean script|
 
 
 ## Notes  
@@ -20,10 +25,16 @@ Left off at outlier removal in script 01 - pick up there.
 
 ### Building DB
 
+/project/fas/jetz/data/MPYC/Anthropause/Inputs/MoseyDB
 
 ### Process and Clean Data
 
-* Using a control file approach for the study period segmentation/annotation b/c this allows future flexibility to assign individual-/cohort-specific study periods according to some covariate (e.g., taxa, location, etc.)
+* Using a control file approach for the study period segmentation/annotation b/c this allows future flexibility to assign individual-/cohort-specific study periods according to some covariate (e.g., taxa, location, etc.)  
+* Script complete - saves two new tables to the db in "/processed_data":  
+  * *event_mod* has occurences outside stufy periods removed and the basic study periods annotated  
+  * *event_clean* further modifies that to remove outliers.  Points >95% quantile for _both_ step length and turn angle are removed.
+  
+  With the test dataset (~2.5 million occurrences) it's pretty fast (< 2 min) - may need to run on high memory HPC for full dataset
 
 
 ### Analysis
