@@ -36,7 +36,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/projects/covid-19_movement'
+  .wd <- '~/project/covid-19_movement'
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
 
 } else {
