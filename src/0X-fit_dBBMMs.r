@@ -48,7 +48,7 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(rd('funs/input_parse.r'))
+  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
   
   .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
