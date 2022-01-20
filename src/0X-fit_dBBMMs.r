@@ -91,7 +91,8 @@ invisible(assert_that(length(dbListTables(db))>0))
 #---- Perform analysis ----#
 message("Gathering movement data...")
 
-evt0 <- tbl(db, "event_clean")
+evt0 <- tbl(db, "event_clean")%>% 
+  collect()
 indtb <- tbl(db,'individual')
 
 yearvec <- c("2019", "2020")
@@ -128,8 +129,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass") %:%
       # extract year
       filter(yr == !!yearvec[i]) %>%
       # sort by timestamp
-      arrange(timestamp) %>% 
-      collect()
+      arrange(timestamp) 
     
     # TODO: this is an arbitrary minimum... check
     if(nrow(evt_mod) <= 25){
