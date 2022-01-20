@@ -33,7 +33,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/projects/covid-19_movement'
+  .wd <- '~/project/covid-19_movement'
   rd <- here::here
   
   .outPF <- file.path(.wd,'out')
@@ -129,7 +129,11 @@ foreach(j = 1:length(ind), .errorhandling = "pass") %:%
       # extract year
       filter(yr == !!yearvec[i]) %>%
       mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T")) %>% 
+
+
+
       # sort by timestamp
+
       arrange(timestamp) 
     
     # TODO: this is an arbitrary minimum... check
@@ -162,22 +166,27 @@ foreach(j = 1:length(ind), .errorhandling = "pass") %:%
                                               #TODO: think about these...
                                               margin = 3, 
                                               window.size = 11)
-      dbbm <- brownian.bridge.dyn(dbb_var_sp[[i]], raster = 1000, location.error = 1, 
+      dbbm <- brownian.bridge.dyn(dbb_var, raster = 1000, location.error = 1, 
                                   margin = 3, window.size = 11)
       
       # Get UD volume
       vol <- getVolumeUD(dbbm)
       
-      # Clip out 95% contour
-      ud95 <- vol
-      ud95[ud95>0.99] <- NA
+      # Make 95% mask
+      mask95 <- vol
+      mask95[mask95>0.99] <- NA
+      mask95[mask95<0.99] <- 1
+      
+      # Clip out 95% UD
+      ud95 <- dbbm*mask95
       
       # write the dbbmm objects to list
       tmp_out <- list("dBBMM Variance" = dbb_var,
-                      "dBBMM Object" = dbbm_sp,
+                      "dBBMM Object" = dbbm,
                       "Contours" =  raster2contour(dbbm),
                       "UD Volume" = vol,
-                      "95% Volume" = ud95,
+                      "95% Mask" = mask95,
+                      "95% UD" = ud95,
                       "events" = evt_mod
       )
       
