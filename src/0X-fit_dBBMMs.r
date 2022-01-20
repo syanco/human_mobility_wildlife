@@ -178,26 +178,24 @@ foreach(j = 1:length(ind), i = 1:2, .errorhandling = "pass") %dopar% {
                     "95% Volume" = ud95,
                     "events" = evt_mod
     )
+    
+    #-- Save individual output
+    
+    message(glue("Writing output for individual {ind[j]} to file..."))
+    
+    save(tmp_out,
+         file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
+    )
+    
+    # Make entry in log file
+    outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
+                       glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
+                       1, as.character(Sys.Date())), 
+                     nrow = 1)
+    write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
+                col.names = F, sep = ",")
+    
   } # fi
-  
-  #-- Save individual output
-  
-  # declare output destination
-  .outTMP <- file.path(.outPF, scientificname, ind[j])
-  
-  message(glue("Writing output for individual {ind[j]} to file..."))
-  
-  save(tmp_out,
-       file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
-  )
-  
-  # Make entry in log file
-  outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
-                     glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                     1, as.character(Sys.Date())), 
-                   nrow = 1)
-  write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
-              col.names = F, sep = ",")
   
 } #j (end loop through individuals)
 
