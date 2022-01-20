@@ -7,9 +7,12 @@
 #SBATCH --mem-per-cpu 50G
 #SBATCH -J prep_covid_2022-01-20
 
-# Loda conda env
+# Load conda env
 module load miniconda
 conda activate spatial
+
+# Declare WD
+wd=~/project/covid-19_movement
 
 # Execute cleaning script (non parallel)
 Rscript $wd/analysis/src/01-prep_and_clean.r --db $wd/processed_data/mosey_mod.db
