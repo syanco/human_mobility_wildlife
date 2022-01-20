@@ -12,11 +12,12 @@
 |2022-01-05|Initialize repo, docs, etc.|
 |2022-01-07|Start building top-level workflow and cleaning scripts|
 |2022-01-10|Completed process and clean script|
+|2022-01-19|Draft dBBMM script|
 
 
 ## Notes  
 
-Left off at outlier removal in script 01 - pick up there.
+Fitting dBBMMs for each ind x yr combination.
 
 ### General
 

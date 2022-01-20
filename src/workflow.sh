@@ -54,3 +54,27 @@ conda activate spatial
 #   * remove events outside study area
 #   * basic data cleaning
 Rscript $wd/analysis/src/01-prep_and_clean.r --db $wd/processed_data/mosey_mod.db
+
+
+####----  Annotate Data ----####
+
+
+
+
+####----  Analysis ----####
+
+  ###---  Fit dBBMMs  ---###
+
+# Make dir to hold fitted dBBMMs (only run once)
+mkdir $wd/out/dBBMMs
+
+# Make log file to track successful outputs (only run once)
+echo "species, ind_id, study_id, year, out_type, produced, filename, out_date" > $out/log.csv
+
+
+# CHOOSE ONE:
+  # Fit dBBMMs (run on local - I don not recommend)
+  # Rscript $wd/analysis/src/0X-fit_dBBMMs.r -nc 2
+  
+  # Fit dBBMMs (run on local - I don not recommend)
+  sbatch ~/project/covid-19_movement/analysis/src/hpc/submit_dBBMM.sh

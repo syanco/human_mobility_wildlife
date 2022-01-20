@@ -38,8 +38,7 @@ if(interactive()) {
   
   .wd <- '~/projects/covid-19_movement'
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
-  .nc <- 2
-  
+
 } else {
   library(docopt)
   library(rprojroot)
@@ -50,8 +49,7 @@ if(interactive()) {
   source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
   
   .dbPF <- makePath(ag$db)
-  .nc <- ag$cores
-  
+
 }
 
 #---- Initialize Environment ----#
