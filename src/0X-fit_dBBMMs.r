@@ -128,6 +128,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass") %:%
       filter(individual_id == !!ind[j]) %>% 
       # extract year
       filter(yr == !!yearvec[i]) %>%
+      mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T")) %>% 
       # sort by timestamp
       arrange(timestamp) 
     
