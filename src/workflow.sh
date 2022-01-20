@@ -56,7 +56,7 @@ conda activate spatial
 
 # CHOOSE ONE:
   # Run on HPC:
-  sbatch analysis/src/submit_prep.sh
+  sbatch analysis/src/hpc/submit_prep.sh
 
   # Run Local:
   # Rscript $wd/analysis/src/01-prep_and_clean.r --db $wd/processed_data/mosey_mod.db
@@ -70,6 +70,9 @@ conda activate spatial
 ####----  Analysis ----####
 
   ###---  Fit dBBMMs  ---###
+
+# Activate covid env
+conda activate covid
 
 # Make dir to hold fitted dBBMMs (only run once)
 mkdir $wd/out/dBBMMs
