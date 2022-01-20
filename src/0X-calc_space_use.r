@@ -2,25 +2,23 @@
 #
 #CONDA: covid
 #
-# This script generates individual dynamic brownian bridge models and associated 
-# UDs for migratory  periods.
+# This script uses previously calculated dBBMMs to assess animal space use 
+# during COVID-19 lockdowns
 
-# TODO:  The dBBMM paramaters (e.g., window size, margin, error, etc.) are 
-# currently hardcoded.  Could be passed in as options to the script.
-# TODO: verify the volume/probability problem for write out.
+# TODO:  add migratory status filtering
+# TODO: Update docopts
 # 
 # ==== Setup ====
 
 '
-Estimate Dynamic Brownian Bridge Movement Models (dBBMs) for pre-segemented 
-migratory periods across multiple individuals
+Calculate space use before and during COVID-19 lockdowns using previously estimated dBBMMs
 
 Usage:
-make_dbbmm.r <db> <out> <nc>
+make_dbbmm.r <in> <out> <nc>
 make_dbbmm.r (-h | --help)
 
 Parameters:
-  db: path to movement databse. 
+  in: path to directory storing dBBMM outputs. 
   out: path to output directory.
   nc: number of cores for parallel processing
   
