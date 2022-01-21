@@ -93,23 +93,26 @@ message("Gathering movement data...")
 
 evt0 <- tbl(db, "event_clean")%>% 
   collect()
-indtb <- tbl(db,'individual')
+indtb <- tbl(db,'individual') %>% 
+  collect()
+
+message("Disconnecting from databse...")
+dbDisconnect(db)
 
 yearvec <- c("2019", "2020")
-trtvec <- c("pre-ld", "ld")
+# trtvec <- c("pre-ld", "ld")
 
 ind <- indtb %>% 
-  collect() %>% 
   pull(individual_id)
 
 registerDoMC(.nc)
 
 # Toggle `%do%` to `%dopar%` for HPC, %do% for local
 # foreach(j = 1:length(inds)) %do% {
-foreach(j = 1:length(ind), .errorhandling = "pass") %:%
-  foreach(i = 1:2, .errorhandling = "pass") %dopar% {
-    message(glue("Starting individual {ind[j]}, year {yearvec[i]}..."))
+foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
+  foreach(i = 1:2, .errorhandling = "pass", .inorder = F) %dopar% {
     
+    message(glue("Starting individual {ind[j]}, year {yearvec[i]}..."))
     
     scientificname <- indtb %>% 
       filter(individual_id == !!ind[j]) %>% 
@@ -148,66 +151,69 @@ foreach(j = 1:length(ind), .errorhandling = "pass") %:%
       
       #-- Fit dBBMMs
       message("Estimating dBBMMs...")
-      
-      # make minimal df for `move`    
-      evt_tmp <- evt_mod %>% 
-        select(lon, lat, timestamp)
-      
-      evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, 
-                     proj=CRS("+proj=longlat"))
-      evt_mv_t <- spTransform(evt_mv, center = T)
-      dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
-                                              # TODO check on error modeling
-                                              location.error = 1,
-                                              #TODO: think about these...
-                                              margin = 3, 
-                                              window.size = 11)
-      dbbm <- brownian.bridge.dyn(dbb_var, raster = 1000, location.error = 1, 
-                                  margin = 3, window.size = 11)
-      
-      # Get UD volume
-      vol <- getVolumeUD(dbbm)
-      
-      # Make 95% mask
-      mask95 <- vol
-      mask95[mask95>0.99] <- NA
-      mask95[mask95<0.99] <- 1
-      
-      # Clip out 95% UD
-      ud95 <- dbbm*mask95
-      
-      # write the dbbmm objects to list
-      tmp_out <- list("dBBMM Variance" = dbb_var,
-                      "dBBMM Object" = dbbm,
-                      "Contours" =  raster2contour(dbbm),
-                      "UD Volume" = vol,
-                      "95% Mask" = mask95,
-                      "95% UD" = ud95,
-                      "events" = evt_mod
-      )
+      tryCatch({
+        # make minimal df for `move`    
+        evt_tmp <- evt_mod %>% 
+          select(lon, lat, timestamp)
+        
+        evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, 
+                       proj=CRS("+proj=longlat"))
+        evt_mv_t <- spTransform(evt_mv, center = T)
+        dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
+                                                # TODO check on error modeling
+                                                location.error = 1,
+                                                #TODO: think about these...
+                                                margin = 3, 
+                                                window.size = 11)
+        dbbm <- brownian.bridge.dyn(dbb_var, raster = 1000, location.error = 1, 
+                                    margin = 3, window.size = 11)
+      }, error = function(e){cat("ERROR: unspecified error in fitting dBBMM", 
+                                 "\n")})
+      tryCatch({
+        # Get UD volume
+        vol <- getVolumeUD(dbbm)
+        
+        # Make 95% mask
+        mask95 <- vol
+        mask95[mask95>0.95] <- NA
+        mask95[mask95<0.95] <- 1
+        
+        # Clip out 95% UD
+        ud95 <- dbbm*mask95
+        
+        # write the dbbmm objects to list
+        tmp_out <- list("dBBMM Variance" = dbb_var,
+                        "dBBMM Object" = dbbm,
+                        "Contours" =  raster2contour(dbbm),
+                        "UD Volume" = vol,
+                        "95% Mask" = mask95,
+                        "95% UD" = ud95,
+                        "events" = evt_mod
+        )
+      }, error = function(e){cat("ERROR: couldnt write dBBMM objects to tmp", 
+                                 "\n")})
       
       #-- Save individual output
       
       message(glue("Writing output for individual {ind[j]} to file..."))
-      
-      save(tmp_out,
-           file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
-      )
-      
-      # Make entry in log file
-      outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
-                         glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                         1, as.character(Sys.Date())), 
-                       nrow = 1)
-      write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
-                  col.names = F, sep = ",")
+      tryCatch({
+        save(tmp_out,
+             file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
+        )
+        
+        # Make entry in log file
+        outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
+                           glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
+                           1, as.character(Sys.Date())), 
+                         nrow = 1)
+        write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
+                    col.names = F, sep = ",")
+      }, error = function(e){cat("ERROR: couldnt save tmp_out to file", 
+                                 "\n")})
       
     } # fi
   } #i (end loop through years) : #j (end loop through individuals)
 
 #---- Finalize script ----#
-
-message("Disconnecting from databse...")
-dbDisconnect(db)
 
 message(glue('Script complete in {diffmin(t0)} minutes'))
