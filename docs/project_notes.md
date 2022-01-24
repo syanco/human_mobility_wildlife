@@ -15,6 +15,7 @@
 |2022-01-10|Completed process and clean script|
 |2022-01-19|Draft dBBMM script|
 |2022-01-20|Working v of dBBMM script - running test|
+|2022-01-24|debugging dbbmm script|
 
 
 ## Notes  

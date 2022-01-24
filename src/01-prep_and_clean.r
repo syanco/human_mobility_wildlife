@@ -73,6 +73,7 @@ suppressWarnings(
 list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
+`%notin%` <- Negate(`%in%`)
 
 #---- Load control files ----#
 periods <- read_csv(file.path(.wd,'analysis/ctfs/dates.csv'),
@@ -91,8 +92,14 @@ evt <- tbl(db,'event')
 
 #-- Make a filtered table by study period
 
-# Code below can be used to crib the SQL query from `dbplyr`...
+# get list of inidviduals to remove from study base don bad coords
+indtb <- tbl(db, "individual") %>%  collect()
 
+rminds <- indtb %>% 
+  filter(study_id == 1891172051 | study_id == 1891403240) %>% 
+  pull(individual_id)
+
+# extract only relevnt time periods
 mod <- evt %>%
   filter((timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2019"] & 
             timestamp < !!periods$date[periods$cutpoint == "stop_2019"])
@@ -114,6 +121,11 @@ mod <- evt %>%
              timestamp < !!periods$date[periods$cutpoint == "stop_2020"] ~ "post-ld_2020")
   ) %>% 
   collect()
+
+#TODO: remove hardcode here
+# filtering individual whose coords are utms not lat long
+mod <- mod %>% 
+  filter(individual_id %notin% rminds)
 
 dbWriteTable(conn = db, name = "event_mod", value = mod, append = F, overwrite = T)
 
