@@ -170,26 +170,30 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
       }, error = function(e){cat("ERROR: unspecified error in fitting dBBMM", 
                                  "\n")})
       tryCatch({
-        # Get UD volume
-        vol <- getVolumeUD(dbbm)
-        
-        # Make 95% mask
-        mask95 <- vol
-        mask95[mask95>0.95] <- NA
-        mask95[mask95<0.95] <- 1
-        
-        # Clip out 95% UD
-        ud95 <- dbbm*mask95
-        
-        # write the dbbmm objects to list
-        tmp_out <- list("dBBMM Variance" = dbb_var,
-                        "dBBMM Object" = dbbm,
-                        "Contours" =  raster2contour(dbbm),
-                        "UD Volume" = vol,
-                        "95% Mask" = mask95,
-                        "95% UD" = ud95,
-                        "events" = evt_mod
-        )
+        if(exists("dbbm")){
+          # Get UD volume
+          vol <- getVolumeUD(dbbm)
+          
+          # Make 95% mask
+          mask95 <- vol
+          mask95[mask95>0.95] <- NA
+          mask95[mask95<0.95] <- 1
+          
+          # Clip out 95% UD
+          ud95 <- dbbm*mask95
+          
+          # write the dbbmm objects to list
+          tmp_out <- list("dBBMM Variance" = dbb_var,
+                          "dBBMM Object" = dbbm,
+                          "Contours" =  raster2contour(dbbm),
+                          "UD Volume" = vol,
+                          "95% Mask" = mask95,
+                          "95% UD" = ud95,
+                          "events" = evt_mod
+          )
+        } else {
+          message(glue("No dbbmm object in memory, nothing written to tmp for individual {ind[j]}, {yearvec[i]}"))
+        }
       }, error = function(e){cat("ERROR: couldnt write dBBMM objects to tmp", 
                                  "\n")})
       
@@ -197,17 +201,21 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
       
       message(glue("Writing output for individual {ind[j]} to file..."))
       tryCatch({
-        save(tmp_out,
-             file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
-        )
-        
-        # Make entry in log file
-        outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
-                           glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                           1, as.character(Sys.Date())), 
-                         nrow = 1)
-        write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
-                    col.names = F, sep = ",")
+        if(exists("tmp_out")){
+          save(tmp_out,
+               file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
+          )
+          
+          # Make entry in log file
+          outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
+                             glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
+                             1, as.character(Sys.Date())), 
+                           nrow = 1)
+          write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
+                      col.names = F, sep = ",")
+        }else {
+          message(glue("No tmp list in memory, nothing written to file for {ind[j]}, {yearvec[i]}"))
+        }
       }, error = function(e){cat("ERROR: couldnt save tmp_out to file", 
                                  "\n")})
       
