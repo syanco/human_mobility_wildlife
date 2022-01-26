@@ -4,8 +4,8 @@
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition pi_jetz
-#SBATCH -c 24
-#SBATCH --mem-per-cpu 25G
+#SBATCH -c 36
+#SBATCH --mem-per-cpu 20G
 #SBATCH -J fit_dBBMMs_2022-01-20
 
 # Load conda env
