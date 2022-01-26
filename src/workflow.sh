@@ -78,7 +78,7 @@ conda activate covid
 mkdir $wd/out/dBBMMs
 
 # Make log file to track successful outputs (only run once)
-echo "species, ind_id, study_id, year, out_type, produced, filename, out_date" > $out/log.csv
+echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > $out/dbbmm_log.csv
 
 
 # CHOOSE ONE:

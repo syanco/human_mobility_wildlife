@@ -14,13 +14,14 @@
 Calculate space use before and during COVID-19 lockdowns using previously estimated dBBMMs
 
 Usage:
-make_dbbmm.r <in> <out> <nc>
+make_dbbmm.r <in> <out> <nc> <ctf>
 make_dbbmm.r (-h | --help)
 
 Parameters:
   in: path to directory storing dBBMM outputs. 
   out: path to output directory.
   nc: number of cores for parallel processing
+  ctf: path to dbbmm log file
   
 Options:
 -h --help     Show this screen.
@@ -34,8 +35,9 @@ if(interactive()) {
   .wd <- '~/projects/covid-19_movement'
   rd <- here::here
   
-  .outPF <- file.path(.wd,'out')
+  .outPF <- file.path(.wd,'out/dbbmms')
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .ctf <- file.path(.wd, "out/dbbmm_log.csv")
   
   .nc <- 2
   
@@ -50,6 +52,7 @@ if(interactive()) {
   
   .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
+  ctf <- makePath(ag$ctf)
   .nc <- makePath(ag$nc)
   
 }
@@ -79,11 +82,16 @@ list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
 
 
 #---- Initialize database ----#
-message("Initializing database connection...")
+message("Initializing database connection and control files...")
 
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
+
+ctf <- read_csv(.ctf)
+#TODO: rm below after a real run with log
+ctf <- ctf[!duplicated(ctf),] %>% 
+  filter(produced == 1)
 
 
 #---- Perform analysis ----#
@@ -98,6 +106,12 @@ trtvec <- c("pre-ld", "ld")
 ind <- indtb %>% 
   collect() %>% 
   pull(individual_id)
+
+#+++++++++++++++++++++#
+for(i in 1:nrow(ctf)){
+  load(glue("{.outPF}/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
+}
+
 
 registerDoMC(.nc)
 

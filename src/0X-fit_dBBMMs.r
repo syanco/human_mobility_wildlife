@@ -79,31 +79,23 @@ suppressWarnings(
 list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
-
 #---- Initialize database ----#
 message("Initializing database connection...")
 
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-
-
-#---- Perform analysis ----#
-message("Gathering movement data...")
-
-evt0 <- tbl(db, "event_clean")%>% 
-  collect()
 indtb <- tbl(db,'individual') %>% 
   collect()
 
 message("Disconnecting from databse...")
 dbDisconnect(db)
 
-yearvec <- c("2019", "2020")
-# trtvec <- c("pre-ld", "ld")
-
 ind <- indtb %>% 
   pull(individual_id)
+
+
+yearvec <- c("2019", "2020")
 
 registerDoMC(.nc)
 
@@ -111,8 +103,20 @@ registerDoMC(.nc)
 # foreach(j = 1:length(inds)) %do% {
 foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
   foreach(i = 1:2, .errorhandling = "pass", .inorder = F) %dopar% {
+    message(glue("Starting individual {ind[j]}, year {yearvec[i]}..."))  
     
-    message(glue("Starting individual {ind[j]}, year {yearvec[i]}..."))
+    #---- Initialize database ----#
+    message(glue("Initializing database connection for individual {ind[j]}, year {yearvec[i]}..."))
+    
+    invisible(assert_that(file.exists(.dbPF)))
+    db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
+    invisible(assert_that(length(dbListTables(db))>0))
+    
+    
+    #---- Perform analysis ----#
+    message(glue("Gathering movement data for individual {ind[j]}, year {yearvec[i]}..."))
+    
+    evt0 <- tbl(db, "event_clean")
     
     scientificname <- indtb %>% 
       filter(individual_id == !!ind[j]) %>% 
@@ -133,7 +137,10 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
       filter(yr == !!yearvec[i]) %>%
       mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T")) %>% 
       # sort by timestamp
-      arrange(timestamp) 
+      arrange(timestamp) %>% 
+      collect()
+    
+    dbDisconnect(db) 
     
     # TODO: this is an arbitrary minimum... check
     if(nrow(evt_mod) <= 25){
@@ -154,41 +161,46 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
       tryCatch({
         # make minimal df for `move`    
         evt_tmp <- evt_mod %>% 
-          select(lon, lat, timestamp)
+          select(lon, lat, timestamp, trt)
         
-        evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, 
+        evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, trt = evt_tmp$trt,
                        proj=CRS("+proj=longlat"))
-        evt_mv_t <- spTransform(evt_mv, center = T)
+        burstid <- factor(evt_tmp$trt[1:(n.locs(evt_mv)-1)])
+        
+        evt_burst <- burst(evt_mv, burstid)
+        evt_mv_t <- spTransform(evt_burst, center = T)
         dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
                                                 # TODO check on error modeling
-                                                location.error = 1,
+                                                location.error = 10,
                                                 #TODO: think about these...
                                                 margin = 3, 
                                                 window.size = 11)
-        dbbm <- brownian.bridge.dyn(dbb_var, raster = 1000, location.error = 1, 
+        dbbm <- brownian.bridge.dyn(dbb_var, raster = 1000, 
+                                    location.error = rep(10, n.locs(evt_mv_t)), 
+                                    ext = 1,
                                     margin = 3, window.size = 11)
       }, error = function(e){cat("ERROR: unspecified error in fitting dBBMM", 
                                  "\n")})
       tryCatch({
         if(exists("dbbm")){
-          # Get UD volume
-          vol <- getVolumeUD(dbbm)
-          
-          # Make 95% mask
-          mask95 <- vol
-          mask95[mask95>0.95] <- NA
-          mask95[mask95<0.95] <- 1
-          
-          # Clip out 95% UD
-          ud95 <- dbbm*mask95
+          # # Get UD volume
+          # vol <- getVolumeUD(dbbm)
+          # 
+          # # Make 95% mask
+          # mask95 <- vol
+          # mask95[mask95>0.95] <- NA
+          # mask95[mask95<0.95] <- 1
+          # 
+          # # Clip out 95% UD
+          # ud95 <- dbbm*mask95
           
           # write the dbbmm objects to list
           tmp_out <- list("dBBMM Variance" = dbb_var,
                           "dBBMM Object" = dbbm,
-                          "Contours" =  raster2contour(dbbm),
-                          "UD Volume" = vol,
-                          "95% Mask" = mask95,
-                          "95% UD" = ud95,
+                          # "Contours" =  raster2contour(dbbm),
+                          # "UD Volume" = vol,
+                          # "95% Mask" = mask95,
+                          # "95% UD" = ud95,
                           "events" = evt_mod
           )
         } else {
