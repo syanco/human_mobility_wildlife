@@ -5,8 +5,9 @@
 # This script uses previously calculated dBBMMs to assess animal space use 
 # during COVID-19 lockdowns
 
-# TODO:  add migratory status filtering
+# TODO:  add migratory status filtering? Or maybe that's after...
 # TODO: Update docopts
+# TODO: Clean the script - there are unused object created, poorly commented, etc
 # 
 # ==== Setup ====
 
@@ -108,29 +109,32 @@ ind <- indtb %>%
   pull(individual_id)
 
 #+++++++++++++++++++++#
-for(i in 1:nrow(ctf)){
+registerDoMC(.nc)
+
+# Toggle `%do%` to `%dopar%` for HPC, %do% for local
+foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
   message(glue("Starting ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
   tryCatch({
-  load(glue("{.outPF}/dbbmms/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
-  
-  r <- tmp_out$`dBBMM Object`
-  # r
-  # plot(sqrt(r))
-  rb <- UDStack(r)
-  UDr <- getVolumeUD(rb)
-  # plot(UDr)
-  for(j in 1:nlayers(UDr)){
-    a <- ncell(UDr[[j]])/1000
-    trt <- names(UDr[[j]])
-    out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], trt = trt, a),
-                  nrow = 1)
-    message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, period {trt}"))
-    write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
-                col.names = F, sep = ",")
+    load(glue("{.outPF}/dbbmms/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
     
-  }
+    r <- tmp_out$`dBBMM Object`
+    # r
+    # plot(sqrt(r))
+    rb <- UDStack(r)
+    UDr <- getVolumeUD(rb)
+    # plot(UDr)
+    for(j in 1:nlayers(UDr)){
+      a <- ncell(UDr[[j]])/1000
+      trt <- names(UDr[[j]])
+      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], trt = trt, a),
+                    nrow = 1)
+      message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, period {trt}"))
+      write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
+                  col.names = F, sep = ",")
+      
+    }
   }, error = function(e){cat(glue("ERROR: Size calulation failed for individual {ctf$ind_id[i]}, year {ctf$year[i]}", 
-                            "\n"))})
+                                  "\n"))})
 }
 
 #---- Finalize script ----#
