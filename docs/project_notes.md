@@ -45,6 +45,7 @@ Execution halted
 ```
 For now I'm just scp'ing the processed db to the HPC to run the dbbmms
 
+* For the HR size - consider just a lmm of size ~ trt X yr + (1|ind) as basic model
 
 ### General
 
