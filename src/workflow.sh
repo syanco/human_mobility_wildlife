@@ -27,7 +27,7 @@
 ####----  Initialization  ----####
 
 # Define working directory - should point to project root folder
-wd=~/projects/covid-19_movement
+wd=~/project/covid-19_movement
 
 
 ####----  Build Initial Database  ----####
@@ -47,6 +47,7 @@ cd $wd
 cp $wd/raw_data/mosey.db $wd/processed_data/mosey_mod.db
 
 #activate spatial env
+module load miniconda
 conda activate spatial
 
 # Process and clean data:
@@ -72,7 +73,7 @@ conda activate spatial
   ###---  Fit dBBMMs  ---###
 
 # Activate covid env
-conda activate covid
+# conda activate covid
 
 # Make dir to hold fitted dBBMMs (only run once)
 mkdir $wd/out/dBBMMs
@@ -92,3 +93,7 @@ echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" >
   
 # Calc dbbmm areas
 echo "species, ind_id, study_id, year, trt, area, phen" > $out/dbbmm_size.csv
+
+# CHOOSE ONE:
+  # Calc sizes on HPC 
+  sbatch ~/project/covid-19_movement/analysis/sec/hpc/submit_size.sh

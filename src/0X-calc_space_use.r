@@ -15,14 +15,14 @@
 Calculate space use before and during COVID-19 lockdowns using previously estimated dBBMMs
 
 Usage:
-make_dbbmm.r <in> <out> <nc> <ctf>
-make_dbbmm.r (-h | --help)
+calc_space_use.r <out> <db> <ctf> <nc>
+calc_space_use.r (-h | --help)
 
 Parameters:
-  in: path to directory storing dBBMM outputs. 
-  out: path to output directory.
-  nc: number of cores for parallel processing
+  out: path to directory storing dBBMM outputs. 
+  db: path to dtabase
   ctf: path to dbbmm log file
+  nc: number of cores for parallel processing
   
 Options:
 -h --help     Show this screen.
