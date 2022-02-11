@@ -166,7 +166,6 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         # if event data is large...
         # TODO:  I think this upper size check is unecessary - maybe remove someday, but for now I just set the threshold very high
         if(nrow(evt_mod) > 50000){
-          
           # Just make anentry in the big mem log file - save dbbmm for later
           outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
                              glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
