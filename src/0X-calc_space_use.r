@@ -53,7 +53,7 @@ if(interactive()) {
   
   .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
-  ctf <- makePath(ag$ctf)
+  .ctf <- makePath(ag$ctf)
   .nc <- makePath(ag$nc)
   
 }
