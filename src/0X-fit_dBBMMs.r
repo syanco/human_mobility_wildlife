@@ -202,10 +202,11 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                                                     margin = 11, 
                                                     window.size = 31)
             # remove any segments with gaps > 3x the intended fix rate
-            dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
+            dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*1)] <- FALSE
             
             dbbm <- brownian.bridge.dyn(dbb_var, 
-                                        raster = 100,
+                                        #TODO: need to come up with a way to select this more dynamically based on the scale of the data
+                                        # raster = 100,
                                         # If we have horiz accuracy use that, otherwise use fixed accuracy
                                         location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
                                                                 #TODO: fixed at 5m - maybe reset to the global mean horiz accuracy in the data?
@@ -215,7 +216,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                                         time.step = (fixmed/15),
                                         # burstType = levels(burstid),
                                         #TODO: below is somewhat arbitrary
-                                        # dimSize = 1000,
+                                        dimSize = 1000,
                                         ext = 10,
                                         margin = 11, window.size = 31)
           }, error = function(e){cat(glue("ERROR: unspecified error in fitting dBBMM for ind {ind[j]}, yr {yearvec[i]}", 

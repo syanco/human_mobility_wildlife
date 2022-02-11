@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH -t 3-
+#SBATCH -t 1-
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition pi_jetz
 #SBATCH -c 24
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J fit_dBBMMs_2022-01-28
+#SBATCH -J fit_dBBMMs_2022-02-11
 
 # Load conda env
 module load miniconda
