@@ -78,8 +78,10 @@ conda activate covid
 mkdir $wd/out/dBBMMs
 
 # Make log file to track successful outputs (only run once)
-echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > $out/dbbmm_log.csv
+echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_log.csv
 
+# Make big mem log file to track ind-year combos saved for the big mem parition
+echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_bigmem_log.csv
 
 # CHOOSE ONE:
   # Fit dBBMMs (run on local - I don not recommend)
@@ -87,3 +89,6 @@ echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" >
   
   # Fit dBBMMs (run on local - I don not recommend)
   sbatch ~/project/covid-19_movement/analysis/src/hpc/submit_dBBMM.sh
+  
+# Calc dbbmm areas
+echo "species, ind_id, study_id, year, trt, area" > $out/dbbmm_size.csv

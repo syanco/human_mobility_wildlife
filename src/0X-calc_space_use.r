@@ -5,8 +5,9 @@
 # This script uses previously calculated dBBMMs to assess animal space use 
 # during COVID-19 lockdowns
 
-# TODO:  add migratory status filtering
+# TODO:  add migratory status filtering? Or maybe that's after...
 # TODO: Update docopts
+# TODO: Clean the script - there are unused object created, poorly commented, etc
 # 
 # ==== Setup ====
 
@@ -35,7 +36,7 @@ if(interactive()) {
   .wd <- '~/projects/covid-19_movement'
   rd <- here::here
   
-  .outPF <- file.path(.wd,'out/dbbmms')
+  .outPF <- file.path(.wd,'out')
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   .ctf <- file.path(.wd, "out/dbbmm_log.csv")
   
@@ -108,110 +109,33 @@ ind <- indtb %>%
   pull(individual_id)
 
 #+++++++++++++++++++++#
-for(i in 1:nrow(ctf)){
-  load(glue("{.outPF}/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
-}
-
-
 registerDoMC(.nc)
 
 # Toggle `%do%` to `%dopar%` for HPC, %do% for local
-# foreach(j = 1:length(inds)) %do% {
-foreach(j = 1:length(ind), i = 1:2, .errorhandling = "pass") %dopar% {
-  message(glue("Starting individual {ind[j]}, year {yearvec[i]}..."))
-  
-  
-  scientificname <- indtb %>% 
-    filter(individual_id == !!ind[j]) %>% 
-    pull(taxon_canonical_name)
-  
-  studyid <- indtb %>% 
-    filter(individual_id == !!ind[j]) %>% 
-    pull(study_id)
-  
-  
-  message("Filtering data and manipulating dates...")
-  
-  # prep data
-  evt_mod <- evt0 %>% 
-    # extract ind
-    filter(individual_id == !!ind[j]) %>% 
-    # extract year
-    filter(yr == !!yearvec[i]) %>%
-    # sort by timestamp
-    arrange(timestamp) %>% 
-    collect()
-  
-  # TODO: this is an arbitrary minimum... check
-  if(nrow(evt_mod) <= 25){
-    message(glue("Insufficient records for individual {ind[j]}, year {yearvec[i]}, movin on..."))
+foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
+  message(glue("Starting ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
+  tryCatch({
+    load(glue("{.outPF}/dbbmms/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
     
-    # Make entry in log file
-    outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
-                       glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                       0, as.character(Sys.Date())), 
-                     nrow = 1)
-    write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
-                col.names = F, sep = ",")
-    
-  } else {
-    
-    #-- Fit dBBMMs
-    message("Estimating dBBMMs...")
-    
-    # make minimal df for `move`    
-    evt_tmp <- evt_mod %>% 
-      select(lon, lat, timestamp)
-    
-    evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, 
-                   proj=CRS("+proj=longlat"))
-    evt_mv_t <- spTransform(evt_mv, center = T)
-    dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
-                                            # TODO check on error modeling
-                                            location.error = 1,
-                                            #TODO: think about these...
-                                            margin = 3, 
-                                            window.size = 11)
-    dbbm <- brownian.bridge.dyn(dbb_var_sp[[i]], raster = 1000, location.error = 1, 
-                                margin = 3, window.size = 11)
-    
-    # Get UD volume
-    vol <- getVolumeUD(dbbm)
-    
-    # Clip out 95% contour
-    ud95 <- vol
-    ud95[ud95>0.99] <- NA
-    
-    # write the dbbmm objects to list
-    tmp_out <- list("dBBMM Variance" = dbb_var,
-                    "dBBMM Object" = dbbm_sp,
-                    "Contours" =  raster2contour(dbbm),
-                    "UD Volume" = vol,
-                    "95% Volume" = ud95,
-                    "events" = evt_mod
-    )
-  } # fi
-  
-  #-- Save individual output
-  
-  # declare output destination
-  .outTMP <- file.path(.outPF, scientificname, ind[j])
-  
-  message(glue("Writing output for individual {ind[j]} to file..."))
-  
-  save(tmp_out,
-       file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
-  )
-  
-  # Make entry in log file
-  outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
-                     glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                     1, as.character(Sys.Date())), 
-                   nrow = 1)
-  write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
-              col.names = F, sep = ",")
-  
-} #j (end loop through individuals)
+    r <- tmp_out$`dBBMM Object`
+    # r
+    # plot(sqrt(r))
+    rb <- UDStack(r)
+    UDr <- getVolumeUD(rb)
+    # plot(UDr)
+    for(j in 1:nlayers(UDr)){
+      a <- ncell(UDr[[j]])/1000
+      trt <- names(UDr[[j]])
+      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], trt = trt, a),
+                    nrow = 1)
+      message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, period {trt}"))
+      write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
+                  col.names = F, sep = ",")
+      
+    }
+  }, error = function(e){cat(glue("ERROR: Size calulation failed for individual {ctf$ind_id[i]}, year {ctf$year[i]}", 
+                                  "\n"))})
+}
 
 #---- Finalize script ----#
 
