@@ -1,51 +1,129 @@
 library(brms)
 library(tidyverse)
+library(ape)
+
+vertnet_tax <- read_csv("raw_data/vertlife_taxonomies.csv")
 
 size <- read_csv("out/dbbmm_size.csv") %>% 
   mutate(trt_new = gsub('_.*','',trt),
          year_f = factor(year),
          trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld"))
 
-form1 <- bf(area ~ trt_new*year_f + (1|species),
-            ndt ~ trt_new*year_f + (1|species))
-mod1 <- brm(form1, data = size, 
-            family = shifted_lognormal(), cores = 2)
-mod1
-conditional_effects(mod1, points = T)
-pp_check(mod1, type = "stat", stat = "mean")
+# join species in dataset to the taxonomy
+foc_sp <- vertnet_tax %>% 
+  inner_join(size, by = c("scientificname" = "species"))
 
-mod2 <- brm(area ~ trt_new*year_f + (1+year_f|species), data = size, 
-            family = shifted_lognormal(), cores = 2)
+#print species by phylum
+foc_sp %>% 
+  filter(group == "Birds") %>% 
+  select(scientificname) %>% 
+  unique() %>%
+  print(n=25)
+
+foc_sp %>% 
+  filter(group == "Mammals") %>% 
+  select(scientificname) %>% 
+  unique() %>%
+  print(n=25)
+
+#read in trees
+birds <- read.nexus("raw_data/tree-pruner-05469463-d432-42ac-a726-58ff39a822b8/output.nex")
+birds <- birds$tree_4345
+mammals <- read.nexus("raw_data/tree-pruner-baceaa54-30cf-4bdd-a253-a20897aa6496/output.nex")
+mammals <- mammals$tree_2272
+combphylo <- bind.tree(birds, mammals)
+phylo_vcov <- ape::vcv.phylo(combphylo)
+
+# fix species names to match phylogeny
+size <- size %>% 
+  mutate(sp2 = gsub(" ", "_", species)) %>% 
+  # also remove any species not in tree (i.e. NAs)
+  filter(sp2 %in% rownames(phylo_vcov)) %>% 
+  mutate(ind_f = as.factor(ind_id))
+
+#- Load ain the species trait data
+traits <- read_csv("raw_data/anthropause_data_sheet.csv") %>% 
+  mutate(mig_mod = case_when(migratory == "Partial" ~ "migratory",
+                             .$migratory == "non-migratory" ~ "non-migratory",
+                             .$migratory == "Complete" ~ "migratory",
+                             .$migratory == "migratory" ~ "migratory",
+                             .$migratory == "Semi-nomadic" ~ "non-migratory",
+                             .$migratory == "Unknown" ~ NA_character_))
+
+size <- size %>% 
+  left_join(traits, by = c("species" = "Species"))
+
+size2 <- size %>% 
+  filter(mig_mod == "non-migratory") %>% 
+  filter(area < quantile(.$area, 0.95))
+# form1 <- bf(area ~ trt_new*year_f + phen + (1|gr(sp2, cov = phylo_vcov)),
+#             # ndt ~ trt_new*year_f + phen + (1|gr(sp2, cov = phylo_vcov)))
+#             ndt ~ 1)
+# 
+# #use this to get stan code (to extract param names for inits)
+# make_stancode(form1, 
+#               data = size, 
+#               data2 = list(phylo_vcov = phylo_vcov), 
+#               family = shifted_lognormal())
+# 
+# inits <- list(sigma = 1 
+#               # sd_1 = 1,
+#               # sd_2 = 1
+#               )
+# 
+# inits_list <- list(inits, inits, inits, inits)
+# 
+# mod1 <- brm(
+#   # area ~ trt_new*year_f + (1|gr(sp2, cov = phylo_vcov)), 
+#   form1,
+#   data = size, 
+#   # inits = inits_list,
+#   family = shifted_lognormal(),
+#   # family = gaussian(),
+#   data2 = list(phylo_vcov = phylo_vcov),
+#   cores = 2,
+#   control = list(adapt_delta = 0.95))
+# 
+# mod1
+# conditional_effects(mod1, points = T)
+# pp_check(mod1, type = "stat", stat = "mean")
+# pp_check(mod1)
+
+# let slpes vary as random effect of phylogeny
+form2 <- bf(area ~ trt_new*year_f + phen + (1+trt_new|gr(sp2, cov = phylo_vcov))
+            + (1|species))
+
+mod2 <- brm(form2, 
+            data2 = list(phylo_vcov = phylo_vcov),
+            data = size,
+            family = Gamma(link = "log"),
+            inits = 0,
+            cores = 2)
+
 mod2
 conditional_effects(mod2, points = T)
 pp_check(mod2, type = "stat", stat = "mean")
 pp_check(mod2) + xlim(c(0,100000))
 
-mod3 <- brm(area ~ trt_new*year_f + (1+year_f*trt_new|species), data = size,
-            family = lognormal(), cores = 2)
+# let slpes vary as random effect of phylogeny
+form3 <- bf(area ~ trt_new*year_f*mig_mod + phen + (1+trt_new|gr(sp2, cov = phylo_vcov))
+            + (1|ind_f))
+
+mod3 <- brm(form3, 
+            data2 = list(phylo_vcov = phylo_vcov),
+            data = size,
+            family = Gamma(link = "log"),
+            inits = 0,
+            cores = 2)
+
 mod3
 conditional_effects(mod3, points = T)
 pp_check(mod3, type = "stat", stat = "mean")
 pp_check(mod3) + xlim(c(0,100000))
 
 
-mod1
-conditional_effects(mod1, points = T)
-pp_check(mod1, type = "stat", stat = "mean")
 
-pp_check(mod1, type = "stat", stat = "mean") +
-  coord_cartesian(xlim = c(0.001, 300000)) +
-  scale_x_continuous("Area",
-                     trans = "log",
-                     breaks = c(0.001, 1, 100, 1000, 10000, 100000),
-                     labels = c(
-                       "0.001", "1", "100", "1000", "10000",
-                       "100000"
-                     )
-  ) +
-  ggtitle("Prior predictive distribution of means")
-
-n <- size %>% 
+###############################
+x <- size %>% 
   group_by(species) %>% 
-  summarize(n = n())
-
+  summarize(n = n_distinct(ind_f))

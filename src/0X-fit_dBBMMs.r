@@ -164,7 +164,8 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         
       } else {
         # if event data is large...
-        if(nrow(evt_mod) > 20000){
+        # TODO:  I think this upper size check is unecessary - maybe remove someday, but for now I just set the threshold very high
+        if(nrow(evt_mod) > 50000){
           
           # Just make anentry in the big mem log file - save dbbmm for later
           outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
@@ -187,20 +188,37 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
             evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, trt = evt_tmp$trt,
                            proj=CRS("+proj=longlat"))
             burstid <- factor(evt_tmp$trt[1:(n.locs(evt_mv)-1)])
-            
+            #id "intended fix rate"
+            fixmed <- median(timeLag(x=evt_mv, units="mins"))
             evt_burst <- burst(evt_mv, burstid)
             evt_mv_t <- spTransform(evt_burst, center = T)
             dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
                                                     # TODO check on error modeling
-                                                    location.error = 10,
+                                                    location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                                                      #TODO: fixed at 5m - maybe reset to the global mean horiz accuracy in the data?
+                                                      rep(5, n.locs(evt_mv_t))}else{
+                                                        evt_mod$horizontal_accuracy},
+                                                    
                                                     #TODO: think about these...
-                                                    margin = 3, 
-                                                    window.size = 11)
-            dbbm <- brownian.bridge.dyn(dbb_var, raster = 1000, 
-                                        location.error = rep(10, n.locs(evt_mv_t)), 
+                                                    margin = 11, 
+                                                    window.size = 31)
+            # remove any segments with gaps > 3x the intended fix rate
+            dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
+            
+            dbbm <- brownian.bridge.dyn(dbb_var, 
+                                        raster = 100,
+                                        # If we have horiz accuracy use that, otherwise use fixed accuracy
+                                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                                                                #TODO: fixed at 5m - maybe reset to the global mean horiz accuracy in the data?
+                                                                rep(5, n.locs(evt_mv_t))}else{
+                                                                evt_mod$horizontal_accuracy} ,
+                                        # location.error = rep(10, n.locs(evt_mv_t)),
+                                        time.step = (fixmed/15),
+                                        # burstType = levels(burstid),
                                         #TODO: below is somewhat arbitrary
-                                        ext = 2.5,
-                                        margin = 3, window.size = 11)
+                                        # dimSize = 1000,
+                                        ext = 10,
+                                        margin = 11, window.size = 31)
           }, error = function(e){cat(glue("ERROR: unspecified error in fitting dBBMM for ind {ind[j]}, yr {yearvec[i]}", 
                                           "\n"))})
           tryCatch({

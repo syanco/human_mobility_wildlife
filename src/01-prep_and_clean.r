@@ -36,7 +36,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/project/covid-19_movement'
+  .wd <- '~/projects/covid-19_movement'
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
 
 } else {
@@ -88,6 +88,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 evt <- tbl(db,'event')
 # dbBegin(db)
+
 #---- Perform analysis ----#
 
 #-- Make a filtered table by study period
@@ -201,8 +202,8 @@ cuts <- evt_sf %>%
 out <- evt_sf %>% 
   # just join the cutpoints back to the dataset
   left_join(cuts) %>% 
-  # conservative outlier thresh, must be past 95% quant for BOTH sl and TA
-  filter(sl < qsl | ta < qta) %>% 
+  # conservative outlier thresh, must be past 95% quant for either sl and TA
+  filter(sl < qsl & ta < qta) %>% 
   ungroup()
 
 dbWriteTable(conn = db, name = "event_clean", value = out, append = FALSE, overwrite = T)

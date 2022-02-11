@@ -94,6 +94,10 @@ ctf <- read_csv(.ctf)
 ctf <- ctf[!duplicated(ctf),] %>% 
   filter(produced == 1)
 
+#- get the phylo control covar
+#TODO
+sp2019 <- raster("raw_data/geoserver_1643663843611/data.tif")
+sp2020 <- raster("raw_data/geoserver_1643663856740/data.tif")
 
 #---- Perform analysis ----#
 message("Gathering movement data...")
@@ -124,9 +128,21 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
     UDr <- getVolumeUD(rb)
     # plot(UDr)
     for(j in 1:nlayers(UDr)){
+      
+      # Get Phenology data
+      if(ctf$year[i] == "2020"){ #grab the correct phenology map
+        # reproject the UD to match the spring data
+        tmpr <- projectRaster(from = rb[[j]], to = sp2020)
+        phen <- sum(values(tmpr*sp2020), na.rm = T)/ncell(tmpr[tmpr > 0])
+      } else {
+        tmpr <- projectRaster(from = rb[[j]], to = sp2019)
+        phen <- sum(values(tmpr*sp2019), na.rm = T)/ncell(tmpr[tmpr > 0])
+      }
+      
+      # Get UD area
       a <- ncell(UDr[[j]])/1000
       trt <- names(UDr[[j]])
-      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], trt = trt, a),
+      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], trt = trt, a, phen),
                     nrow = 1)
       message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, period {trt}"))
       write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
