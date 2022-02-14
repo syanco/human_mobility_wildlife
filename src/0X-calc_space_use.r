@@ -113,6 +113,7 @@ ind <- indtb %>%
   pull(individual_id)
 
 #+++++++++++++++++++++#
+message(glue("Starting {.nc} cores"))
 registerDoMC(.nc)
 
 # Toggle `%do%` to `%dopar%` for HPC, %do% for local

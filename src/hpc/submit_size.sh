@@ -15,6 +15,10 @@ conda activate covid
 # Declare WD
 wd=~/project/covid-19_movement
 
+#copy db to tmp
+cp $wd/processed_data/mosey_mod.db /tmp/
 
-# Execute cleaning script (non parallel)
-Rscript $wd/analysis/src/0X-calc_space_use.r ./out ./processed_data/mosey_mod.db ./out/dbbmm_log.csv 24
+
+# Execute calc size script/
+Rscript $wd/analysis/src/0X-calc_space_use.r /tmp/mosey_mod.db ./out/dbbmm_log.csv 24
+
