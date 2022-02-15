@@ -188,7 +188,8 @@ evt_sf <- evt1 %>%
          lag_lat = dplyr::lag(lat, 1),
          sl = distGeo(cbind(lon,lat), cbind(lag_lon, lag_lat)),
          bearing = bearing(cbind(lon,lat), cbind(lag_lon, lag_lat)),
-         ta = 180-abs(180 - abs(bearing - dplyr::lag(bearing, 1)) %% 360))
+         ta = 180-abs(180 - abs(bearing - dplyr::lag(bearing, 1)) %% 360),
+         wk = lubridate::week(timestamp))
 
 cuts <- evt_sf %>% 
   as.data.frame() %>% 

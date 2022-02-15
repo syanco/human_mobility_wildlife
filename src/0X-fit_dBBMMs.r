@@ -182,11 +182,11 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
           tryCatch({
             # make minimal df for `move`    
             evt_tmp <- evt_mod %>% 
-              select(lon, lat, timestamp, trt)
+              select(lon, lat, timestamp, wk)
             
             evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, trt = evt_tmp$trt,
                            proj=CRS("+proj=longlat"))
-            burstid <- factor(evt_tmp$trt[1:(n.locs(evt_mv)-1)])
+            burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
             #id "intended fix rate"
             fixmed <- median(timeLag(x=evt_mv, units="mins"))
             evt_burst <- burst(evt_mv, burstid)

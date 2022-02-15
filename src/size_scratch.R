@@ -103,10 +103,10 @@ mod2 <- brm(form2,
 mod2
 conditional_effects(mod2, points = T)
 pp_check(mod2, type = "stat", stat = "mean")
-pp_check(mod2) + xlim(c(0,100000))
+pp_check(mod2)
 
 # let slpes vary as random effect of phylogeny
-form3 <- bf(area ~ trt_new*year_f*mig_mod + phen + (1+trt_new|gr(sp2, cov = phylo_vcov))
+form3 <- bf(area ~ trt_new*year_f*mig_mod + phen + (1+trt_new*year_f*mig_mod|gr(sp2, cov = phylo_vcov))
             + (1|ind_f))
 
 mod3 <- brm(form3, 
@@ -119,7 +119,7 @@ mod3 <- brm(form3,
 mod3
 conditional_effects(mod3, points = T)
 pp_check(mod3, type = "stat", stat = "mean")
-pp_check(mod3) + xlim(c(0,100000))
+pp_check(mod3)
 
 
 
