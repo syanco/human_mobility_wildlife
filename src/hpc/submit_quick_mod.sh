@@ -1,24 +1,23 @@
 #!/bin/bash
 
-#SBATCH -t 1:00:00
+#SBATCH -t 1-
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition pi_jetz
-#SBATCH -c 24
+#SBATCH -c 4
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J calc_size_2022-02-11
+#SBATCH -J quick_mod_2022-02-16
 
 # Load conda env
 module load miniconda
-conda activate covid
+conda activate brms
 
 # Declare WD
 wd=~/project/covid-19_movement
 
-#copy db to tmp
-cp $wd/processed_data/mosey_mod.db /tmp/
-
+#ensure we're in wd
+cd $wd
 
 # Execute calc size script/
-Rscript $wd/analysis/src/0X-calc_space_use.r ./out /tmp/mosey_mod.db ./out/dbbmm_log.csv 24
+Rscript analysis/src/quick_model.r
 
