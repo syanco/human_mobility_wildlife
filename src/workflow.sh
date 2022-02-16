@@ -96,4 +96,4 @@ echo "species, ind_id, study_id, year, wk, area, phen" > $out/dbbmm_size.csv
 
 # CHOOSE ONE:
   # Calc sizes on HPC 
-  sbatch ~/project/covid-19_movement/analysis/sec/hpc/submit_size.sh
+  sbatch ~/project/covid-19_movement/analysis/src/hpc/submit_size.sh
