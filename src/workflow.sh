@@ -76,7 +76,7 @@ conda activate spatial
 # conda activate covid
 
 # Make dir to hold fitted dBBMMs (only run once)
-mkdir $wd/out/dBBMMs
+mkdir $wd/out/dbbmms
 
 # Make log file to track successful outputs (only run once)
 echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_log.csv
@@ -92,7 +92,7 @@ echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" >
   sbatch ~/project/covid-19_movement/analysis/src/hpc/submit_dBBMM.sh
   
 # Calc dbbmm areas
-echo "species, ind_id, study_id, year, trt, area, phen" > $out/dbbmm_size.csv
+echo "species, ind_id, study_id, year, wk, area, phen" > $out/dbbmm_size.csv
 
 # CHOOSE ONE:
   # Calc sizes on HPC 

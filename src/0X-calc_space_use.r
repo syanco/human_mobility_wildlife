@@ -138,18 +138,19 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       } else {
         tmpr <- projectRaster(from = rb[[j]], to = sp2019)
         phen <- sum(values(tmpr*sp2019), na.rm = T)/ncell(tmpr[tmpr > 0])
-      }
+      } #else
       
       # Get UD area
-      a <- ncell(UDr[[j]])/1000
-      trt <- names(UDr[[j]])
-      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], trt = trt, a, phen),
+      ud95 <- UDr[[j]]<=.95
+      a <- sum(values(ud95))*res(ud95)[1]*res(ud95)[1]
+      wk <- names(UDr[[j]])
+      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], wk, a, phen),
                     nrow = 1)
       message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, period {trt}"))
       write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
                   col.names = F, sep = ",")
       
-    }
+    } #j
   }, error = function(e){cat(glue("ERROR: Size calulation failed for individual {ctf$ind_id[i]}, year {ctf$year[i]}", 
                                   "\n"))})
 }
