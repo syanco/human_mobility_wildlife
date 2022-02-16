@@ -41,7 +41,8 @@ size <- size %>%
   mutate(sp2 = gsub(" ", "_", species)) %>% 
   # also remove any species not in tree (i.e. NAs)
   filter(sp2 %in% rownames(phylo_vcov)) %>% 
-  mutate(ind_f = as.factor(ind_id))
+  mutate(ind_f = as.factor(ind_id),
+         wk_n = as.numeric(substring(wk,2)))
 
 #- Load ain the species trait data
 traits <- read_csv("raw_data/anthropause_data_sheet.csv") %>% 
@@ -56,8 +57,7 @@ size <- size %>%
   left_join(traits, by = c("species" = "Species"))
 
 size2 <- size %>% 
-  filter(mig_mod == "non-migratory") %>% 
-  filter(area < quantile(.$area, 0.95))
+  filter(mig_mod == "migratory") 
 # form1 <- bf(area ~ trt_new*year_f + phen + (1|gr(sp2, cov = phylo_vcov)),
 #             # ndt ~ trt_new*year_f + phen + (1|gr(sp2, cov = phylo_vcov)))
 #             ndt ~ 1)
@@ -91,16 +91,14 @@ size2 <- size %>%
 # pp_check(mod1, type = "stat", stat = "mean")
 # pp_check(mod1)
 
-# let slpes vary as random effect of phylogeny
-form2 <- bf(area ~ trt_new*year_f + phen + (1+trt_new|gr(sp2, cov = phylo_vcov))
-            + (1|species))
+form2 <- bf(area ~ year_f + s(wk_n, by = year_f) + (1|gr(sp2, cov = phylo_vcov)))
 
 mod2 <- brm(form2, 
             data2 = list(phylo_vcov = phylo_vcov),
             data = size,
             family = Gamma(link = "log"),
             inits = 0,
-            cores = 2)
+            cores = 4)
 
 mod2
 conditional_effects(mod2, points = T)
