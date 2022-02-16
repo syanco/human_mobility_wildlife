@@ -5,9 +5,11 @@ library(ape)
 vertnet_tax <- read_csv("raw_data/vertlife_taxonomies.csv")
 
 size <- read_csv("out/dbbmm_size.csv") %>% 
-  mutate(trt_new = gsub('_.*','',trt),
+  mutate(
+    # trt_new = gsub('_.*','',trt),
          year_f = factor(year),
-         trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld"))
+         # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
+         )
 
 # join species in dataset to the taxonomy
 foc_sp <- vertnet_tax %>% 

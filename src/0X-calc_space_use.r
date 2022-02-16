@@ -146,7 +146,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       wk <- names(UDr[[j]])
       out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], wk, a, phen),
                     nrow = 1)
-      message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, period {trt}"))
+      message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, week {wk}"))
       write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
                   col.names = F, sep = ",")
       
