@@ -47,10 +47,10 @@ size <- size %>%
 form <- bf(area ~ year_f + s(wk_n, by = year_f) + (1|ind_f) + (1|gr(sp2, cov = phylo_vcov)))
 
 mod <- brm(form, 
-            data2 = list(phylo_vcov = phylo_vcov),
-            data = size,
-            family = Gamma(link = "log"),
-            inits = 0,
-            cores = 4)
+           data2 = list(phylo_vcov = phylo_vcov),
+           data = size,
+           family = Gamma(link = "log"),
+           inits = 0,
+           cores = 4)
 
 save("out/quick_mod.rdata")

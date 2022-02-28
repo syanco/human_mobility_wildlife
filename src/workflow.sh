@@ -92,7 +92,7 @@ echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" >
   sbatch ~/project/covid-19_movement/analysis/src/hpc/submit_dBBMM.sh
   
 # Calc dbbmm areas
-echo "species, ind_id, study_id, year, wk, area, phen" > $out/dbbmm_size.csv
+echo "species, ind_id, study_id, year, wk, area, sg, pop, ndvi, lst" > $out/dbbmm_size.csv
 
 # CHOOSE ONE:
   # Calc sizes on HPC 

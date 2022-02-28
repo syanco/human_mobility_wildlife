@@ -45,7 +45,7 @@ if(interactive()) {
 } else {
   library(docopt)
   library(rprojroot)
-
+  
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
@@ -78,7 +78,7 @@ suppressWarnings(
   }))
 
 #Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
+list.files(file.path(.wd,'analysis/src/funs/auto'), full.names=TRUE) %>%
   walk(source)
 
 
@@ -89,28 +89,46 @@ invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
 
+evt_sg <- tbl(db, "event_sg") %>% 
+  collect()
+
+evt_cen <- tbl(db, "event_census") %>% 
+  collect()
+
+ind <- tbl(db,'individual') %>% 
+  collect() %>% 
+  pull(individual_id)
+
+dbDisconnect(db)
+
+invisible(assert_that(file.exists(.dbPF)))
+db <- dbConnect(RSQLite::SQLite(), "processed_data/mosey_mod_anno.db", `synchronous` = NULL)
+invisible(assert_that(length(dbListTables(db))>0))
+
+evt_anno <- tbl(db, "event_clean") %>% 
+  collect()
+
+dbDisconnect(db)
+
+# yearvec <- c("2019", "2020")
+# trtvec <- c("pre-ld", "ld")
+
+
+
 ctf <- read_csv(.ctf)
 #TODO: rm below after a real run with log
 ctf <- ctf[!duplicated(ctf),] %>% 
   filter(produced == 1)
 
-#- get the phylo control covar
-#TODO
-sp2019 <- raster("raw_data/geoserver_1643663843611/data.tif")
-sp2020 <- raster("raw_data/geoserver_1643663856740/data.tif")
+# #- get the phylo control covar
+# #TODO
+# sp2019 <- raster("raw_data/geoserver_1643663843611/data.tif")
+# sp2020 <- raster("raw_data/geoserver_1643663856740/data.tif")
 
 #---- Perform analysis ----#
 message("Gathering movement data...")
 
-evt0 <- tbl(db, "event_clean")
-indtb <- tbl(db,'individual')
 
-yearvec <- c("2019", "2020")
-trtvec <- c("pre-ld", "ld")
-
-ind <- indtb %>% 
-  collect() %>% 
-  pull(individual_id)
 
 #+++++++++++++++++++++#
 message(glue("Starting {.nc} cores"))
@@ -130,21 +148,54 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
     # plot(UDr)
     for(j in 1:nlayers(UDr)){
       
-      # Get Phenology data
-      if(ctf$year[i] == "2020"){ #grab the correct phenology map
-        # reproject the UD to match the spring data
-        tmpr <- projectRaster(from = rb[[j]], to = sp2020)
-        phen <- sum(values(tmpr*sp2020), na.rm = T)/ncell(tmpr[tmpr > 0])
-      } else {
-        tmpr <- projectRaster(from = rb[[j]], to = sp2019)
-        phen <- sum(values(tmpr*sp2019), na.rm = T)/ncell(tmpr[tmpr > 0])
-      } #else
+      # # Get Phenology data
+      # if(ctf$year[i] == "2020"){ #grab the correct phenology map
+      #   # reproject the UD to match the spring data
+      #   tmpr <- projectRaster(from = rb[[j]], to = sp2020)
+      #   phen <- sum(values(tmpr*sp2020), na.rm = T)/ncell(tmpr[tmpr > 0])
+      # } else {
+      #   tmpr <- projectRaster(from = rb[[j]], to = sp2019)
+      #   phen <- sum(values(tmpr*sp2019), na.rm = T)/ncell(tmpr[tmpr > 0])
+      # } #else
       
       # Get UD area
       ud95 <- UDr[[j]]<=.95
       a <- sum(values(ud95))*res(ud95)[1]*res(ud95)[1]
-      wk <- names(UDr[[j]])
-      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], wk, a, phen),
+      
+      # get week number
+      week <- as.numeric(substring(names(UDr[[j]]),2))
+      
+      # Get event IDs underlying dBBMM (used as key to filter annotations below)
+      evtids <- tmp_out$events %>%
+        filter(wk == week) %>% 
+        pull(event_id)
+      
+      # Get safegraph data
+      sg <- evt_sg %>% 
+        filter(event_id %in% evtids) %>% 
+        summarize(sg = mean(daily_count, na.rm = T))
+      
+      # Get pop density
+      pop <- evt_cen %>%
+      filter(event_id %in% evtids) %>% 
+        summarize(sg = mean(total_population_2019, na.rm = T))
+      
+      # get Human encroachment
+      # TODO: add code
+
+      # Get NDVI
+      ndvi <- evt_anno %>% 
+        filter(event_id %in% evtids) %>% 
+        summarize(sg = mean(ndvi, na.rm = T))
+      
+      # Get lst
+      lst <- evt_anno %>% 
+        filter(event_id %in% evtids) %>% 
+        summarize(sg = mean(lst, na.rm = T))
+      
+      
+      # Write Out Results
+      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], week, a, sg, pop, ndvi, lst),
                     nrow = 1)
       message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, week {wk}"))
       write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
@@ -157,7 +208,5 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
 
 #---- Finalize script ----#
 
-message("Disconnecting from databse...")
-dbDisconnect(db)
 
 message(glue('Script complete in {diffmin(t0)} minutes'))
