@@ -47,8 +47,8 @@ cd $wd
 cp $wd/raw_data/mosey.db $wd/processed_data/mosey_mod.db
 
 #activate spatial env
-module load miniconda
-conda activate spatial
+# module load miniconda
+# conda activate spatial
 
 # Process and clean data:
 #   * add study period annotation
