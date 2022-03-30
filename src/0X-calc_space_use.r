@@ -33,14 +33,14 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/projects/covid-19_movement'
+  .wd <- '~/project/covid-19_movement'
   rd <- here::here
   
   .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod_20220303.db')
   .ctf <- file.path(.wd, "out/dbbmm_log.csv")
   
-  .nc <- 2
+  .nc <- 4
   
 } else {
   library(docopt)
@@ -102,7 +102,7 @@ ind <- tbl(db,'individual') %>%
 dbDisconnect(db)
 
 invisible(assert_that(file.exists(.dbPF)))
-db <- dbConnect(RSQLite::SQLite(), "processed_data/mosey_mod_anno.db", `synchronous` = NULL)
+db <- dbConnect(RSQLite::SQLite(), file.path(.wd,'processed_data/mosey_mod_anno.db'), `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
 
 evt_anno <- tbl(db, "event_clean") %>% 
@@ -197,7 +197,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       # Write Out Results
       out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], week, a, sg, pop, ndvi, lst),
                     nrow = 1)
-      message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, week {wk}"))
+      message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, week {week}"))
       write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
                   col.names = F, sep = ",")
       

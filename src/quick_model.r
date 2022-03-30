@@ -44,13 +44,15 @@ size <- size %>%
   left_join(traits, by = c("species" = "Species"))
 
 
-form <- bf(area ~ year_f + s(wk_n, by = year_f) + (1|ind_f) + (1|gr(sp2, cov = phylo_vcov)))
+# form <- bf(area ~ year_f + s(wk_n, by = year_f) + (1|ind_f) + (1|gr(sp2, cov = phylo_vcov)))
+form <- bf(area ~ pop*sg*mig_mod + ndvi + year_f + (1|sp2) + (1|ind_f))
 
 mod <- brm(form, 
-           data2 = list(phylo_vcov = phylo_vcov),
+           # data2 = list(phylo_vcov = phylo_vcov),
            data = size,
            family = Gamma(link = "log"),
            inits = 0,
-           cores = 4)
+           cores = 4,
+           iter = 20000)
 
 save("out/quick_mod.rdata")

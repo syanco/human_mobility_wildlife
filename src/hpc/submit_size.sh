@@ -4,7 +4,7 @@
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition pi_jetz
-#SBATCH -c 24
+#SBATCH -c 10
 #SBATCH --mem-per-cpu 10G
 #SBATCH -J calc_size_2022-02-11
 
