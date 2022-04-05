@@ -1,10 +1,11 @@
 library(brms)
 library(tidyverse)
 library(ape)
+library(lubridate)
 
 vertnet_tax <- read_csv("raw_data/vertlife_taxonomies.csv")
 
-size <- read_csv("out/dbbmm_size.csv") %>% 
+size <- read_csv("out/dbbmm_size_old.csv") %>% 
   mutate(
     # trt_new = gsub('_.*','',trt),
     year_f = factor(year),
@@ -27,9 +28,13 @@ phylo_vcov <- ape::vcv.phylo(combphylo)
 size <- size %>% 
   mutate(sp2 = gsub(" ", "_", species)) %>% 
   # also remove any species not in tree (i.e. NAs)
-  filter(sp2 %in% rownames(phylo_vcov)) %>% 
+  # filter(sp2 %in% rownames(phylo_vcov)) %>% 
   mutate(ind_f = as.factor(ind_id),
-         wk_n = as.numeric(substring(wk,2)))
+         wk_n = as.numeric(substring(wk,2)),
+         ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u" )) %>%
+  distinct()
+
+
 
 #- Load ain the species trait data
 traits <- read_csv("raw_data/anthropause_data_sheet.csv") %>% 
@@ -43,16 +48,20 @@ traits <- read_csv("raw_data/anthropause_data_sheet.csv") %>%
 size <- size %>% 
   left_join(traits, by = c("species" = "Species"))
 
+size_res <- size %>%
+  filter(mig_mod == "non-migratory")%>%
+  filter(area < 10000000)
 
 # form <- bf(area ~ year_f + s(wk_n, by = year_f) + (1|ind_f) + (1|gr(sp2, cov = phylo_vcov)))
-form <- bf(area ~ pop*sg*mig_mod + ndvi + year_f + (1|sp2) + (1|ind_f))
+# form <- bf(area ~ pop*sg + ndvi + year_f + (1|sp2) + (1|ind_f) + ar(time = ts, p = 1, gr = ind_f:year_f, cov = F))
+form <- bf(area ~ pop*sg + (1|sp2) + (1|ind_f) + ar(time = ts, gr = ind_f, cov = F))
 
 mod <- brm(form, 
            # data2 = list(phylo_vcov = phylo_vcov),
-           data = size,
+           data = size_res,
            family = Gamma(link = "log"),
            inits = 0,
            cores = 4,
-           iter = 20000)
+           iter = 10000)
 
 save("out/quick_mod.rdata")
