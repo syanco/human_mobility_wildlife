@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#SBATCH -t 6:00:00
+#SBATCH -t 1-
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition pi_jetz
 #SBATCH -c 10
-#SBATCH --mem-per-cpu 10G
+#SBATCH --mem-per-cpu 20G
 #SBATCH -J calc_size_2022-02-11
 
 # Load conda env

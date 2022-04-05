@@ -75,6 +75,7 @@ suppressWarnings(
     library(move)
     library(doMC)
     library(foreach)
+    library(sf)
   }))
 
 #Source all files in the auto load funs directory
@@ -177,12 +178,12 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       
       # Get pop density
       pop <- evt_cen %>%
-      filter(event_id %in% evtids) %>% 
-        summarize(sg = mean(total_population_2019, na.rm = T))
+        filter(event_id %in% evtids) %>% 
+        summarize(pop = mean(total_population_2019, na.rm = T))
       
       # get Human encroachment
       # TODO: add code
-
+      
       # Get NDVI
       ndvi <- evt_anno %>% 
         filter(event_id %in% evtids) %>% 
@@ -193,9 +194,27 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
         filter(event_id %in% evtids) %>% 
         summarize(sg = mean(lst, na.rm = T))
       
+
+      #unpack underlying data
+      evt_tmp <- tmp_out$events 
+      evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, trt = evt_tmp$trt,
+                     proj=CRS("+proj=longlat"))
+      evt_sf <- st_as_sf(evt_tmp, coords = c("lon", "lat"), crs = 4326)
+      
+      # get n pts
+      n <- nrow(evt_tmp)
+      
+      # get area of bounding box of uinderlying points      
+      a_bb <- st_area(st_make_grid(evt_sf, n=1))
+      
+      # get median fix rate
+      fixmed <- median(timeLag(x=evt_mv, units="mins"))
+      
+      # get meann horiz accuracy
+      m_error <- mean(na.omit(evt_tmp$horizontal_accuracy))
       
       # Write Out Results
-      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], week, a, sg, pop, ndvi, lst),
+      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], week, a, sg, pop, ndvi, lst, n, a_bb, fixmed, m_error),
                     nrow = 1)
       message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, week {week}"))
       write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
