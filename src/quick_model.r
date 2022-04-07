@@ -35,7 +35,6 @@ size <- size %>%
   distinct()
 
 
-
 #- Load ain the species trait data
 traits <- read_csv("raw_data/anthropause_data_sheet.csv") %>% 
   mutate(mig_mod = case_when(migratory == "Partial" ~ "migratory",
@@ -54,7 +53,8 @@ size_res <- size %>%
 
 # form <- bf(area ~ year_f + s(wk_n, by = year_f) + (1|ind_f) + (1|gr(sp2, cov = phylo_vcov)))
 # form <- bf(area ~ pop*sg + ndvi + year_f + (1|sp2) + (1|ind_f) + ar(time = ts, p = 1, gr = ind_f:year_f, cov = F))
-form <- bf(area ~ pop*sg + (1|sp2) + (1|ind_f) + ar(time = ts, gr = ind_f, cov = F))
+form <- bf(area ~ pop*mig_mod + sg + (1|sp2) + (1|ind_f)) 
+           # + ar(time = ts, gr = ind_f, cov = F))
 
 mod <- brm(form, 
            # data2 = list(phylo_vcov = phylo_vcov),
@@ -62,6 +62,6 @@ mod <- brm(form,
            family = Gamma(link = "log"),
            inits = 0,
            cores = 4,
-           iter = 10000)
+           iter = 1000)
 
 save("out/quick_mod.rdata")
