@@ -181,6 +181,12 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
         filter(event_id %in% evtids) %>% 
         summarize(sg = mean(safegraph_daily_count, na.rm = T))
       
+      # Get area of CBG to normalize safegraph data
+      cbg_area <- evt_sg %>% 
+        filter(event_id %in% evtids) %>% 
+        summarize(sg = mean(cbg_area_m2, na.rm = T))
+      
+      
       # Get GHM data
       ghm <- evt_ghm %>% 
         filter(event_id %in% evtids) %>% 
@@ -224,7 +230,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       m_error <- mean(na.omit(evt_tmp$horizontal_accuracy))
       
       # Write Out Results
-      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], week, a, sg, pop, ndvi, lst, n, a_bb, fixmed, m_error),
+      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], week, a, sg, cbg_area, pop, ndvi, lst, n, a_bb, fixmed, m_error),
                     nrow = 1)
       message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, week {week}"))
       write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
