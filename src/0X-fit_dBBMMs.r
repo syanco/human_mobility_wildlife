@@ -33,7 +33,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/projects/covid-19_movement'
+  .wd <- '~/project/covid-19_movement'
   rd <- here::here
   
   .outPF <- file.path(.wd,'out')
@@ -202,7 +202,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                                                     margin = 11, 
                                                     window.size = 31)
             # remove any segments with gaps > 3x the intended fix rate
-            dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*1)] <- FALSE
+            dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
             
             dbbm <- brownian.bridge.dyn(dbb_var, 
                                         #TODO: need to come up with a way to select this more dynamically based on the scale of the data

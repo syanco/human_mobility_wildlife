@@ -162,6 +162,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       # Get UD area
       ud95 <- UDr[[j]]<=.95
       a <- sum(values(ud95))*res(ud95)[1]*res(ud95)[1]
+      a
       
       # get week number
       week <- as.numeric(substring(names(UDr[[j]]),2))
