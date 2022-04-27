@@ -33,7 +33,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/project/covid-19_movement'
+  .wd <- '~/projects/covid-19_movement'
   rd <- here::here
   
   .outPF <- file.path(.wd,'out')
@@ -90,8 +90,8 @@ invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
 
-evt_sg <- tbl(db, "event_sg") %>% 
-  collect()
+# evt_sg <- tbl(db, "event_sg") %>% 
+#   collect()
 
 evt_cen <- tbl(db, "event_census") %>% 
   collect()
@@ -114,7 +114,11 @@ dbDisconnect(db)
 # yearvec <- c("2019", "2020")
 # trtvec <- c("pre-ld", "ld")
 
+# SG from csv
+evt_sg <- read.csv("out/event-annotation/event_sg.csv")
 
+# GHM from csv
+evt_ghm <- read.csv("out/event-annotation/event_ghm.csv")
 
 ctf <- read_csv(.ctf)
 #TODO: rm below after a real run with log
@@ -162,7 +166,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       # Get UD area
       ud95 <- UDr[[j]]<=.95
       a <- sum(values(ud95))*res(ud95)[1]*res(ud95)[1]
-      a
+      # a
       
       # get week number
       week <- as.numeric(substring(names(UDr[[j]]),2))
@@ -175,7 +179,12 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       # Get safegraph data
       sg <- evt_sg %>% 
         filter(event_id %in% evtids) %>% 
-        summarize(sg = mean(daily_count, na.rm = T))
+        summarize(sg = mean(safegraph_daily_count, na.rm = T))
+      
+      # Get GHM data
+      ghm <- evt_ghm %>% 
+        filter(event_id %in% evtids) %>% 
+        summarize(ghm = mean(ghm, na.rm = T))
       
       # Get pop density
       pop <- evt_cen %>%
@@ -188,12 +197,12 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       # Get NDVI
       ndvi <- evt_anno %>% 
         filter(event_id %in% evtids) %>% 
-        summarize(sg = mean(ndvi, na.rm = T))
+        summarize(ndvi = mean(ndvi, na.rm = T))
       
       # Get lst
       lst <- evt_anno %>% 
         filter(event_id %in% evtids) %>% 
-        summarize(sg = mean(lst, na.rm = T))
+        summarize(lst = mean(lst, na.rm = T))
       
 
       #unpack underlying data
