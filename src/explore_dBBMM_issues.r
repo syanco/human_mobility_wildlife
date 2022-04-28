@@ -24,7 +24,7 @@ ggplot(size) +
 
 
 targ_ind <- size_sum %>%
-  filter(sp == "Rostrhamus_sociabilis") %>%
+  filter(sp == "Scolopax_minor" | sp == "Rostrhamus_sociabilis") %>%
   # filter(sp == "Scolopax_minor") %>%
   pull(ind_f)
 
@@ -36,7 +36,13 @@ x <- evt %>%
   filter(individual_id %in% targ_ind) %>%
   collect()
 
+one <- x %>%
+  filter(individual_id == 1891588271,
+         timestamp > "2019-01-01")
 
+one_clean <- evt_c %>%
+  filter(individual_id == 1891588271) %>%
+  collect()
 ####################################
 
 evt_sf <- evt_tmp %>%

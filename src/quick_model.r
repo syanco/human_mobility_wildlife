@@ -5,7 +5,7 @@ library(lubridate)
 
 vertnet_tax <- read_csv("raw_data/vertlife_taxonomies.csv")
 
-size <- read_csv("out/dbbmm_size_old.csv") %>% 
+size <- read_csv("out/dbbmm_size.csv") %>% 
   mutate(
     # trt_new = gsub('_.*','',trt),
     year_f = factor(year),
@@ -48,18 +48,21 @@ size <- size %>%
   left_join(traits, by = c("species" = "Species"))
 
 size_res <- size %>%
-  filter(mig_mod == "non-migratory")%>%
-  filter(area < 10000000)
+  # filter(mig_mod == "non-migratory") %>%
+  filter(study_id != 351564596) %>%
+  filter(study_id != 1891587670) %>%
+  # mutate(log_area = log(area))
+  mutate(sg_norm = area/cbg_area)
 
 # form <- bf(area ~ year_f + s(wk_n, by = year_f) + (1|ind_f) + (1|gr(sp2, cov = phylo_vcov)))
 # form <- bf(area ~ pop*sg + ndvi + year_f + (1|sp2) + (1|ind_f) + ar(time = ts, p = 1, gr = ind_f:year_f, cov = F))
-form <- bf(area ~ pop*mig_mod + sg + (1|sp2) + (1|ind_f)) 
+form <- bf(log_area ~ sg*sp2 + ndvi + lst + (1|ind_f)) 
            # + ar(time = ts, gr = ind_f, cov = F))
 
 mod <- brm(form, 
            # data2 = list(phylo_vcov = phylo_vcov),
            data = size_res,
-           family = Gamma(link = "log"),
+           # family = Gamma(link = "log"),
            inits = 0,
            cores = 4,
            iter = 1000)
