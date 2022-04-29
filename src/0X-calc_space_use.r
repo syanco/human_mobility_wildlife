@@ -5,14 +5,13 @@
 # This script uses previously calculated dBBMMs to assess animal space use 
 # during COVID-19 lockdowns
 
-# TODO:  add migratory status filtering? Or maybe that's after...
-# TODO: Update docopts
-# TODO: Clean the script - there are unused object created, poorly commented, etc
+# TODO: Clean the script - unused object created, poorly commented, etc
 # 
 # ==== Setup ====
 
 '
-Calculate space use before and during COVID-19 lockdowns using previously estimated dBBMMs
+Calculate space use before and during COVID-19 lockdowns using previously 
+estimated dBBMMs
 
 Usage:
 0X-calc_space_use.r <out> <db> <ctf> <nc>
@@ -33,7 +32,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/projects/covid-19_movement'
+  .wd <- '~/project/covid-19_movement'
   rd <- here::here
   
   .outPF <- file.path(.wd,'out')
@@ -103,7 +102,9 @@ ind <- tbl(db,'individual') %>%
 dbDisconnect(db)
 
 invisible(assert_that(file.exists(.dbPF)))
-db <- dbConnect(RSQLite::SQLite(), file.path(.wd,'processed_data/mosey_mod_anno.db'), `synchronous` = NULL)
+db <- dbConnect(RSQLite::SQLite(), 
+                file.path(.wd,'processed_data/mosey_mod_anno.db'), 
+                `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
 
 evt_anno <- tbl(db, "event_clean") %>% 
@@ -115,10 +116,12 @@ dbDisconnect(db)
 # trtvec <- c("pre-ld", "ld")
 
 # SG from csv
-evt_sg <- read.csv("out/event-annotation/event_sg.csv")
+evt_sg <- read.csv("out/event-annotation/event_sg.csv", 
+                   colClasses = c(event_id = "integer64"))
 
 # GHM from csv
-evt_ghm <- read.csv("out/event-annotation/event_ghm.csv")
+evt_ghm <- read.csv("out/event-annotation/event_ghm.csv", 
+                    colClasses = c(event_id = "integer64"))
 
 ctf <- read_csv(.ctf)
 #TODO: rm below after a real run with log
@@ -186,7 +189,6 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
         filter(event_id %in% evtids) %>% 
         summarize(sg = mean(cbg_area_m2, na.rm = T))
       
-      
       # Get GHM data
       ghm <- evt_ghm %>% 
         filter(event_id %in% evtids) %>% 
@@ -196,9 +198,6 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       pop <- evt_cen %>%
         filter(event_id %in% evtids) %>% 
         summarize(pop = mean(total_population_2019, na.rm = T))
-      
-      # get Human encroachment
-      # TODO: add code
       
       # Get NDVI
       ndvi <- evt_anno %>% 
@@ -213,7 +212,8 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
 
       #unpack underlying data
       evt_tmp <- tmp_out$events 
-      evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, trt = evt_tmp$trt,
+      evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, 
+                     trt = evt_tmp$trt,
                      proj=CRS("+proj=longlat"))
       evt_sf <- st_as_sf(evt_tmp, coords = c("lon", "lat"), crs = 4326)
       
@@ -230,14 +230,31 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       m_error <- mean(na.omit(evt_tmp$horizontal_accuracy))
       
       # Write Out Results
-      out <- matrix(c(ctf$species[i], ctf$ind_id[i], ctf$study_id[i], ctf$year[i], week, a, sg, cbg_area, pop, ndvi, lst, n, a_bb, fixmed, m_error),
+      out <- matrix(c(ctf$species[i], 
+                      ctf$ind_id[i], 
+                      ctf$study_id[i], 
+                      ctf$year[i], 
+                      week, 
+                      a, 
+                      sg, 
+                      cbg_area, 
+                      pop, 
+                      ndvi, 
+                      lst, 
+                      n, 
+                      a_bb, 
+                      fixmed, 
+                      m_error),
                     nrow = 1)
-      message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, week {week}"))
-      write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, row.names = F, 
-                  col.names = F, sep = ",")
+      
+      message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, 
+                   week {week}"))
+      write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, 
+                  row.names = F, col.names = F, sep = ",")
       
     } #j
-  }, error = function(e){cat(glue("ERROR: Size calulation failed for individual {ctf$ind_id[i]}, year {ctf$year[i]}", 
+  }, error = function(e){cat(glue("ERROR: Size calulation failed for individual 
+                                  {ctf$ind_id[i]}, year {ctf$year[i]}", 
                                   "\n"))})
 }
 
