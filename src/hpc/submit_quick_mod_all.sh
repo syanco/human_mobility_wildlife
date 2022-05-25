@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH -t 1-
+#SBATCH -t 3-
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition pi_jetz
 #SBATCH -c 4
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J quick_mod_2022-05-02
+#SBATCH -J quick_mod_all_2022-05-14
 
 # Load conda env
 module load miniconda
@@ -19,5 +19,5 @@ wd=~/project/covid-19_movement
 cd $wd
 
 # Execute calc size script/
-Rscript analysis/src/hpc_mod.r
+Rscript analysis/src/hpc_mod_all.r
 

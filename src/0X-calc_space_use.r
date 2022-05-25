@@ -237,6 +237,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                       week, 
                       a, 
                       sg, 
+                      ghm,
                       cbg_area, 
                       pop, 
                       ndvi, 

@@ -48,23 +48,33 @@ size <- size %>%
   left_join(traits, by = c("species" = "Species"))
 
 size_res <- size %>%
-  # filter(mig_mod == "non-migratory") %>%
+  filter(mig_mod == "non-migratory") %>%
   filter(study_id != 351564596) %>%
   filter(study_id != 1891587670) %>%
-  # mutate(log_area = log(area))
-  mutate(sg_norm = area/cbg_area)
+  mutate(log_area = log(area),
+         sg_norm = area/cbg_area,
+         log_sg_norm = log(sg_norm),
+         grp = as.factor(paste(ind_f, year, sep = "_")),
+         year_f = as.factor(year)) %>%
+  group_by(grp) %>%
+  arrange(.by_group = T)
 
 # form <- bf(area ~ year_f + s(wk_n, by = year_f) + (1|ind_f) + (1|gr(sp2, cov = phylo_vcov)))
 # form <- bf(area ~ pop*sg + ndvi + year_f + (1|sp2) + (1|ind_f) + ar(time = ts, p = 1, gr = ind_f:year_f, cov = F))
-form <- bf(log_area ~ sg*sp2 + ndvi + lst + (1|ind_f)) 
+form <- bf(log_area ~ sg_norm*sp2 + ghm + year_f + ndvi + lst + (1|grp) + ar(time = wk, gr=grp)) 
+# form <- bf(log_sg_norm ~ 1 + (1|ind_f) + ar(time = ts ,gr=ind_f)) 
+
            # + ar(time = ts, gr = ind_f, cov = F))
 
-mod <- brm(form, 
+mod_res <- brm(form, 
            # data2 = list(phylo_vcov = phylo_vcov),
            data = size_res,
            # family = Gamma(link = "log"),
            inits = 0,
            cores = 4,
-           iter = 1000)
+           iter = 500)
+
+pp_check(mod_res)
+plot(mod_res)
 
 save("out/quick_mod.rdata")
