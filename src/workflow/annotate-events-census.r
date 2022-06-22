@@ -1,22 +1,17 @@
-#!/usr/bin/env Rscript
+#!/usr/bin/env Rscript 
+#
 # DESCRIPTION #
 #
-# This script determines the administrative units for records for the COVID-19 Animal Movement Project
+# This script links human mobility data with animal events for the COVID-19 Animal Movement Project
+# Human mobility sourced from SafeGraph, provided by Song Gao
+#
 # See project documentation for details about anticipated directory structure.
+# This script implements the breezy philosophy: github.com/benscarlson/breezy
 #
 # Major tasks fof this script:
 #   * Annotate event dataset with:
-#     * CensusBlockGroup (12 digit FIPS code)
-#     * BlockGroup (1 digit FIPS code)
-#     * TractCode (6 digit FIPS)
-#     * CountyFIPS (3 digit FIPS)
-#     * StateFIPS (2 digit FIPS)
-#     * County (character string)
-#     * State (2 character code)
-#   *write out table with administrative info
-#
-# This script implements the breezy philosophy: github.com/benscarlson/breezy
-
+#     * daily and hourly device counts
+#   *write out table with decive counts
 
 # ==== Breezy setup ====
 
@@ -44,7 +39,6 @@ if(interactive()) {
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/')
   
 } else {
   library(docopt)
@@ -56,8 +50,9 @@ if(interactive()) {
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/')
 }
+
+message("start census annotation")
 
 source(file.path(.wd,'/src/startup.r'))
 
@@ -66,8 +61,6 @@ suppressWarnings(
     library(DBI)
     library(RSQLite)
     library(data.table)
-    library(raster)
-    library(sf)
   }))
 
 #---- Initialize database ----#
@@ -77,34 +70,26 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
 invisible(assert_that(length(dbListTables(db))>0))
 
-# read in global human modification layer
-message("reading in human modification...")
-ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
-
-# read in event table
 message("reading in event table...")
-evt_sf <- dbGetQuery(db,'SELECT event_id,lon,lat from event_clean') %>%
-  collect() %>%
-  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
+evt_df <- dbGetQuery(db,'SELECT * from event_cbg') %>%
+  collect()
 
-# transform to raster reference system
-message("transform event table...")
-evt_sf <- st_transform(evt_sf,st_crs(ghm))
+message("reading in census data...")
 
-# extract values at points
-message("intersecting events with human modification...")
-evt_sf$ghm <- raster::extract(ghm,evt_sf)
+acs2019 <- fread(paste0(.datPF,"safegraph_open_census_data_2019/data/cbg_b01.csv")) %>%
+  select(census_block_group,B01003e1) %>%
+  rename(cbg_2010 = census_block_group,
+         total_population_2019 = B01003e1) %>%
+  mutate(cbg_2010 = as.character(cbg_2010))
 
-evt_ghm <- evt_sf %>%
-  st_drop_geometry()
+message("joining events with census data...")
+evt_census <- left_join(evt_df,acs2019, by = c("cbg_2010" = "cbg_2010"))
 
-head(evt_ghm)
-
-# write out new table with annotations
 message("writing out new event table...")
-fwrite(evt_ghm, paste0(.outPF, "event-annotations/event_ghm.csv"))
-#dbWriteTable(conn = db, name = "event_ghm", value = evt_ghm, append = FALSE, overwrite = T)
+fwrite(evt_census, paste0(.outPF, "event-annotations/event_census.csv"))
+#dbWriteTable(conn = db, name = "event_census", value = evt_census, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
 
-message("intersection with human modification done!")
+
+message("census annotation done!")

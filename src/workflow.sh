@@ -239,7 +239,47 @@
   
   ##
 
-####
+  
+  ##-- Optional Annotations --##
+
+    #- Extract TNC GHM to census geometries -#
+
+      # Inputs: cbg shp file + ghm raster
+      # outputs: shp file (cbg info + ghm)
+
+      # SLURM:
+      sbatch $src/hpc/run_extract_ghm_cbg.sh
+
+      # ON DEMAND:
+      # Rscript $src/workflow/extract-ghm-cbg.r
+    
+      # TODO:
+      #   * Fix/update docopts in extract-ghm-cbg.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
+
+    #
+
+    #- Annotate events with census population density -#
+
+      # Inputs: db:eventclean + safegraph open census data csv
+      # Outputs: csv (event_id + total_population_2019)
+
+      # SLURM:
+      sbatch $src/hpc/run_annotate_events_census.sh
+      
+      # ON DEMAND:
+      # Rscript $src/workflow/annotate-events-census.r
+
+      # TODO:
+      #   * Fix/update docopts in extract-ghm-cbg.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
+      #   * Clarify inputs
+
+    #
+  
+  ##
 
 
 ####----  Analysis ----####
