@@ -278,36 +278,57 @@
       #   * Clarify inputs
 
     #
-  
+    
+    # TODO:
+    #   * Clarify use of optional annos - deprecate?
+
   ##
 
 
 ####----  Analysis ----####
 
-  ###---  Fit dBBMMs  ---###
+  ##---  Space Use  ---##
 
-# Activate covid env
-# conda activate covid
+    #- Fit dBBMMs -#
+      
+      # Inputs: db:event_clean + out/dbbmm_log.csv (blank) + 
+      #           out/dbbmm_bigmem_log.csv (blank) + no. cores
+      # Outputs: rdata files in out/ (one per individual) 
 
-# Make dir to hold fitted dBBMMs (only run once)
-mkdir $wd/out/dbbmms
-
-# Make log file to track successful outputs (only run once)
-echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_log.csv
-
-# Make big mem log file to track ind-year combos saved for the big mem parition
-echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_bigmem_log.csv
-
-# CHOOSE ONE:
-  # Fit dBBMMs (run on local - I don not recommend)
-  # Rscript $wd/analysis/src/0X-fit_dBBMMs.r -nc 2
+      # Make log file to track successful outputs
+      echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_log.csv
   
-  # Fit dBBMMs (run on local - I don not recommend)
-  sbatch ~/project/covid-19_movement/analysis/src/hpc/submit_dBBMM.sh
+      # Make big mem log file to track ind-year combos saved for the big mem parition
+      echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_bigmem_log.csv
   
-# Calc dbbmm areas
-echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, pop, ndvi, lst, n, a_bb, fixmed, m_error" > ./out/dbbmm_size.csv
+      # SLURM:
+      sbatch ~/project/covid-19_movement/analysis/src/hpc/submit_dBBMM.sh
 
-# CHOOSE ONE:
-  # Calc sizes on HPC 
-  sbatch ~/project/covid-19_movement/analysis/src/hpc/submit_size.sh
+      # ON DEMAND:
+      # conda activate covid
+      # Rscript $src/workflow/fit-dBBMMs.r $wd/processed_data/mosey_mod.db $wd/out 1
+      
+      # TODO:
+      #   * big mem log likely unneccesary, deprecate/delete
+  
+    #
+    
+    #- Calculate dBBMM areas and collate environment -#
+
+      # Inputs: db:event_clean + db:event_census + out filepath + 
+      #           out/dbbmm_log.csv (filled) + no. cores
+      # Outputs: csv 
+      
+      # Create csv to store results
+      echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, pop, ndvi, lst, n, a_bb, fixmed, m_error" > ./out/dbbmm_size.csv
+
+      # SLURM:
+      sbatch $src/hpc/run_calc_space_use.sh
+      
+      # ON DEMAND:
+      # conda activate covid
+      # Rscript $src/workflow/calc-space-use.r
+    
+    #
+
+####

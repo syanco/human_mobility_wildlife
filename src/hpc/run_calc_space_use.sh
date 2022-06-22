@@ -20,5 +20,5 @@ cp $wd/processed_data/mosey_mod_20220303.db /tmp/
 
 
 # Execute calc size script/
-Rscript $wd/analysis/src/0X-calc_space_use.r ./out /tmp/mosey_mod_20220303.db ./out/dbbmm_log.csv 24
+Rscript $wd/analysis/src/calc-space-use.r ./out /tmp/mosey_mod_20220303.db ./out/dbbmm_log.csv 24
 

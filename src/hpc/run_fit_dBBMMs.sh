@@ -6,7 +6,7 @@
 #SBATCH --partition pi_jetz
 #SBATCH -c 24
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J fit_dBBMMs_2022-02-11
+#SBATCH -J fit_dBBMMs
 
 # Load conda env
 module load miniconda
@@ -19,4 +19,4 @@ wd=~/project/covid-19_movement
 cp $wd/processed_data/mosey_mod.db /tmp/
 
 # Execute cleaning script (non parallel)
-Rscript $wd/analysis/src/0X-fit_dBBMMs.r /tmp/mosey_mod.db $wd/out 24
+Rscript $wd/analysis/src/workflow/fit-dBBMMs.r /tmp/mosey_mod.db $wd/out 24
