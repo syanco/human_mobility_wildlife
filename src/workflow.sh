@@ -34,21 +34,32 @@
 
 #------------------------------------------------------------------------------#
 
+#------------------------------------------------------------------------------#
+
+  # TODO:
+  
+  #   * relativize all sbatch .sh scripts (i.e., call .r files relative to $wd)
+
+#------------------------------------------------------------------------------#
 
 ####----  Initialization  ----####
+  
+  # define working directory
+  wd=~/project/covid-19_movement
+  src=$wd/analysis/src
+  
+  # Go to working directory
+  cd $wd
+  
+  # Make scripts executable (mostly to make docopts visible via `-h` flag)
+  chmod +x $src/workflow/clean_movement.r
+  chmod +x $src/workflow/compute-cbg-area.r
+  chmod +x $src/workflow/annotate-events-cbg.r
+  
+  # Turn on miniconda (only necessary on HPC when not using SLURM)
+  # module load miniconda
 
-# define working directory
-wd=~/project/covid-19_movement
-src=$wd/analysis/src
-
-# Go to working directory
-cd $wd
-
-# Make scripts executable (mostly to make docopts visible via `-h` flag)
-chmod +x $src/clean_movement.r
-
-# Turn on miniconda (only necessary on HPC when not using SLURM)
-# module load miniconda
+####
 
 
 
@@ -93,6 +104,9 @@ chmod +x $src/clean_movement.r
     
     # INTERACTIVE (script must be run interactively)
     $src/wf-mosey_env.sh
+    
+    # TODO:
+    #   * Add conda environment for mosey_env
   ##
     
   ##-- Census Annotations --##
@@ -115,6 +129,7 @@ chmod +x $src/clean_movement.r
       # TODO: 
       #   * Missing code for last step above ("dsq-joblist-2022-05-12.sh")
       #   * Rewrite for non-DSQ (for reproducibility)?
+      #   * make conda env for this step, remove module r, dsq?
     #
     
     #- Compute cbg area -#
@@ -126,11 +141,29 @@ chmod +x $src/clean_movement.r
       sbatch $src/hpc/run_compute_cbg_area.sh
       
       # ON DEMAND:
-      # $src/workflow/compute-cbg-area.r
+      # Rscript $src/workflow/compute-cbg-area.r
       
       # TODO:
       #   * Fix/update docopts in compute-cbg-area.r
       #   * Pass .shp location as arg?
+      #   * Use conda rather than module r?
+    #
+    
+    #- Annotate events with cbg info -#
+    
+      # Inputs: db:event_clean + cbg intersection csv + cbg area csv
+      # Outputs: csv (event_id + cbg info + cbg area)
+
+      # SLURM:
+      sbatch $src/hpc/run_annotate_events_cbg.sh
+      
+      # ON DEMAND:
+      # Rscript $src/workflow/annotate-events-cbg.r
+
+      # TODO:
+      #   * Fix/update docopts in annotate-events-cbg.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
     #
   
   ##
