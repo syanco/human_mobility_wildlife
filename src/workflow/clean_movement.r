@@ -18,13 +18,18 @@
 
 
 '
+Prep and clean data for the COVID-19 Animal Movement Project
+See project documentation for details about anticipated directory structure.
+Expects db to be of format mosey_db, with a table named "event"
+
 Usage:
-01-prep_and_clean.r [--db=<db>] 
-01-prep_and_clean.r (-h | --help)
+clean_movement.r [--db=<db>] 
+clean_movement.r (-h | --help)
 
 Control files:
-  src/ctfs/dates.csv
-
+  analysis/ctfs/dates.csv
+  
+Conda Environment: spatial
 
 Options:
 -h --help     Show this screen.
@@ -96,10 +101,6 @@ evt <- tbl(db,'event')
 # get list of inidviduals to remove from study base don bad coords
 indtb <- tbl(db, "individual") %>%  collect()
 
-rminds <- indtb %>% 
-  filter(study_id == 1891172051 | study_id == 1891403240) %>% 
-  pull(individual_id)
-
 # extract only relevnt time periods
 mod <- evt %>%
   filter((timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2019"] & 
@@ -123,11 +124,16 @@ mod <- evt %>%
   ) %>% 
   collect()
 
+# remove specific studies from db
 #TODO: remove hardcode here
-# filtering individual whose coords are utms not lat long
+rminds <- indtb %>% 
+  filter(study_id == 1891172051 | study_id == 1891403240) %>% 
+  pull(individual_id)
+
 mod <- mod %>% 
   filter(individual_id %notin% rminds)
 
+# write results back to db
 dbWriteTable(conn = db, name = "event_mod", value = mod, append = F, overwrite = T)
 
 # # SQLite query to filter out events outside study periods, add a year variable,
@@ -191,6 +197,7 @@ evt_sf <- evt1 %>%
          ta = 180-abs(180 - abs(bearing - dplyr::lag(bearing, 1)) %% 360),
          wk = lubridate::week(timestamp))
 
+# calculate qunatile-based cutoffs
 cuts <- evt_sf %>% 
   as.data.frame() %>% 
   group_by(individual_id) %>% 
@@ -207,11 +214,13 @@ out <- evt_sf %>%
   filter(sl < qsl & ta < qta) %>% 
   ungroup()
 
+# write table back to db
 dbWriteTable(conn = db, name = "event_clean", value = out, append = FALSE, overwrite = T)
 
 
 #---- Finalize script ----#
 
+# disconnect from db
 dbDisconnect(db)
 
 message(glue('Script complete in {diffmin(t0)} minutes'))

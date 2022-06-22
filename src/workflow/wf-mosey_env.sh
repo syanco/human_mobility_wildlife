@@ -1,21 +1,27 @@
-#---- Get the database from hpc ----#
-
-#Connect to vpn
-/opt/cisco/anyconnect/bin/vpn connect access.yale.edu
-
-wd=analysis/anno
-dbr=/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db
-
-cd $wd
-
-#check file size
-ssh grace "ls -lh $dbr" #8.3GB
-
-#download the file
-scp grace:$dbr data
-
-#disconnect from vpn
-/opt/cisco/anyconnect/bin/vpn disconnect
+# Annotate movement data using mosey env.
+# 
+# MUST BE RUN INTERACTIVELY 
+# (b/c progress depends on remote processing times on google.)
+#
+#
+# #---- Get the database from hpc ----#
+# 
+# #Connect to vpn
+# /opt/cisco/anyconnect/bin/vpn connect access.yale.edu
+# 
+# wd=analysis/anno
+# dbr=/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db
+# 
+# cd $wd
+# 
+# #check file size
+# ssh grace "ls -lh $dbr" #8.3GB
+# 
+# #download the file
+# scp grace:$dbr data
+# 
+# #disconnect from vpn
+# /opt/cisco/anyconnect/bin/vpn disconnect
 
 #----
 #---- mosey_env
@@ -104,20 +110,20 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 #for testing, see db/anno_test.sql for ddl to create event_test
 $MOSEYENV_SRC/main/import_anno.sh $gcsOutURL $annoP $db --table event_clean
 
-#----
-#---- Upload the database----#
-#----
-
-#Connect to vpn
-/opt/cisco/anyconnect/bin/vpn connect access.yale.edu
-
-wd=analysis/anno
-dbAnno=/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod_anno.db
-
-cd $wd
-
-#upload the file (also rename it)
-scp data/mosey_mod.db grace:$dbAnno 
-
-#disconnect from vpn
-/opt/cisco/anyconnect/bin/vpn disconnect
+# #----
+# #---- Upload the database----#
+# #----
+# 
+# #Connect to vpn
+# /opt/cisco/anyconnect/bin/vpn connect access.yale.edu
+# 
+# wd=analysis/anno
+# dbAnno=/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod_anno.db
+# 
+# cd $wd
+# 
+# #upload the file (also rename it)
+# scp data/mosey_mod.db grace:$dbAnno 
+# 
+# #disconnect from vpn
+# /opt/cisco/anyconnect/bin/vpn disconnect
