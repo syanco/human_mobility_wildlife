@@ -23,7 +23,7 @@
 # (not recommended).
 
 # This workflow also assumes a specific directory strcuture.  See README for 
-# detail son directory strcuture.
+# details on directory strcuture.
 
 # CONDA ENVIRONMENTS
 # 
@@ -56,6 +56,14 @@
   chmod +x $src/workflow/clean_movement.r
   chmod +x $src/workflow/compute-cbg-area.r
   chmod +x $src/workflow/annotate-events-cbg.r
+  chmod +x $src/workflow/process-safegraph.r
+  chmod +x $src/workflow/annotate-events-safegraph.r
+  chmod +x $src/workflow/annotate-events-ghm.r
+  chmod +x $src/workflow/annotate-events-census.r
+  chmod +x $src/workflow/extract-ghm-cbg.r
+  chmod +x $src/workflow/fit-dBBMMs.r
+  chmod +x $src/workflow/calc-space-use.r
+
   
   # Turn on miniconda (only necessary on HPC when not using SLURM)
   # module load miniconda
@@ -104,7 +112,7 @@
     # Outputs: db:event_clean (annotated)
     
     # INTERACTIVE (script must be run interactively)
-    $src/wf-mosey_env.sh
+    $src/workflow/wf-mosey_env.sh
     
     # TODO:
     #   * Add conda environment for mosey_env
@@ -330,5 +338,56 @@
       # Rscript $src/workflow/calc-space-use.r
     
     #
+
+    #- Fit space use models -#
+      # TODO: Scott work scratch code into workflow
+    #
+  
+    #- Generate model results and diagnostic sheets-#
+      # TODO: Scott work scratch code into workflow
+    #
+
+  ##
+  
+  
+  ##-- Niche Breadth --##
+    
+    #- Calculate MVNH Breadth -#
+      # TODO: Scott bring in Diego's code
+    #
+    
+    #- Join annotations to niche breadth
+      # TODO: Scott find code?  Write new code?  What the hell happened?!
+    #
+    
+    #- Fit niche breadth models -#
+      # TODO: Scott work scratch code into workflow
+    #
+  
+    #- Generate model results and diagnostic sheets-#
+      # TODO: Scott work scratch code into workflow
+    #
+
+  ##
+  
+  
+  ##-- Step Selection Function --##
+
+  ##
+  
+####
+
+
+
+####---- Outputs ----####
+
+  ##-- Figures --##
+  
+  ##
+
+
+  ##-- Other Outputs --##
+  
+  ##
 
 ####
