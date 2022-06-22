@@ -179,8 +179,8 @@
   
     #- Process SafeGraph data -#
       
-      # Inputs: safegrapg txt files (one file per cbg/week)
-      # Outputs: csv (one file per cbg/week)
+      # Inputs: safegraph txt files (one file per cbg/week)
+      # Outputs: sg data csv (one file per cbg/week)
 
       # SLURM:
       sbatch $src/hpc/run_process_safegraph_data.sh
@@ -195,7 +195,25 @@
       #   * comment out/delete deprecated code line 118 and beyond?
     
     #
-  
+
+    #- Annotate events with SafeGraph -#
+    
+    # Inputs: db:event_clean + cbg info csv + sg data csv
+    # Outputs: csv (event_id + timestamp + cbg info = cbg area + sg count)
+
+    # SLURM:
+    sbatch $src/hpc/run_annotate_events_safegraph.sh
+    
+    # ON DEMAND:
+    # Rscript $src/workflow/annotate-events-safegraph.r
+    
+    # TODO:
+    #   * Fix/update docopts in annotate-events-safegraph.r
+    #   * Pass input/output paths as arg?
+    #   * Use conda rather than module r?
+
+  #
+
   ##
 
 ####
