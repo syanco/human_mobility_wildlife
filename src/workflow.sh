@@ -39,6 +39,7 @@
   # TODO:
   
   #   * relativize all sbatch .sh scripts (i.e., call .r files relative to $wd)
+  #   * Fix breezy paths (e.g., i think the `rd(src/startup.r)` call won't work)
 
 #------------------------------------------------------------------------------#
 
@@ -107,7 +108,9 @@
     
     # TODO:
     #   * Add conda environment for mosey_env
+  
   ##
+    
     
   ##-- Census Annotations --##
   
@@ -130,6 +133,7 @@
       #   * Missing code for last step above ("dsq-joblist-2022-05-12.sh")
       #   * Rewrite for non-DSQ (for reproducibility)?
       #   * make conda env for this step, remove module r, dsq?
+    
     #
     
     #- Compute cbg area -#
@@ -147,6 +151,7 @@
       #   * Fix/update docopts in compute-cbg-area.r
       #   * Pass .shp location as arg?
       #   * Use conda rather than module r?
+    
     #
     
     #- Annotate events with cbg info -#
@@ -164,6 +169,31 @@
       #   * Fix/update docopts in annotate-events-cbg.r
       #   * Pass input/output paths as arg?
       #   * Use conda rather than module r?
+    
+    #
+  
+  ##
+  
+  
+  ##-- SafeGraph Annotations --##
+  
+    #- Process SafeGraph data -#
+      
+      # Inputs: safegrapg txt files (one file per cbg/week)
+      # Outputs: csv (one file per cbg/week)
+
+      # SLURM:
+      sbatch $src/hpc/run_process_safegraph_data.sh
+      
+      # ON DEMAND:
+      # Rscript $src/workflow/process-safegraph-data.r
+      
+      # TODO:
+      #   * Fix/update docopts in process-safegraph-data.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
+      #   * comment out/delete deprecated code line 118 and beyond?
+    
     #
   
   ##
