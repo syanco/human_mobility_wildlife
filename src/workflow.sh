@@ -103,22 +103,35 @@ chmod +x $src/clean_movement.r
       # Outputs:  csv per job (event_id + cbg info)
 
       # DSQ: (Yale-specific)
-      # module load R/4.1.0-foss-2020b
-      # Rscript $src/workflow/create_intersection_joblist.R
+      module load R/4.1.0-foss-2020b
+      Rscript $src/workflow/create_intersection_joblist.r
 
-      #module load dSQ
-      #dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 2- 
+      module load dSQ
+      dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 2-
 
       # UPDATE WITH DATE
-      #sbatch dsq-joblist-2022-05-12.sh
+      sbatch dsq-joblist-2022-05-12.sh
       
       # TODO: 
-      #   * Missing code for last step above
+      #   * Missing code for last step above ("dsq-joblist-2022-05-12.sh")
       #   * Rewrite for non-DSQ (for reproducibility)?
     #
     
-    #-
-  
+    #- Compute cbg area -#
+
+      # Inputs: cbg shp files
+      # Outputs: csv (cbg info + area)
+
+      # SLURM:
+      sbatch $src/hpc/run_compute_cbg_area.sh
+      
+      # ON DEMAND:
+      # $src/workflow/compute-cbg-area.r
+      
+      # TODO:
+      #   * Fix/update docopts in compute-cbg-area.r
+      #   * Pass .shp location as arg?
+    #
   
   ##
 
