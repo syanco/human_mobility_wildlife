@@ -198,22 +198,45 @@
 
     #- Annotate events with SafeGraph -#
     
-    # Inputs: db:event_clean + cbg info csv + sg data csv
-    # Outputs: csv (event_id + timestamp + cbg info = cbg area + sg count)
+      # Inputs: db:event_clean + cbg info csv + sg data csv
+      # Outputs: csv (event_id + timestamp + cbg info = cbg area + sg count)
+  
+      # SLURM:
+      sbatch $src/hpc/run_annotate_events_safegraph.sh
+      
+      # ON DEMAND:
+      # Rscript $src/workflow/annotate-events-safegraph.r
+      
+      # TODO:
+      #   * Fix/update docopts in annotate-events-safegraph.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
+  
+    #
 
-    # SLURM:
-    sbatch $src/hpc/run_annotate_events_safegraph.sh
+  ##
+  
+  
+  ##-- Human Modification Annotations --#
+  
+    #- Annotate events with TNC GHM -#
     
-    # ON DEMAND:
-    # Rscript $src/workflow/annotate-events-safegraph.r
+      # Inputs: db:event_clean + ghm raster
+      # Ouputs: csv (event_id + ghm)
+
+      # SLURM:
+      sbatch $src/hpc/run_annotate_events_ghm.sh
     
-    # TODO:
-    #   * Fix/update docopts in annotate-events-safegraph.r
-    #   * Pass input/output paths as arg?
-    #   * Use conda rather than module r?
-
-  #
-
+      # ON DEMAND:
+      # Rscript $src/workflow/annotate-events-ghm.r
+      
+      # TODO:
+      #   * Fix/update docopts in annotate-events-ghm.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
+    
+    #
+  
   ##
 
 ####
