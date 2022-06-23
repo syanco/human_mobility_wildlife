@@ -11,4 +11,11 @@
 
 module load R
 
-Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/annotate-events-safegraph.R
+# Declare WD
+wd=~/project/covid-19_movement
+src=$wd/analysis/src/workflow
+
+# Move to WD
+cd $wd
+
+Rscript $src/annotate-events-safegraph.r

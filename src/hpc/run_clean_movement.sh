@@ -12,6 +12,10 @@ conda activate spatial
 
 # Declare WD
 wd=~/project/covid-19_movement
+src=$wd/analysis/src/workflow
+
+# Move to WD
+cd $wd
 
 # Execute cleaning script (non parallel)
-Rscript $wd/analysis/src/workflow/clean_movement.r --db $wd/processed_data/mosey_mod.db
+Rscript $src/clean_movement.r --db $wd/processed_data/mosey_mod.db
