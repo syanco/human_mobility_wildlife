@@ -37,9 +37,6 @@
 #------------------------------------------------------------------------------#
 
   # TODO:
-  
-  #   * relativize all sbatch .sh scripts (i.e., call .r files relative to $wd)
-  #   * Fix breezy paths (e.g., i think the `rd(src/startup.r)` call won't work)
 
 #------------------------------------------------------------------------------#
 
@@ -134,11 +131,12 @@
       module load dSQ
       dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 2-
 
-      # UPDATE WITH DATE
+      # The step above generates a .sh file to submit the job to the Slurm manager
+      # Thus, after running the previous line, thje file referenced below will be 
+      # created (and update the date to match the day it was generated).
       sbatch dsq-joblist-2022-05-12.sh
       
       # TODO: 
-      #   * Missing code for last step above ("dsq-joblist-2022-05-12.sh")
       #   * Rewrite for non-DSQ (for reproducibility)?
       #   * make conda env for this step, remove module r, dsq?
     
