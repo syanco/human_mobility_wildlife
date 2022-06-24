@@ -14,11 +14,15 @@ conda activate covid
 
 # Declare WD
 wd=~/project/covid-19_movement
+src=$wd/analysis/src/workflow
+
+# Move to WD
+cd $wd
 
 #copy db to tmp
 cp $wd/processed_data/mosey_mod_20220303.db /tmp/
 
 
 # Execute calc size script/
-Rscript $wd/analysis/src/calc-space-use.r ./out /tmp/mosey_mod_20220303.db ./out/dbbmm_log.csv 24
+Rscript $src/calc-space-use.r ./out /tmp/mosey_mod_20220303.db ./out/dbbmm_log.csv 24
 

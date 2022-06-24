@@ -33,7 +33,7 @@ if(interactive()) {
   library(here)
   
   .wd <- '~/project/covid-19_movement'
-  rd <- here::here
+  # rd <- here::here
   
   .outPF <- file.path(.wd,'out')
   .dbPF <- file.path(.wd,'processed_data/mosey_mod_20220303.db')

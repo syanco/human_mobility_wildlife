@@ -11,4 +11,11 @@
 
 module load R/4.1.0-foss-2020b
 
-Rscript /gpfs/ysm/project/jetz/ryo3/projects/covid/src/poc/extract-ghm-cbg.r
+# Declare WD
+wd=~/project/covid-19_movement
+src=$wd/analysis/src/workflow
+
+# Move to WD
+cd $wd
+
+Rscript $src/extract-ghm-cbg.r

@@ -35,7 +35,7 @@ if(interactive()) {
   
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
   .test <- TRUE
-  rd <- here::here
+  # rd <- here::here
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'analysis/')
@@ -45,9 +45,10 @@ if(interactive()) {
   library(docopt)
   library(rprojroot)
   
-  .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
+  .wd <- getwd()
   .script <-  thisfile()
-  rd <- is_rstudio_project$make_fix_file(.script)
+  # rd <- is_rstudio_project$make_fix_file(.script)
+  
   # UPDATE VERSION!!!
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'analysis/')
