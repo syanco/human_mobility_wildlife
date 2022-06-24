@@ -38,7 +38,7 @@ if(interactive()) {
   
   .wd <- '~/Documents/Yale/projects/covid'
   .test <- TRUE
-  rd <- here::here
+  # rd <- here::here
   
   .datPF <- file.path(.wd,'data/safegraph/counties-dates-2-10-22/')
   .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-10-22-reformatted/')
@@ -48,10 +48,10 @@ if(interactive()) {
   library(rprojroot)
   
   #ag <- docopt(doc, version = '0.1\n')
-  .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
+  .wd <- getwd()
   .script <-  thisfile()
   #.test <- as.logical(ag$test)
-  rd <- is_rstudio_project$make_fix_file(.script)
+  # rd <- is_rstudio_project$make_fix_file(.script)
   
   #source(rd('src/funs/input_parse.r'))
   
@@ -61,7 +61,7 @@ if(interactive()) {
 
 #---- Initialize Environment ----#
 
-source(rd('src/startup.r'))
+source(file.path(.wd,'/src/startup.r'))
 
 #Source all files in the auto load funs directory
 list.files(rd('src/funs/auto'),full.names=TRUE) %>%
