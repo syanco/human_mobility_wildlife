@@ -371,7 +371,169 @@
   
   ##-- Step Selection Function --##
 
+    #- Generate background points
+      # Inputs: db:event_clean
+      # Outputs: individual csvs 
+
+      # SLURM:
+      sbatch $src/hpc/run_generate_background_points.sh
+
+      # ON DEMAND:
+      # Rscript $src/workflow/generate-background-points.r
+    #
+    
   ##
+
+    #- Environmental annotations for background points 
+
+#**********************************************************************#
+#*
+#*    Stopped here - need to re-work some parts of mosey_env to just load
+#*    the exported csvs directly into GEE - probably just hard code it directly
+#*    into wf-mosey_env-BG.sh for now.
+#*
+#**********************************************************************#  
+    # Inputs: Background csvs + analysis/ctfs/env.csv
+    # Outputs: db:event_clean (annotated)
+    
+    # INTERACTIVE (script must be run interactively)
+    $src/workflow/wf-mosey_env-BG.sh
+    
+    # TODO:
+    #   * Add conda environment for mosey_env
+  
+  ##
+    
+    
+  ##-- Census Annotations --##
+  
+    #- Intersect events with cbg geometries -#
+    
+      # Inputs:   db:event_clean + cbg shp file
+      # Outputs:  csv per job (event_id + cbg info)
+
+      # DSQ: (Yale-specific)
+      module load R/4.1.0-foss-2020b
+      Rscript $src/workflow/create_intersection_joblist.r
+
+      module load dSQ
+      dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 2-
+
+      # The step above generates a .sh file to submit the job to the Slurm manager
+      # Thus, after running the previous line, thje file referenced below will be 
+      # created (and update the date to match the day it was generated).
+      sbatch dsq-joblist-2022-05-12.sh
+      
+      # TODO: 
+      #   * Rewrite for non-DSQ (for reproducibility)?
+      #   * make conda env for this step, remove module r, dsq?
+    
+    #
+    
+    #- Compute cbg area -#
+
+      # Inputs: cbg shp files
+      # Outputs: csv (cbg info + area)
+
+      # SLURM:
+      sbatch $src/hpc/run_compute_cbg_area.sh
+      
+      # ON DEMAND:
+      # Rscript $src/workflow/compute-cbg-area.r
+      
+      # TODO:
+      #   * Fix/update docopts in compute-cbg-area.r
+      #   * Pass .shp location as arg?
+      #   * Use conda rather than module r?
+    
+    #
+    
+    #- Annotate events with cbg info -#
+    
+      # Inputs: db:event_clean + cbg intersection csv + cbg area csv
+      # Outputs: csv (event_id + cbg info + cbg area)
+
+      # SLURM:
+      sbatch $src/hpc/run_annotate_events_cbg.sh
+      
+      # ON DEMAND:
+      # Rscript $src/workflow/annotate-events-cbg.r
+
+      # TODO:
+      #   * Fix/update docopts in annotate-events-cbg.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
+    
+    #
+  
+  ##
+  
+  
+  ##-- SafeGraph Annotations --##
+  
+    #- Process SafeGraph data -#
+      
+      # Inputs: safegraph txt files (one file per cbg/week)
+      # Outputs: sg data csv (one file per cbg/week)
+
+      # SLURM:
+      sbatch $src/hpc/run_process_safegraph_data.sh
+      
+      # ON DEMAND:
+      # Rscript $src/workflow/process-safegraph-data.r
+      
+      # TODO:
+      #   * Fix/update docopts in process-safegraph-data.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
+      #   * comment out/delete deprecated code line 118 and beyond?
+    
+    #
+
+    #- Annotate events with SafeGraph -#
+    
+      # Inputs: db:event_clean + cbg info csv + sg data csv
+      # Outputs: csv (event_id + timestamp + cbg info = cbg area + sg count)
+  
+      # SLURM:
+      sbatch $src/hpc/run_annotate_events_safegraph.sh
+      
+      # ON DEMAND:
+      # Rscript $src/workflow/annotate-events-safegraph.r
+      
+      # TODO:
+      #   * Fix/update docopts in annotate-events-safegraph.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
+  
+    #
+
+  ##
+  
+  
+  ##-- Human Modification Annotations --#
+  
+    #- Annotate events with TNC GHM -#
+    
+      # Inputs: db:event_clean + ghm raster
+      # Ouputs: csv (event_id + ghm)
+
+      # SLURM:
+      sbatch $src/hpc/run_annotate_events_ghm.sh
+    
+      # ON DEMAND:
+      # Rscript $src/workflow/annotate-events-ghm.r
+      
+      # TODO:
+      #   * Fix/update docopts in annotate-events-ghm.r
+      #   * Pass input/output paths as arg?
+      #   * Use conda rather than module r?
+    
+    #
+  
+  ##
+
+
   
 ####
 
