@@ -77,6 +77,8 @@ for IND in $indIds; do
   
   earthengine upload table $gcsCSV --asset_id $geePts --x_column lon --y_column lat --force
 done
+
+
 #----
 #---- Annotate 
 #----
@@ -121,7 +123,7 @@ for indId in $indIds; do
     # if column is not present don't pass parameters
 
     #echo "index: $i, env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
-    out=$gcsOutP/${studyId}_${colnames[$i]} #do not include url, bucket, or file extension
+    out=$gcsOutP/${indId}_${colnames[$i]} #do not include url, bucket, or file extension
     
     echo Annotating "env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
     $MOSEYENV_SRC/anno_gee.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}
@@ -134,20 +136,19 @@ done
 #----
 
 for IND in ${indIds}; do
-	echo "Downloading study ${studyId}"
+	echo "Downloading study ${IND}"
 
-# 	# get length of an array
-#   n=${#envs[@]}
+  # get length of an array
+  # n=${#envs[@]}
 
   # use for loop to read all values and indexes
-  for (( i=0; i<${n}; i++ ));
-  do
+  for (( i=0; i<${n}; i++ )); do
   
-	# for env in "${envs[@]}"
-	# do
-	#  envN=${env##*/} #gets the name (w/o path) of the env variable
-	#  echo "Importing $envN"
-	#   annoN=${studyId}_${envN}
+  	# for env in "${envs[@]}"
+	  # do
+  	#  envN=${env##*/} #gets the name (w/o path) of the env variable
+	  #  echo "Importing $envN"
+	  #   annoN=${studyId}_${envN}
 		
 		
     #i=0
@@ -176,3 +177,6 @@ for IND in ${indIds}; do
 		echo "Downloading $gcsOutURL/${annoN}_*.csv ..."
 		
 		gsutil cp $gcsOutURL/${annoN}_*.csv $annoP
+	done
+done
+		

@@ -97,7 +97,7 @@ for(i in 1:length(ids)){
         fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/",id,".csv"))
         
         # write to log file
-        write.table(c(ids[i], 1), glue("{.outPF}/sf-background-pts/bg-log.csv"), append = T, row.names = F, 
+        write.table(c(ids[i], 1), glue("{.outPF}/ssf-background-pts/bg-log.csv"), append = T, row.names = F, 
                     col.names = F, sep = ",")
         message(paste0(id,": worked"))
         
