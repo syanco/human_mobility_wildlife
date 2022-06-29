@@ -3,11 +3,10 @@
 #SBATCH --job-name=bckgrnd-pts
 #SBATCH --cpus-per-task=1
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=ruth.oliver@yale.edu
+#SBATCH --mail-user=scott.yanco@yale.edu
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=1000g -t 2-
 #SBATCH --partition=pi_jetz
-#SBATCH -C avx2
 
 module load miniconda
 conda activate covid
