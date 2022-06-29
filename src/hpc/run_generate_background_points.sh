@@ -10,7 +10,7 @@
 #SBATCH -C avx2
 
 module load miniconda
-conda activate move
+conda activate covid
 
 # Declare WD
 wd=~/project/covid-19_movement

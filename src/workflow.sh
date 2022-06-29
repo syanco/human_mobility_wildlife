@@ -375,6 +375,9 @@
       # Inputs: db:event_clean
       # Outputs: individual csvs 
 
+      # create log file which is then used as ctf for annotation step
+      echo "ind, run" > ./out/ssf-background-pts/bg-log.csv
+      
       # SLURM:
       sbatch $src/hpc/run_generate_background_points.sh
 

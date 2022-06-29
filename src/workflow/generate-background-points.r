@@ -2,11 +2,11 @@ if(interactive()) {
   # rm(list=ls())
   library(here)
   
-  .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
+  .wd <- '~/projects/covid-19_movement'
   .test <- TRUE
   # rd <- here::here
   .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/')
+  .outPF <- file.path(.wd,'out/')
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   
@@ -18,7 +18,7 @@ if(interactive()) {
   .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/')
+  .outPF <- file.path(.wd,'out/')
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   
@@ -26,7 +26,7 @@ if(interactive()) {
 
 message("start generating background points...")
 
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -50,9 +50,9 @@ evt <- dbGetQuery(db,'SELECT event_id,individual_id,lon,lat,timestamp from event
          "date_time" = as_datetime(timestamp),
          "year" = lubridate::year(date),
          "doy" = lubridate::yday(date)) %>%
-  filter(year >= 2019) %>% # lazy check on date filter
-  filter(year <= 2020) %>%
-  filter(doy < 170) %>%
+  dplyr::filter(year >= 2019) %>% # lazy check on date filter
+  dplyr::filter(year <= 2020) %>%
+  dplyr::filter(doy < 170) %>%
   group_by(individual_id, date) %>%  
   sample_n(1) %>% # randomly select one event per day
   ungroup()
@@ -94,8 +94,11 @@ for(i in 1:length(ids)){
         ssf <- steps %>%
           random_steps(n_control = 15) 
         
-        fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/individual-",id,".csv"))
+        fwrite(ssf, paste0(.outPF,"ssf-background-pts/individual-files/",id,".csv"))
         
+        # write to log file
+        write.table(c(ids[i], 1), glue("{.outPF}/sf-background-pts/bg-log.csv"), append = T, row.names = F, 
+                    col.names = F, sep = ",")
         message(paste0(id,": worked"))
         
         test <- ssf %>%
