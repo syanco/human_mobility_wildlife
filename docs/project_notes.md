@@ -6,18 +6,6 @@
 * Check that dBBMM log file count matches the out/ directory
 
 
-## Major Activity Log
-
-|Date|Activity|
-|:-|:------------|
-|2022-01-05|Initialize repo, docs, etc.|
-|2022-01-07|Start building top-level workflow and cleaning scripts|
-|2022-01-10|Completed process and clean script|
-|2022-01-19|Draft dBBMM script|
-|2022-01-20|Working v of dBBMM script - running test|
-|2022-01-24|debugging dbbmm script|
-
-
 ## Notes  
 
 *Fitting dBBMMs for each ind x yr combination.
@@ -75,4 +63,6 @@ For now I'm just scp'ing the processed db to the HPC to run the dbbmms
   * For HR/UD - I actually think the time-invariant, stationary HR from an AKDE is not really what we want...  also it carries additional assumptions.  But if we fit a dBBMM we get the UD, and can use Earth Movers Distance to compare between UDs.  
     * Not positive but I think we can also fit a single dBBMM per year and chop up by ld period after the fact.  
   * For niches - use spider plots to show relative contribution ot breadth and dissimilarity, and colored traces to show e.g., ld and per-ld
-    
+
+###Annotations
+Pick up by running import and annotation steps in wf-mosey_env_BG.sh (after generate bg is complete on HPC)
