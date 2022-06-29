@@ -88,7 +88,7 @@
 
     # ON DEMAND:
     # conda activate spatial
-    # Rscript $src/workflow/clean_movement.r --db $wd/processed_data/mosey_mod.db
+    # Rscript $src/workflow/clean-movement.r --db $wd/processed_data/mosey_mod.db
   
     # TODO: 
     #   * Remove hardcoded study filters

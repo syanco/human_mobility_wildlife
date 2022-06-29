@@ -72,6 +72,7 @@ suppressWarnings(
     library(RSQLite)
     library(sf)
     library(geosphere)
+    library(rnaturalearth)
   }))
 
 #Source all files in the auto load funs directory
@@ -101,7 +102,7 @@ evt <- tbl(db,'event')
 # get list of inidviduals to remove from study base don bad coords
 indtb <- tbl(db, "individual") %>%  collect()
 
-# extract only relevnt time periods
+# extract only relevant time periods
 mod <- evt %>%
   filter((timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2019"] & 
             timestamp < !!periods$date[periods$cutpoint == "stop_2019"])
@@ -132,6 +133,14 @@ rminds <- indtb %>%
 
 mod <- mod %>% 
   filter(individual_id %notin% rminds)
+
+# # Filter to only observations within the US
+# 
+# usa <- ne_countries(country = 'united states', returnclass = "sf")
+# 
+# mod2 <- mod %>% 
+#   
+
 
 # write results back to db
 dbWriteTable(conn = db, name = "event_mod", value = mod, append = F, overwrite = T)
