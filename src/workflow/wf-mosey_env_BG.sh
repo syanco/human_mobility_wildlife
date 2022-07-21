@@ -12,11 +12,11 @@
 # pyenv activate gee
 mamba activate annotate
 
-wd=~/project/covid-19_movement
+wd=~/projects/covid-19_movement
 src=$wd/analysis/src
 db=processed_data/mosey_mod_anno.db
 
-export MOSEYENV_SRC=~/project/mosey_env/main #for mosey_anno_gee.sh
+export MOSEYENV_SRC=~/projects/mosey_env/main #for mosey_anno_gee.sh
 
 cd $wd
 
@@ -57,8 +57,8 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 # Use miller to filter by run column and then take the study_id field
 # need to use tail to remove first line, which is the header
 # study ids have \r suffix. Need to remove these
-indIds=($(mlr --csv --opprint filter '$run == 1' then cut -f ind out/ssf-background-pts/bg-log.csv | tail -n +2))
-indIds=( ${studyIds[@]%$'\r'} ) # remove \r suffix
+indIds=($(mlr --csv --opprint cut -f ind out/ssf-background-pts/bg-log.csv | tail -n +2))
+indIds=${indIds[@]%$'\r'} # remove \r suffix
 
 # cd $csvP
 
@@ -66,7 +66,7 @@ indIds=( ${studyIds[@]%$'\r'} ) # remove \r suffix
 for IND in $indIds; do 
 
   gcsCSV=$gcsInURL/${IND}.csv
-  geePts=$geePtsP/$studyId
+  geePts=$geePtsP/$IND
 
   #---- Upload file to GCS
   echo Uploading $IND to gcs...
@@ -86,16 +86,31 @@ done
 #Don't run this until all import tasks have finished
 #https://code.earthengine.google.com/tasks
 
-envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id $envP | tail -n +2))
+envs=($(mlr --csv --opprint filter '$run == 1' then cut -f "env_id" $envP | tail -n +2))
 bands=($(mlr --csv --opprint filter '$run == 1' then cut -f band $envP | tail -n +2))
 colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name $envP | tail -n +2))
 
 # Remove \r suffix
-envs=( ${envs[@]%$'\r'} )
-bands=( ${bands[@]%$'\r'} )
-colnames=( ${colnames[@]%$'\r'} )
+envs=(${envs[@]%$'\r'})
+bands=(${bands[@]%$'\r'})
+colnames=(${colnames[@]%$'\r'})
 
-echo Annotating ${#indIds[@]} studies.
+# echo ${envs[@]}
+# # envs=${envs[@]:1}
+# echo Annotating ${#indIds[@]} background sets.
+# 
+# # Find index of last individual sent to GEE, then subset the vector after that 
+# # to restart loop if it stops before completion
+# # indIDs=(${indIds[0]})
+# value=1153545169
+# 
+# for i in "${!indIds[@]}"; do
+#    if [[ "${indIds[$i]}" = "${value}" ]]; then
+#        echo "${i}";
+#    fi
+# done
+# 
+# indIds=${indIds[@]:699}
 
 for indId in $indIds; do 
   echo "Start processing individual ${indId}"
@@ -127,6 +142,7 @@ for indId in $indIds; do
     
     echo Annotating "env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
     $MOSEYENV_SRC/anno_gee.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}
+    
   done
 
 done
@@ -136,13 +152,14 @@ done
 #----
 
 for IND in ${indIds}; do
-	echo "Downloading study ${IND}"
+	echo "Downloading individual ${IND}"
 
   # get length of an array
-  # n=${#envs[@]}
+  n=${#envs[@]}
 
   # use for loop to read all values and indexes
-  for (( i=0; i<${n}; i++ )); do
+  for (( i=0; i<${n}; i++ )); 
+  do
   
   	# for env in "${envs[@]}"
 	  # do
@@ -157,7 +174,7 @@ for IND in ${indIds}; do
 
     echo "Importing ${colnames[$i]}"
     
-		annoN=${studyId}_${colnames[$i]}
+		annoN=${IND}_${colnames[$i]}
 		annoPF=$annoP/${annoN}.csv
 		gcsCSV=$gcsOutURL/${annoN}.csv
 

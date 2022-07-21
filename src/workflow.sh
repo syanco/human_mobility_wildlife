@@ -108,7 +108,7 @@
     # Inputs: db:event_clean + analysis/ctfs/env.csv
     # Outputs: db:event_clean (annotated)
     
-    # INTERACTIVE (script must be run interactively)
+    # INTERACTIVE - RUN LOCAL (script must be run interactively; pulls db from hpc then puts it back)
     $src/workflow/wf-mosey_env.sh
     
     # TODO:
@@ -389,19 +389,15 @@
 
     #- Environmental annotations for background points 
 
-#**********************************************************************#
-#*
-#*    Stopped here - need to re-work some parts of mosey_env to just load
-#*    the exported csvs directly into GEE - probably just hard code it directly
-#*    into wf-mosey_env-BG.sh for now.
-#*
-#**********************************************************************#  
     # Inputs: Background csvs + analysis/ctfs/env.csv
     # Outputs: db:event_clean (annotated)
     
-    # INTERACTIVE (script must be run interactively)
-    $src/workflow/wf-mosey_env-BG.sh
+    # INTERACTIVE - RUN LOCAL (script must be run interactively and not on HPC...)
     
+    #pull bg files to local
+    scp -r grace:~/project/covid-19_movement/out/ssf-background-pts ~/projects/covid-19_movement/out
+    $src/workflow/wf-mosey_env-BG.sh
+    scp -r out/ssf-background-pts/annotated grace:~/project/covid-19_movement/out/ssf-background-pts/annotated
     # TODO:
     #   * Add conda environment for mosey_env
   
