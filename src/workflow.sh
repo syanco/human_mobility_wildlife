@@ -125,16 +125,17 @@
       # Outputs:  csv per job (event_id + cbg info)
 
       # DSQ: (Yale-specific)
-      module load R/4.1.0-foss-2020b
+      # module load R/4.1.0-foss-2020b
+      mamba activate covid
       Rscript $src/workflow/create_intersection_joblist.r
 
       module load dSQ
-      dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 2-
+      dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 02:00:00
 
       # The step above generates a .sh file to submit the job to the Slurm manager
       # Thus, after running the previous line, thje file referenced below will be 
       # created (and update the date to match the day it was generated).
-      sbatch dsq-joblist-2022-05-12.sh
+      sbatch dsq-joblist-2022-07-22.sh
       
       # TODO: 
       #   * Rewrite for non-DSQ (for reproducibility)?
