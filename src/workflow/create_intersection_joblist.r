@@ -19,8 +19,8 @@ if(interactive()) {
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'src/poc/')
-  .outPF <- file.path(.wd,"src/workflow/")
+  .datPF <- file.path(.wd,'analysis/src/poc/')
+  .outPF <- file.path(.wd,"analysis/src/workflow/")
 }
 
 source(file.path(.wd,'analysis/src/startup.r'))
