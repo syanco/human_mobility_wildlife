@@ -60,7 +60,7 @@ if(interactive()) {
   .outPF <- file.path(.wd,'out/event-cbg-intersection/')
 }
 
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
