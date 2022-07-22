@@ -8,7 +8,9 @@
 #SBATCH --mem-per-cpu=100g -t 1-
 #SBATCH --partition=pi_jetz
 
-module load R/4.1.0-foss-2020b
+# module load R/4.1.0-foss-2020b
+module load miniconda
+conda activate covid
 
 # Declare WD
 wd=~/project/covid-19_movement
