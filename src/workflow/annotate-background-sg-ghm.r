@@ -14,11 +14,11 @@ if(interactive()) {
   library(docopt)
   library(rprojroot)
   
-  .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
+  .wd <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement'
   .script <-  thisfile()
   rd <- is_rstudio_project$make_fix_file(.script)
-  .datPF <- file.path(.wd,'analysis/')
-  .outPF <- file.path(.wd,'analysis/')
+  .datPF <- file.path(.wd,'out/')
+  .outPF <- file.path(.wd,'out/')
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   
@@ -55,7 +55,7 @@ evt <- data.table::rbindlist(lapply(files[start_ix:end_ix], data.table::fread)) 
 
 
 message("reading in census block group geometries...")
-cbg_sf <- st_read(paste0(.wd,"/data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
+cbg_sf <- st_read(paste0(.wd,"/raw_data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
 cbg_area <- fread(paste0(.datPF, "event-annotations/cbg-area.csv"), colClasses = "character") %>%
   select(cbg_2010, cbg_area_m2)
 
@@ -85,7 +85,7 @@ evt_sg <- left_join(evt_cbg,daily_data, by = c("cbg_2010", "date")) %>%
 
 # read in global human modification layer
 message("reading in human modification...")
-ghm <- raster(paste0(.wd,"/data/gHM/gHM.tif"))
+ghm <- raster(paste0(.wd,"/raw_data/gHM/gHM.tif"))
 
 # transform to raster reference system
 message("transform event table...")
@@ -113,7 +113,7 @@ for(i in 1:length(ids)){
   d <- evt_sg_ghm %>%
     filter(individual_id == id)
   
-  fwrite(d, paste0(paste0(.outPF, "event-annotations/ssf-background-points-annotations/individual-files/individual-",id,".csv")))
+  fwrite(d, paste0(paste0(.outPF, "/ssf-background-points/annotated/individual-",id,".csv")))
 }
 
 
