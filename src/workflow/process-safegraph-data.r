@@ -54,7 +54,7 @@ if(interactive()) {
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   #source(rd('src/funs/input_parse.r'))
-  
+  library(data.table)
   .datPF <- file.path(.wd,'raw_data/safegraph/counties-dates-2-10-22/')
   .outPF <- file.path(.wd,'processed_data/safegraph/counties-dates-2-10-22-reformatted/')
 }
