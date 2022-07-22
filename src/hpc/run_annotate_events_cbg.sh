@@ -3,11 +3,10 @@
 #SBATCH --job-name=cbg_annotation
 #SBATCH --cpus-per-task=1
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=ruth.oliver@yale.edu
+#SBATCH --mail-user=scott.yanco@yale.edu
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=100g -t 2-
-#SBATCH --partition=general,pi_jetz
-#SBATCH -C avx2
+#SBATCH --mem-per-cpu=100g -t 1-
+#SBATCH --partition=pi_jetz
 
 module load R/4.1.0-foss-2020b
 

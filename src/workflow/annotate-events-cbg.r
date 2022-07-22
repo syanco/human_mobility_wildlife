@@ -39,23 +39,23 @@ if(interactive()) {
   # rd <- here::here
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'analysis/')
-  .outPF <- file.path(.wd,'analysis/')
+  .datPF <- file.path(.wd,'out/')
+  .outPF <- file.path(.wd,'out/')
   
 } else {
   library(docopt)
   library(rprojroot)
   
   .wd <- getwd()
-  .script <-  thisfile()
+  # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'analysis/')
-  .outPF <- file.path(.wd,'analysis/')
+  .datPF <- file.path(.wd,'out/')
+  .outPF <- file.path(.wd,'out/')
 }
 
 message("start safegraph annotation")
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
