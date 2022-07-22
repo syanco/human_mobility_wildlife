@@ -1,15 +1,16 @@
 #!/bin/bash
 
-#SBATCH --job-name=safegraph_annotation
+#SBATCH --job-name=cbg_annotation
 #SBATCH --cpus-per-task=1
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=ruth.oliver@yale.edu
+#SBATCH --mail-user=scott.yanco@yale.edu
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=1000g -t 2-
-#SBATCH --partition=general,bigmem,pi_jetz
-#SBATCH -C avx2
+#SBATCH --mem-per-cpu=100g -t 1-
+#SBATCH --partition=pi_jetz
 
-module load R
+# module load R
+module load miniconda
+conda activate covid
 
 # Declare WD
 wd=~/project/covid-19_movement

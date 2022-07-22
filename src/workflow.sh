@@ -163,11 +163,6 @@
     
     #
     
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#
-#   JULY WORKFLOW BOOKMARK
-#    
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     
     #- Annotate events with cbg info -#
     
@@ -210,7 +205,11 @@
       #   * comment out/delete deprecated code line 118 and beyond?
     
     #
-
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#
+#   JULY WORKFLOW BOOKMARK
+#    
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     #- Annotate events with SafeGraph -#
     
       # Inputs: db:event_clean + cbg info csv + sg data csv

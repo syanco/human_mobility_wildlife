@@ -30,7 +30,7 @@
 
 #---- Input Parameters ----#
 if(interactive()) {
-  rm(list=ls())
+  # rm(list=ls())
   library(here)
   
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
@@ -42,21 +42,22 @@ if(interactive()) {
   .outPF <- file.path(.wd,'analysis/')
   
 } else {
-  library(docopt)
-  library(rprojroot)
+  # library(docopt)
+  # library(rprojroot)
   
   .wd <- getwd()
-  .script <-  thisfile()
+  # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   # UPDATE VERSION!!!
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'analysis/')
-  .outPF <- file.path(.wd,'analysis/')
+  .datPF <- file.path(.wd,'out/')
+  .pdPF  <- file.path(.wd,'processed_data')
+  .outPF <- file.path(.wd,'out/')
 }
 
 message("start safegraph annotation")
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -78,9 +79,9 @@ evt_df <- dbGetQuery(db,'SELECT event_id,timestamp from event_clean') %>%
   mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
   collect()
 
-evt_cbg <- fread(paste0(.datPF, "event-annotations/event_cbg.csv"), colClasses = "character")
+evt_cbg <- fread(paste0(.datPF, "event-annotation/event_cbg.csv"), colClasses = "character")
 
-reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
+reformatted_files_daily <- list.files(paste0(.pdPF,"safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
 
 # combine all data
 message("reading in safegraph data...")
@@ -117,7 +118,7 @@ evt_sg <- evt_df %>%
 #  select(-date,-date_hour)
 
 message("writing out new event table...")
-fwrite(evt_sg, paste0(.outPF, "event-annotations/event_sg.csv"))
+fwrite(evt_sg, paste0(.outPF, "event-annotation/event_sg.csv"))
 
 #dbWriteTable(conn = db, name = "event_sg", value = evt_sg, append = FALSE, overwrite = T)
 
