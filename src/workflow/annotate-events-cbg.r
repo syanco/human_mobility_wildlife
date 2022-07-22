@@ -43,8 +43,8 @@ if(interactive()) {
   .outPF <- file.path(.wd,'out/')
   
 } else {
-  library(docopt)
-  library(rprojroot)
+  # library(docopt)
+  # library(rprojroot)
   
   .wd <- getwd()
   # .script <-  thisfile()
