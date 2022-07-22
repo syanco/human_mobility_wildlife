@@ -1,13 +1,11 @@
 #!/bin/bash
 
-#SBATCH --job-name=cbg_area
-#SBATCH --cpus-per-task=1
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=cott.yanco@yale.edu
-#SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=100g -t 1-
-#SBATCH --partition=pi_jetz
-#SBATCH -C avx2
+#SBATCH -t 1-
+#SBATCH --mail-type ALL
+#SBATCH --mail-user scott.yanco@yale.edu
+#SBATCH --partition pi_jetz
+#SBATCH -c 1
+#SBATCH --mem-per-cpu 100G
 
 module load R/4.1.0-foss-2020b
 
