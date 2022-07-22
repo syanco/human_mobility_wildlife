@@ -3,9 +3,9 @@
 #SBATCH --job-name=cbg_area
 #SBATCH --cpus-per-task=1
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=ruth.oliver@yale.edu
+#SBATCH --mail-user=cott.yanco@yale.edu
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=100g -t 2-
+#SBATCH --mem-per-cpu=100g -t 1-
 #SBATCH --partition=general,pi_jetz
 #SBATCH -C avx2
 
