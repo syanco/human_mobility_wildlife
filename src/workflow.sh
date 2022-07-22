@@ -142,7 +142,13 @@
       #   * make conda env for this step, remove module r, dsq?
     
     #
-    
+
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#
+#   JULY WORKFLOW BOOKMARK
+#    
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
     #- Compute cbg area -#
 
       # Inputs: cbg shp files

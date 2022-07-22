@@ -7,7 +7,7 @@ if(interactive()) {
   # rd <- here::here
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'src/poc/')
+  .datPF <- file.path(.wd,'src/workflow/')
   .outPF <- file.path(.wd,"src/workflow/")
   
 } else {
@@ -19,7 +19,7 @@ if(interactive()) {
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'analysis/src/poc/')
+  .datPF <- file.path(.wd,'analysis/src/workflow/')
   .outPF <- file.path(.wd,"analysis/src/workflow/")
 }
 
