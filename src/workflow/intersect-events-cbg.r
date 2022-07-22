@@ -53,7 +53,7 @@ if(interactive()) {
   
   .wd <- '/gpfs/ysm/project/jetz/sy522/projects/covid'
   .script <-  thisfile()
-  rd <- is_rstudio_project$make_fix_file(.script)
+  # rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'raw_data/')
