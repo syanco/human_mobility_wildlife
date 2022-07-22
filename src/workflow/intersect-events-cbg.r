@@ -51,7 +51,7 @@ if(interactive()) {
   library(docopt)
   library(rprojroot)
   
-  .wd <- '/gpfs/ysm/project/jetz/sy522/projects/covid'
+  .wd <- getwd()
   .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
