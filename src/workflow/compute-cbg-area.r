@@ -44,21 +44,21 @@ if(interactive()) {
   # rd <- here::here
   
   .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/event-annotations/')
+  .outPF <- file.path(.wd,'out/event-annotation/')
   
 } else {
   library(docopt)
   library(rprojroot)
   
   .wd <- getwd()
-  .script <-  thisfile()
+  # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
-  .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,'analysis/event-annotations/')
+  .datPF <- file.path(.wd,'raw_data/')
+  .outPF <- file.path(.wd,'out/event-annotation/')
 }
 
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
