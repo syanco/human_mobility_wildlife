@@ -33,7 +33,7 @@
 
 #---- Input Parameters ----#
 if(interactive()) {
-  rm(list=ls())
+  # rm(list=ls())
   library(here)
   
   .wd <- '~/Documents/Yale/projects/covid'
@@ -44,28 +44,28 @@ if(interactive()) {
   .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-10-22-reformatted/')
   
 } else {
-  library(docopt)
-  library(rprojroot)
+  # library(docopt)
+  # library(rprojroot)
   
   #ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
-  .script <-  thisfile()
+  # .script <-  thisfile()
   #.test <- as.logical(ag$test)
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   #source(rd('src/funs/input_parse.r'))
   
-  .datPF <- file.path(.wd,'data/safegraph/counties-dates-2-10-22/')
-  .outPF <- file.path(.wd,'analysis/safegraph/counties-dates-2-10-22-reformatted/')
+  .datPF <- file.path(.wd,'raw_data/safegraph/counties-dates-2-10-22/')
+  .outPF <- file.path(.wd,'processed_data/safegraph/counties-dates-2-10-22-reformatted/')
 }
 
 #---- Initialize Environment ----#
 
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
-#Source all files in the auto load funs directory
-list.files(rd('src/funs/auto'),full.names=TRUE) %>%
-  walk(source)
+# #Source all files in the auto load funs directory
+# list.files(rd('src/funs/auto'),full.names=TRUE) %>%
+#   walk(source)
 
 # get list of files
 files <- data.frame("name" = list.files(.datPF, pattern = "*.txt",recursive = TRUE)) %>%
@@ -117,110 +117,110 @@ for(i in 1:nrow(files_daily)){
 
 # DEPRECATED CODE
 
-if (1 == 2){
-  if(length(list.files(paste0(.outPF,"/daily-data/"))) == length(counties)){
-    message("daily data already processed!")
-  }else{
-    for (j in 1:length(counties)){
-      message("processing daily data...")
-      
-      # subset to files from single county
-      county_files <- files_daily %>%
-        filter(county_id == counties[j])
-      
-      d <- c()
-      for (i in 1:nrow(county_files)){
-        # start with first file
-        file <- county_files[i,]
-        # reformat data
-        dd <- process_daily_data(file$name)
-        d <- rbind(d,dd)
-      }
-      # write out file with all data from a single county
-      fwrite(d, paste0(.outPF,"/daily-data/",counties[j],"_cbg_day_SUM.csv"))
-    }
-  } 
-  
-  if(file.exists(paste0(paste0(.outPF,"all_counties_cbg_day_SUM.csv")))){
-    message("daily data already combined!")
-  }else{
-    message("combining daily data...")
-    
-    ## combine daily data into single file
-    # combine county files into a single file
-    reformatted_files_daily <- list.files(paste0(.outPF,"/daily-data/"), full.names = TRUE)
-    
-    # combine all data
-    all_data_daily <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::fread),use.names = TRUE)
-    
-    # write out as single file
-    fwrite(all_data_daily, paste0(paste0(.outPF,"all_counties_cbg_day_SUM.csv")))
-  }
-  
-  
-  
-  
-  # create reformatted files for each county
-  process_hourly_data <- function(file_name){
-    # read in file
-    d <- fread(paste0(.datPF,file[,]$name)) %>%
-      # rename census block group column
-      rename("cbg" = "V1") %>%
-      # convert from "wide" to "long" format
-      # columns are hours of the week, values are device counts
-      pivot_longer(!cbg, names_to = "hour_of_week", values_to = "count", names_prefix = "V") %>%
-      mutate("hour_of_week" = as.numeric(hour_of_week)-2,
-             "day_of_week" = floor((as.numeric(hour_of_week))/24), #find day of week
-             "hour_of_day" = hour_of_week - 24*day_of_week, #find hour of day
-             "minutes_seconds" = rep(":00:00", nrow(.)), #create dummy minutes and seconds
-             "county_id" = rep(file[,]$county_id),
-             "start_date" = rep(file[,]$start_date),
-             "date" = start_date + day_of_week) %>% # find true date by adding from start date
-      unite("time", c("hour_of_day","minutes_seconds"),sep = "") %>% #concatenate time
-      unite("date", c("date","time"), sep = " ") %>% #concatenate date and time
-      select(county_id,cbg,date,count)
-    return(d)
-  }
-  
-  if(length(list.files(paste0(.outPF,"/hourly-data/"))) == length(counties)){
-    message("hourly data already processed!")
-  }else{
-    message("processing hourl data...")
-    
-    # create reformatted files for each county
-    for (j in 1:length(counties)){
-      
-      # subset to files from single county
-      county_files <- files_hourly %>%
-        filter(county_id == counties[j])
-      
-      d <- c()
-      for (i in 1:nrow(county_files)){
-        # start with first file
-        file <- county_files[i,]
-        # reformat data
-        dd <- process_hourly_data(file$name)
-        d <- rbind(d,dd)
-      }
-      # write out file with all data from a single county
-      fwrite(d, paste0(.outPF,"/hourly-data/",counties[j],"_cbg_hour_SUM.csv"))
-    }
-  }
-  
-  if(file.exists(paste0(paste0(.outPF,"all_counties_cbg_hour_SUM.csv")))){
-    message("hourly data already combined!")
-  }else{
-    message("combining hourly data...")
-    
-    ## combine hourly data into single file
-    # combine county files into a single file
-    reformatted_files_hourly <- list.files(paste0(.outPF,"/hourly-data/"), full.names = TRUE)
-    
-    # combine all data
-    all_data_hourly <- data.table::rbindlist(lapply(reformatted_files_hourly, data.table::fread),use.names = TRUE)
-    
-    # write out as single file
-    fwrite(all_data_hourly, paste0(paste0(.outPF,"all_counties_cbg_hour_SUM.csv")))
-  }
-  
-}  
+# if (1 == 2){
+#   if(length(list.files(paste0(.outPF,"/daily-data/"))) == length(counties)){
+#     message("daily data already processed!")
+#   }else{
+#     for (j in 1:length(counties)){
+#       message("processing daily data...")
+#       
+#       # subset to files from single county
+#       county_files <- files_daily %>%
+#         filter(county_id == counties[j])
+#       
+#       d <- c()
+#       for (i in 1:nrow(county_files)){
+#         # start with first file
+#         file <- county_files[i,]
+#         # reformat data
+#         dd <- process_daily_data(file$name)
+#         d <- rbind(d,dd)
+#       }
+#       # write out file with all data from a single county
+#       fwrite(d, paste0(.outPF,"/daily-data/",counties[j],"_cbg_day_SUM.csv"))
+#     }
+#   } 
+#   
+#   if(file.exists(paste0(paste0(.outPF,"all_counties_cbg_day_SUM.csv")))){
+#     message("daily data already combined!")
+#   }else{
+#     message("combining daily data...")
+#     
+#     ## combine daily data into single file
+#     # combine county files into a single file
+#     reformatted_files_daily <- list.files(paste0(.outPF,"/daily-data/"), full.names = TRUE)
+#     
+#     # combine all data
+#     all_data_daily <- data.table::rbindlist(lapply(reformatted_files_daily, data.table::fread),use.names = TRUE)
+#     
+#     # write out as single file
+#     fwrite(all_data_daily, paste0(paste0(.outPF,"all_counties_cbg_day_SUM.csv")))
+#   }
+#   
+#   
+#   
+#   
+#   # create reformatted files for each county
+#   process_hourly_data <- function(file_name){
+#     # read in file
+#     d <- fread(paste0(.datPF,file[,]$name)) %>%
+#       # rename census block group column
+#       rename("cbg" = "V1") %>%
+#       # convert from "wide" to "long" format
+#       # columns are hours of the week, values are device counts
+#       pivot_longer(!cbg, names_to = "hour_of_week", values_to = "count", names_prefix = "V") %>%
+#       mutate("hour_of_week" = as.numeric(hour_of_week)-2,
+#              "day_of_week" = floor((as.numeric(hour_of_week))/24), #find day of week
+#              "hour_of_day" = hour_of_week - 24*day_of_week, #find hour of day
+#              "minutes_seconds" = rep(":00:00", nrow(.)), #create dummy minutes and seconds
+#              "county_id" = rep(file[,]$county_id),
+#              "start_date" = rep(file[,]$start_date),
+#              "date" = start_date + day_of_week) %>% # find true date by adding from start date
+#       unite("time", c("hour_of_day","minutes_seconds"),sep = "") %>% #concatenate time
+#       unite("date", c("date","time"), sep = " ") %>% #concatenate date and time
+#       select(county_id,cbg,date,count)
+#     return(d)
+#   }
+#   
+#   if(length(list.files(paste0(.outPF,"/hourly-data/"))) == length(counties)){
+#     message("hourly data already processed!")
+#   }else{
+#     message("processing hourl data...")
+#     
+#     # create reformatted files for each county
+#     for (j in 1:length(counties)){
+#       
+#       # subset to files from single county
+#       county_files <- files_hourly %>%
+#         filter(county_id == counties[j])
+#       
+#       d <- c()
+#       for (i in 1:nrow(county_files)){
+#         # start with first file
+#         file <- county_files[i,]
+#         # reformat data
+#         dd <- process_hourly_data(file$name)
+#         d <- rbind(d,dd)
+#       }
+#       # write out file with all data from a single county
+#       fwrite(d, paste0(.outPF,"/hourly-data/",counties[j],"_cbg_hour_SUM.csv"))
+#     }
+#   }
+#   
+#   if(file.exists(paste0(paste0(.outPF,"all_counties_cbg_hour_SUM.csv")))){
+#     message("hourly data already combined!")
+#   }else{
+#     message("combining hourly data...")
+#     
+#     ## combine hourly data into single file
+#     # combine county files into a single file
+#     reformatted_files_hourly <- list.files(paste0(.outPF,"/hourly-data/"), full.names = TRUE)
+#     
+#     # combine all data
+#     all_data_hourly <- data.table::rbindlist(lapply(reformatted_files_hourly, data.table::fread),use.names = TRUE)
+#     
+#     # write out as single file
+#     fwrite(all_data_hourly, paste0(paste0(.outPF,"all_counties_cbg_hour_SUM.csv")))
+#   }
+#   
+# }  
