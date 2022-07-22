@@ -6,7 +6,7 @@
 #SBATCH --mail-user=cott.yanco@yale.edu
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=100g -t 1-
-#SBATCH --partition=general,pi_jetz
+#SBATCH --partition=pi_jetz
 #SBATCH -C avx2
 
 module load R/4.1.0-foss-2020b
