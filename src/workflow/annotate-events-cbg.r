@@ -86,7 +86,7 @@ data_cbg <- intersection %>%
 fwrite(data_counties, paste0(.outPF,"safegraph-summary/counties-list.csv"))
 fwrite(data_cbg, paste0(.outPF,"safegraph-summary/census-block-group-list.csv"))
 
-area <- fread(paste0(.datPF,"event-annotations/cbg-area.csv"), colClasses = "character") %>%
+area <- fread(paste0(.datPF,"event-annotation/cbg-area.csv"), colClasses = "character") %>%
   select(cbg_2010, cbg_area_m2)
 
 message("reading in event table...")
@@ -99,7 +99,7 @@ evt_cbg <- evt_df %>%
   left_join(., area, by = "cbg_2010")
 
 message("writing out new event table...")
-fwrite(evt_cbg, paste0(.outPF, "event-annotations/event_cbg.csv"))
+fwrite(evt_cbg, paste0(.outPF, "event-annotation/event_cbg.csv"))
 #dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
