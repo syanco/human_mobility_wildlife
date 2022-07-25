@@ -250,12 +250,7 @@
   
   ##
   ##
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                                                 #
-#             JULY WORKFLOW BOOKMARK              #
-#                                                 #
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-  
+
   ##-- Optional Annotations --##
 
     #- Extract TNC GHM to census geometries -#
@@ -299,7 +294,11 @@
     #   * Clarify use of optional annos - deprecate?
 
   ##
-
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                                                 #
+#             JULY WORKFLOW BOOKMARK              #
+#                                                 #
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 ####----  Analysis ----####
 
