@@ -30,7 +30,7 @@
 
 #---- Input Parameters ----#
 if(interactive()) {
-  rm(list=ls())
+  # rm(list=ls())
   library(here)
   
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
@@ -38,7 +38,8 @@ if(interactive()) {
   # rd <- here::here
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'data/')
+  .datPF <- file.path(.wd,'raw_data/')
+  .outPF <- file.path(.wd,"out/")
   
 } else {
   library(docopt)
@@ -49,12 +50,13 @@ if(interactive()) {
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'data/')
+  .datPF <- file.path(.wd,'raw_data/')
+  .outPF <- file.path(.wd,"out/")
 }
 
 message("start census annotation")
 
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -86,7 +88,7 @@ message("joining events with census data...")
 evt_census <- left_join(evt_df,acs2019, by = c("cbg_2010" = "cbg_2010"))
 
 message("writing out new event table...")
-fwrite(evt_census, paste0(.outPF, "event-annotations/event_census.csv"))
+fwrite(evt_census, paste0(.outPF, "event-annotation/event_census.csv"))
 #dbWriteTable(conn = db, name = "event_census", value = evt_census, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
