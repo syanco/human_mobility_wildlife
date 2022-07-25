@@ -38,8 +38,9 @@ if(interactive()) {
   # rd <- here::here
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'analysis/')
-  .outPF <- file.path(.wd,'analysis/')
+  .datPF <- file.path(.wd,'out/')
+  .pdPF  <- file.path(.wd,'processed_data')
+  .outPF <- file.path(.wd,'out/')
   
 } else {
   # library(docopt)
@@ -52,7 +53,7 @@ if(interactive()) {
   # UPDATE VERSION!!!
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'out/')
-  .pdPF  <- file.path(.wd,'processed_data')
+  .pdPF  <- file.path(.wd,'processed_data/')
   .outPF <- file.path(.wd,'out/')
 }
 
