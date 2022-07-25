@@ -6,7 +6,7 @@
 #SBATCH --mail-user=scott.yanco@yale.edu
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=100g -t 1-
-#SBATCH --partition=pi_jetz
+#SBATCH --partition=day
 
 # module load R
 module load miniconda
