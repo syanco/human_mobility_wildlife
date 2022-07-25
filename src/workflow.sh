@@ -317,7 +317,7 @@
       echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_bigmem_log.csv
   
       # SLURM:
-      sbatch ~/project/covid-19_movement/analysis/src/hpc/submit_dBBMM.sh
+      sbatch ~/project/covid-19_movement/analysis/src/hpc/run_fit_dBBMMs.sh
 
       # ON DEMAND:
       # conda activate covid
