@@ -35,7 +35,7 @@
 
 #---- Input Parameters ----#
 if(interactive()) {
-  rm(list=ls())
+  # rm(list=ls())
   library(here)
   
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
@@ -43,7 +43,7 @@ if(interactive()) {
   # rd <- here::here
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'data/')
+  .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,'analysis/')
   
 } else {
@@ -51,15 +51,15 @@ if(interactive()) {
   library(rprojroot)
   
   .wd <- getwd()
-  .script <-  thisfile()
+  # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
-  .datPF <- file.path(.wd,'data/')
+  .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,'analysis/')
 }
 
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -98,11 +98,11 @@ evt_sf$ghm <- raster::extract(ghm,evt_sf)
 evt_ghm <- evt_sf %>%
   st_drop_geometry()
 
-head(evt_ghm)
+# head(evt_ghm)
 
 # write out new table with annotations
 message("writing out new event table...")
-fwrite(evt_ghm, paste0(.outPF, "event-annotations/event_ghm.csv"))
+fwrite(evt_ghm, paste0(.outPF, "event-annotation/event_ghm.csv"))
 #dbWriteTable(conn = db, name = "event_ghm", value = evt_ghm, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
