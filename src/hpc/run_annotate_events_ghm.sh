@@ -10,7 +10,7 @@
 
 # module load R
 module load miniconda
-conda activate covidR
+conda activate covid
 
 # Declare WD
 wd=~/project/covid-19_movement

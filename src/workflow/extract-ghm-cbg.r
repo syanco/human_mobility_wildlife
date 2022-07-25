@@ -13,15 +13,15 @@
 
 #---- Input Parameters ----#
 if(interactive()) {
-  rm(list=ls())
+  # rm(list=ls())
   library(here)
   
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
   .test <- TRUE
   # rd <- here::here
   
-  .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,"analysis/")
+  .datPF <- file.path(.wd,'raw_data/')
+  .outPF <- file.path(.wd,"out/")
   
 } else {
   library(docopt)
@@ -31,11 +31,11 @@ if(interactive()) {
   .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
-  .datPF <- file.path(.wd,'data/')
-  .outPF <- file.path(.wd,"analysis/")
+  .datPF <- file.path(.wd,'raw_data/')
+  .outPF <- file.path(.wd,"out/")
 }
 
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
