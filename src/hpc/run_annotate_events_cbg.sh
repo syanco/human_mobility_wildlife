@@ -5,8 +5,8 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=scott.yanco@yale.edu
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=100g -t 1-
-#SBATCH --partition=pi_jetz
+#SBATCH --mem-per-cpu=100g -t 2:00:00
+#SBATCH --partition=day
 
 # module load R/4.1.0-foss-2020b
 module load miniconda

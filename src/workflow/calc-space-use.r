@@ -14,8 +14,8 @@ Calculate space use before and during COVID-19 lockdowns using previously
 estimated dBBMMs
 
 Usage:
-0X-calc_space_use.r <out> <db> <ctf> <nc>
-0X-calc_space_use.r (-h | --help)
+calc-space-use.r <out> <db> <ctf> <nc>
+calc-space-use.r (-h | --help)
 
 Parameters:
   --out: path to directory storing dBBMM outputs. 

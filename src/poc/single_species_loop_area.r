@@ -53,7 +53,7 @@ sp_sum <- size_res %>%
   filter(nind >10) #require a minimum of 10 individuals
 
 
-#decalre model form
+#declare model form
 form <-  bf(log_area ~ sg_norm*ghm + ndvi + lst + (1 |grp) + ar(time = wk, gr = grp))
 
 # loop throuigh species

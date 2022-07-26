@@ -5,7 +5,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=scott.yanco@yale.edu
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=100g -t 1-
+#SBATCH --mem-per-cpu=100g -t 2:00:00
 #SBATCH --partition=day
 
 # module load R

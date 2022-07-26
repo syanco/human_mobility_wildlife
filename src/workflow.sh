@@ -253,52 +253,50 @@
 
   ##-- Optional Annotations --##
 
-    #- Extract TNC GHM to census geometries -#
+#TODO: probably just delete all this
 
-      # Inputs: cbg shp file + ghm raster
-      # outputs: shp file (cbg info + ghm)
+    # #- Extract TNC GHM to census geometries -#
+    # 
+    #   # Inputs: cbg shp file + ghm raster
+    #   # outputs: shp file (cbg info + ghm)
+    # 
+    #   # SLURM:
+    #   sbatch $src/hpc/run_extract_ghm_cbg.sh
+    # 
+    #   # ON DEMAND:
+    #   # Rscript $src/workflow/extract-ghm-cbg.r
+    # 
+    #   # TODO:
+    #   #   * Fix/update docopts in extract-ghm-cbg.r
+    #   #   * Pass input/output paths as arg?
+    #   #   * Use conda rather than module r?
+    # 
+    # #
 
-      # SLURM:
-      sbatch $src/hpc/run_extract_ghm_cbg.sh
-
-      # ON DEMAND:
-      # Rscript $src/workflow/extract-ghm-cbg.r
-    
-      # TODO:
-      #   * Fix/update docopts in extract-ghm-cbg.r
-      #   * Pass input/output paths as arg?
-      #   * Use conda rather than module r?
-
-    #
-
-    #- Annotate events with census population density -#
-
-      # Inputs: db:eventclean + safegraph open census data csv
-      # Outputs: csv (event_id + total_population_2019)
-
-      # SLURM:
-      sbatch $src/hpc/run_annotate_events_census.sh
-      
-      # ON DEMAND:
-      # Rscript $src/workflow/annotate-events-census.r
-
-      # TODO:
-      #   * Fix/update docopts in extract-ghm-cbg.r
-      #   * Pass input/output paths as arg?
-      #   * Use conda rather than module r?
-      #   * Clarify inputs
-
-    #
+    # #- Annotate events with census population density -#
+    # 
+    #   # Inputs: db:eventclean + safegraph open census data csv
+    #   # Outputs: csv (event_id + total_population_2019)
+    # 
+    #   # SLURM:
+    #   sbatch $src/hpc/run_annotate_events_census.sh
+    #   
+    #   # ON DEMAND:
+    #   # Rscript $src/workflow/annotate-events-census.r
+    # 
+    #   # TODO:
+    #   #   * Fix/update docopts in extract-ghm-cbg.r
+    #   #   * Pass input/output paths as arg?
+    #   #   * Use conda rather than module r?
+    #   #   * Clarify inputs
+    # 
+    # #
     
     # TODO:
     #   * Clarify use of optional annos - deprecate?
 
   ##
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                                                 #
-#             JULY WORKFLOW BOOKMARK              #
-#                                                 #
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
 
 ####----  Analysis ----####
 
@@ -327,7 +325,7 @@
       #   * big mem log likely unneccesary, deprecate/delete
   
     #
-    
+
     #- Calculate dBBMM areas and collate environment -#
 
       # Inputs: db:event_clean + db:event_census + out filepath + 
@@ -345,9 +343,19 @@
       # Rscript $src/workflow/calc-space-use.r
     
     #
-
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                                                 #
+#             JULY WORKFLOW BOOKMARK              #
+#                                                 #
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     #- Fit space use models -#
       # TODO: Scott work scratch code into workflow
+      
+      # Inputs: space use csv + trait csv + no. cores
+      # Outputs: model rdata objects 
+       
+      conda activate brms
+      
     #
   
     #- Generate model results and diagnostic sheets-#
@@ -360,7 +368,10 @@
   ##-- Niche Breadth --##
     
     #- Calculate MVNH Breadth -#
-      # TODO: Scott bring in Diego's code
+      # Inputs: db:event_clean  + out filepath + no. cores
+      # Outputs: csv 
+      
+      sbatch $src/hpc/run_calc_space_use.sh
     #
     
     #- Join annotations to niche breadth
@@ -411,7 +422,11 @@
     #   * Add conda environment for mosey_env
   
   ##
-    
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                                                 #
+#             JULY WORKFLOW BOOKMARK              #
+#                                                 #
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     #- SafeGraph and GHM annotations for background pts
     
     # Inputs: Background csvs

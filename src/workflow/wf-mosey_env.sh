@@ -110,24 +110,17 @@ $MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP $envP #"${envs[*]}"
 #---- Import into mosey ----#
 #----
 
+# add columns to db to receive annos
+sqlite3 $db "alter table event_clean add column tmax REAL;"
+sqlite3 $db "alter table event_clean add column tmin REAL;"
+sqlite3 $db "alter table event_clean add column lst REAL;"
+sqlite3 $db "alter table event_clean add column ndvi REAL;"
+sqlite3 $db "alter table event_clean add column elev REAL;"
+sqlite3 $db "alter table event_clean add column dist2road REAL;"
+
 #points and annotations are stored in event_clean
 #for testing, see db/anno_test.sql for ddl to create event_test
-$MOSEYENV_SRC/main/import_anno.sh $gcsOutURL $annoP $db --table event_clean
+$MOSEYENV_SRC/import_anno.sh $gcsOutURL $annoP $db --table event_clean
 
-# #----
-# #---- Upload the database----#
-# #----
-# 
-# #Connect to vpn
-# /opt/cisco/anyconnect/bin/vpn connect access.yale.edu
-# 
-# wd=analysis/anno
-# dbAnno=/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod_anno.db
-# 
-# cd $wd
-# 
-# #upload the file (also rename it)
-# scp data/mosey_mod.db grace:$dbAnno 
-# 
-# #disconnect from vpn
-# /opt/cisco/anyconnect/bin/vpn disconnect
+# Send db back to HPC
+scp $db grace:$dbr
