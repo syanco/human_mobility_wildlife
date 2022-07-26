@@ -4,7 +4,7 @@
 
 '
 Usage:
-fit-space-use-models.r <dat> <out> [--cores=<cores>] [--minsp=<minsp>] [--iter=<iter>]
+fit-space-use-models.r <dat> <out> [--cores=<cores>] [--minsp=<minsp>] [--iter=<iter>] [--thin=<thin>]
 fit-space-use-models.r (-h | --help)
 
 
@@ -18,6 +18,7 @@ Options:
 -c --cores=<cores>  The number of cores
 -m --minsp=<minsp>  Minimum number of indibiduals per species to run a model
 -i --iter=<iter>    MCMC iterations
+-t --thin=<thin>    MCMC thinning rate
 ' -> doc
 
 if(interactive()) {
@@ -29,7 +30,8 @@ if(interactive()) {
 
   .cores <- 1
   .minsp <- 10
-  .iter <- 3000
+  .iter <- 5000
+  .thin <- 4
   
 } else {
   library(docopt)
@@ -40,6 +42,7 @@ if(interactive()) {
   .cores <- ag$cores
   .minsp <- ag$minsp
   .iter  <- ag$iter
+  .thin <- ag$thin
   
   source(file.path(.wd,'analysis/src/funs/input_parse.r'))
   
@@ -74,10 +77,13 @@ conflict_prefer("ar", "brms")
 conflict_prefer("lag", "stats")
 conflict_prefer("when", "foreach")
 
+# load breezy functions
 source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
 
+# check arg inputs
 .minsp <- ifelse(is.null(.minsp), 10, as.numeric(.minsp))
 .iter <- ifelse(is.null(.iter), 3000, as.numeric(.iter))
+.thin <- ifelse(is.null(.thin), 4, as.numeric(.thin))
 
 #---- Local parameters ----#
 
@@ -87,22 +93,24 @@ source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
 #---- Load data ----#
 message("Loading data...")
 
+# load and process data
 size <- read_csv("out/dbbmm_size.csv") %>%
   filter(study_id != 351564596) %>%
   filter(study_id != 1891587670) %>%
   mutate(
-    log_area = log(area),
-    sg_norm = area / cbg_area,
-    log_sg_norm = log(sg_norm),
-    ind_f = as.factor(ind_id),
-    grp = paste(ind_f, year, sep = "_"),
+    log_area = log(area), #get log of weekly area use
+    log_area_scale = scale(log_area), # standardize it
+    sg_norm = sg / cbg_area, # normalize safegraph data by size of the CBG
+    # log_sg_norm = log(sg_norm),
+    ind_f = as.factor(ind_id), # cretae factor version of ind for REs
+    grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
     # trt_new = gsub('_.*','',trt),
-    year_f = factor(year),
+    year_f = factor(year), # create year factor
     # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
     # sp2 = gsub(" ", "_", species),  
-    wk_n = as.numeric(substring(wk, 2)),
-    ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"),
-    study_f = as.factor(study_id)
+    wk_n = as.numeric(substring(wk, 2)), # extract week number
+    ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
+    study_f = as.factor(study_id) # make study id factor
   ) %>%
   distinct()
 
@@ -118,11 +126,11 @@ registerDoMC(.cores)
 # ==== Perform analysis ====
 
 #declare model form
-form <-  bf(log_area ~ sg_norm*ghm + ndvi + lst + (1 |study_f/grp) + ar(time = wk, gr = grp))
+form <-  bf(log_area_scale ~ sg_norm*ghm + ndvi + lst + (1 |grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
-# loop throuigh species
+# loop through species
 foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   
   # get focal species
@@ -137,13 +145,12 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   # fit model
   mod <- brm(
     form,
-    # data2 = list(phylo_vcov = phylo_vcov),
     data = dat,
     # family = Gamma(link = "log"),
     inits = 0,
     cores = 1,
     iter = .iter,
-    thin = 4
+    thin = .thin
   )
   
   #stash results into named list
