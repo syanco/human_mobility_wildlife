@@ -354,8 +354,14 @@
       # Inputs: space use csv + trait csv + no. cores
       # Outputs: model rdata objects 
        
+      # SLURM
       conda activate brms
+      sbatch $src/hpc/run_fit_space_use_models.sh
       
+      # ON DEMAND:
+      # conda activate brms
+      # Rscript $wd/analysis/src/workflow/fit-space-use-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area 24 10 10000 5
+
     #
   
     #- Generate model results and diagnostic sheets-#
