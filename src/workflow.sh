@@ -355,7 +355,6 @@
       # Outputs: model rdata objects 
        
       # SLURM
-      conda activate brms
       sbatch $src/hpc/run_fit_space_use_models.sh
       
       # ON DEMAND:
