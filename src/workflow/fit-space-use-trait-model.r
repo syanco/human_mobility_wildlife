@@ -4,13 +4,17 @@
 
 '
 Usage:
-fit-space-use-models.r <dat> <out> [<cores> <minsp> <iter> <thin>]
+fit-space-use-models.r <dat> <out> <trait> <cores> [<iter> <thin>]
 fit-space-use-models.r (-h | --help)
 
 
 Parameters:
 dat: path to input csv file.
 out: path to output directory.
+trait: path to species trait csv
+cores: number of HPC cores 
+iter: MCMC iterations
+thin: MCMC thin rate
 
 Options:
 -h --help           Show this screen.
@@ -19,20 +23,21 @@ Options:
 ' -> doc
 
 if(interactive()) {
-
+  
   .wd <- getwd()
   
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
   .outP <- file.path(.wd,'out/single_species_models/area')
-
-  .cores <- 20
+  .traitPF <- file.path(.wd, 'raw_data/anthropause_data_sheet.csv')
+  
+  .cores <- 4
   .minsp <- 10
   .iter <- 5000
   .thin <- 4
   
 } else {
   library(docopt)
-
+  
   ag <- docopt(doc, version = '0.1\n')
   
   .wd <- getwd()
@@ -45,6 +50,7 @@ if(interactive()) {
   
   .datPF <- makePath(ag$dat)
   .outP <- makePath(ag$out)
+  .traitPF <- makePath(ag$trait)
   
 }
 
@@ -92,9 +98,12 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   mutate(
     log_area = log(area), #get log of weekly area use
     log_area_scale = scale(log_area), # standardize it
-    sg_norm = sg / cbg_area, # normalize safegraph data by size of the CBG
+    sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
     # log_sg_norm = log(sg_norm),
-    ind_f = as.factor(ind_id), # cretae factor version of ind for REs
+    ghm_scale = scale(ghm),
+    ndvi_scale = scale(ndvi),
+    lst_scale = scale(lst),
+    ind_f = as.factor(ind_id), # create factor version of ind for REs
     grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
     # trt_new = gsub('_.*','',trt),
     year_f = factor(year), # create year factor
@@ -106,132 +115,43 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   ) %>%
   distinct()
 
-# get ind count per species
-sp_sum <- size %>%
-  group_by(species) %>%
-  summarize(nind = length(unique(ind_f))) %>%
-  filter(nind > .minsp) #require a minimum of 10 individuals
+message("Loading trait data...")
+traits <- read_csv(.traitPF)
 
-# ==== Start cluster and register backend ====
-registerDoMC(.cores)
+# combine data
+dat <- size %>% 
+  left_join(traits, by = c("species" = "Species"))
+
 
 # ==== Perform analysis ====
 
 #declare model form
-form <-  bf(log_area_scale ~ sg_norm*ghm + ndvi + lst + (1 |grp) + ar(time = wk, gr = grp))
+form <-  bf(log_area_scale ~ sg_norm*ghm_scale + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
-# loop through species
-foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
+message("Strating model...")
 
-  # get focal species
-  sp <- sp_sum$species[i]
+# fit model
+mod <- brm(
+  form,
+  data = dat,
+  # family = Gamma(link = "log"),
+  inits = 0,
+  cores = .cores,
+  iter = .iter,
+  thin = .thin
+)
 
-  message(glue("Strating model for {sp}..."))
+#stash results into named list
+out <- list(
+  data = dat,
+  model = mod
+)
 
-  #filter data
-  dat <- size %>%
-    filter(species == sp)
+#write out results
+save(out, file = glue("{.outP}/size_trait_mod_{Sys.Date()}.rdata"))
 
-  # fit model
-  mod <- brm(
-    form,
-    data = dat,
-    # family = Gamma(link = "log"),
-    inits = 0,
-    cores = 1,
-    iter = .iter,
-    thin = .thin
-  )
-
-  #stash results into named list
-  out <- list(
-    species = sp,
-    data = dat,
-    model = mod
-  )
-
-  #write out results
-  save(out, file = glue("{.outP}/{sp}_{Sys.Date()}.rdata"))
-
-} # i
-
-
-#---- Load data ----#
-message("Loading data...")
-
-# load and process data
-size <- read_csv("out/dbbmm_size.csv") %>%
-  filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) %>%
-  mutate(
-    log_area = log(area), #get log of weekly area use
-    log_area_scale = scale(log_area), # standardize it
-    sg_norm = sg / cbg_area, # normalize safegraph data by size of the CBG
-    # log_sg_norm = log(sg_norm),
-    ind_f = as.factor(ind_id), # cretae factor version of ind for REs
-    grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
-    # trt_new = gsub('_.*','',trt),
-    year_f = factor(year), # create year factor
-    # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
-    # sp2 = gsub(" ", "_", species),
-    wk_n = as.numeric(substring(wk, 2)), # extract week number
-    ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
-    study_f = as.factor(study_id) # make study id factor
-  ) %>%
-  distinct()
-
-# get ind count per species
-sp_sum <- size %>%
-  group_by(species) %>%
-  summarize(nind = length(unique(ind_f))) %>%
-  filter(nind > .minsp) #require a minimum of 10 individuals
-
-# ==== Start cluster and register backend ====
-registerDoMC(.cores)
-
-# ==== Perform analysis ====
-
-#declare model form
-form <-  bf(log_area_scale ~ sg_norm*ghm + ndvi + lst + (1 |grp) + ar(time = wk, gr = grp))
-message("Fitting models with formula:")
-print(form)
-
-# loop through species
-foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
-
-  # get focal species
-  sp <- sp_sum$species[i]
-
-  message(glue("Strating model for {sp}..."))
-
-  #filter data
-  dat <- size %>%
-    filter(species == sp)
-
-  # fit model
-  mod <- brm(
-    form,
-    data = dat,
-    # family = Gamma(link = "log"),
-    inits = 0,
-    cores = 1,
-    iter = .iter,
-    thin = .thin
-  )
-
-  #stash results into named list
-  out <- list(
-    species = sp,
-    data = dat,
-    model = mod
-  )
-
-  #write out results
-  save(out, file = glue("{.outP}/{sp}_{Sys.Date()}.rdata"))
-
-} # i
 
 # ==== Finalize script ====
 message(glue('Script complete in {diffmin(t0)} minutes'))

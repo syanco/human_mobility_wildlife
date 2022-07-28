@@ -349,13 +349,13 @@
 #                                                 #
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     #- Fit space use models -#
-      # TODO: Scott work scratch code into workflow
       
       # Inputs: space use csv + trait csv + no. cores
       # Outputs: model rdata objects 
        
       # SLURM
       sbatch $src/hpc/run_fit_space_use_models.sh
+      sbatch $src/hpc/run_fit_space_use_trait_model.sh
       
       # ON DEMAND:
       # conda activate brms
