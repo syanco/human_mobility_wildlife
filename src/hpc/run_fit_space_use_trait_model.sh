@@ -4,9 +4,9 @@
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition day
-#SBATCH -c 24
+#SBATCH -c 4
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J fit_space_use_mods
+#SBATCH -J fit_space_use_trait_mod
 
 # Load conda env
 module load miniconda
