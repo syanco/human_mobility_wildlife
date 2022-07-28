@@ -1,13 +1,17 @@
+################################################################################################################
+#       COVID-19 Animal Movement                                                                               #
+################################################################################################################
+
+# This script generates individual n-dimensional hypervolumes (Lu et al. 2020).
 
 # ==== Setup ====
 
 '
 Calculate multivariate niches across multiple individuals
-
 Usage:
 
-calculate_niches.r <db> <out> <nc>
-calculate_niches.r (-h | --help)
+calc-niche-breadth.r <db> <out> <nc>
+calc-niche-breadth.r (-h | --help)
 
 Parameters:
   db: path to movement databse. 
@@ -22,19 +26,17 @@ Options:
 
 #---- Input Parameters ----#
 if(interactive()) {
-  library(here)
+  # library(here)
   
-  .wd <- '~/projects/Anthropause/'
-  rd <- here::here
+  .wd <- getwd()
   
-  .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path(.wd,'mosey_mod.db')
+  .outPF <- file.path(.wd,'out/single_species_models/niche')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   
   .nc <- 2
   
 } else {
   library(docopt)
-  library(rprojroot)
   
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
@@ -52,7 +54,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'/src/startup.r'))
+source(file.path(.wd,'analysis/src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -92,7 +94,7 @@ ind <- indtb %>%
   pull(individual_id)
 
 
-ind <- ind[ind  %in% unique(evt0$individual_id)]
+ind = ind[ind  %in% unique(evt0$individual_id)]
 
 # Look at climate data what is the percentage of NA. More than half of LST has NA
 # prop.table(table(is.na(evt0$lst)))
@@ -111,38 +113,40 @@ yearvec <- c("2019", "2020")
 
 registerDoMC(.nc)
 
+# DEPRECATED - moved this process into the workflow.sh script
+# # check if output csv exists and intit if not
+# if(!file.exists(glue("{.outPF}/niche_determinant_anthropause_test.csv"))){
+#   # Write an empty table:
+#   determinant_template = data.frame()
+#   columns= c("total","tmax","tmin","lst","ndvi", 'elev', 'dist2road', 'cor', 'week', 'individual',
+#              'scientificname', 'studyid','year') 
+#   determinant_template = data.frame(matrix(nrow = 0, ncol = length(columns))) 
+#   # assign column names
+#   colnames(determinant_template) = columns
+#   
+#   write.table(determinant_template, glue("{.outPF}/niche_determinant_anthropause_test.csv"), append = T, row.names = F, 
+#               col.names = T, sep = ",")
+# }
 
-if(!file.exists(glue("{.outPF}/niche_determinant_anthropause_test.csv"))){
-  # Write an empty table:
-  determinant_template = data.frame()
-  columns= c("total","tmax","tmin","ndvi", 'elev', 'dist2road', 'cor', 'week', 'individual',
-             'scientificname', 'studyid','year') 
-  determinant_template = data.frame(matrix(nrow = 0, ncol = length(columns))) 
-  # assign column names
-  colnames(determinant_template) = columns
-  
-  write.table(determinant_template, glue("{.outPF}/niche_determinant_anthropause_test.csv"), append = T, row.names = F, 
-              col.names = T, sep = ",")
-}
-
-
-if(!file.exists(glue("{.outPF}/niche_log_test.csv"))){
-  # Write the log file:
-  columns= c("studyid","individual","scientificname","year", 'status', 'week') 
-  logfile_template = data.frame(matrix(nrow = 0, ncol = length(columns))) 
-  # assign column names
-  colnames(logfile_template) = columns
-  
-  write.table(logfile_template, glue("{.outPF}/niche_log_test.csv"), append = T, row.names = F, 
-              col.names = T, sep = ",")
-}
+# DEPRECATED - moved this process into the workflow.sh script
+# # check if log csv exists and intit if not
+# if(!file.exists(glue("{.outPF}/niche_log_test.csv"))){
+#   # Write the log file:
+#   columns= c("studyid","individual","scientificname","year", 'status', 'week') 
+#   logfile_template = data.frame(matrix(nrow = 0, ncol = length(columns))) 
+#   # assign column names
+#   colnames(logfile_template) = columns
+#   
+#   write.table(logfile_template, glue("{.outPF}/niche_log_test.csv"), append = T, row.names = F, 
+#               col.names = T, sep = ",")
+# }
 
 
 for(j in 1:length(unique(ind)) ){
   # j <- 100
   for(i in unique(yearvec)){
     # i <- 2019
-    print(paste0('Data for individual ', ind[j], ' year ', i))
+    # print(paste0('Data for individual ', ind[j], ' year ', i))
     
     # Toggle `%do%` to `%dopar%` for HPC, %do% for local
     # foreach(j = 1:length(inds)) %do% {
@@ -173,7 +177,7 @@ for(j in 1:length(unique(ind)) ){
     
     message("Filtering data and manipulating dates...")
     
-    print(i)
+    # print(i)
     
     # i = 2020
     evt_mod <- evt0 %>% 
@@ -185,15 +189,15 @@ for(j in 1:length(unique(ind)) ){
       arrange(timestamp)
     
     
-    tmp_sub = evt_mod %>% select("event_id","individual_id","timestamp","lon","lat", 'week', 'yr', 'n_indiv_week_year', 'tmax',
-                                 'tmin', 'ndvi', 'elev', 'dist2road' )
+    # tmp_sub = evt_mod %>% select("event_id","individual_id","timestamp","lon","lat", 'week', 'yr', 'n_indiv_week_year', 'tmax',
+    #                              'tmin', 'ndvi', 'elev', 'dist2road' )
     
     
     #-- Fit Multivariate niches ####
     message("Estimating Multivariate niches")
     
     wk <- unique(evt_mod$week)
-    wk = wk[complete.cases(wk)]
+    # wk = wk[complete.cases(wk)]
     if(length(wk)==0){print(paste0('No data for year ', i, ' writing in logfile'))
       
       tmp_dummy_fail = data.frame(
@@ -217,78 +221,66 @@ for(j in 1:length(unique(ind)) ){
       # w <- 26
       # Minimum of how many points per week? Maybe do biweekly? for sample size related? echoeing benas concerns? # Ask Scott ####
       # some weeks have no data NA values ind j == 4111
-      print(w)
+      # print(w)
       
       evt_tmp <- evt_mod %>% filter(week == w) %>%
-        select(tmax, tmin, ndvi, elev, dist2road, week, event_id, individual_id, n_indiv_week_year) %>% drop_na(tmax, tmin, ndvi, elev, dist2road)
+        select(tmax, tmin, ndvi, elev, dist2road, week, event_id, individual_id, 
+               n_indiv_week_year) %>%
+        drop_na(tmax, tmin, ndvi, elev, dist2road)
       
       # evt_tmp$n_indiv_week_year
       
       
       tryCatch({
         
-        determinant = MVNH_det(na.omit(evt_tmp[,c('tmax', 'tmin', 'ndvi', 'elev', 'dist2road')]), log = TRUE)
-        # year
-        determinant_df = data.frame(as.list(determinant))
-        determinant_df$week <- unique(w)
-        determinant_df$individual <- unique(evt_tmp$individual_id)
-        determinant_df$scientificname <- scientificname
-        determinant_df$studyid <- studyid
-        determinant_df$year <- i
-        
-        
-        # Appnd = true in the .csv
-        
-        # How do we compare dissimilarity? -> Same week previous year? Among which individuals?
-        # 
+        if(nrow(evt_tmp) > 0){      
+          determinant <- MVNH_det(evt_tmp[,c('tmax', 'tmin', 'ndvi', 'elev', 'dist2road')], log = TRUE)
+
+          determinant_df <- data.frame(as.list(determinant))
+          determinant_df$week <- unique(w)
+          determinant_df$individual <- unique(evt_tmp$individual_id)
+          determinant_df$scientificname <- scientificname
+          determinant_df$studyid <- studyid
+          determinant_df$year <- i
+          
+          write.table(determinant_df, glue("{.outPF}/niche_determinant_anthropause_test.csv"), append = T, row.names = F, 
+                      col.names = F, sep = ",")
+          
+          
+          
+          tmp_dummy_success = data.frame(
+            studyid = studyid, 
+            individual  = ind[j],
+            scientificname = scientificname,
+            year = i,
+            status = 1,
+            week = w)
+          
+          # logfile_template$studyid <- studyid
+          write.table(tmp_dummy_success, glue("{.outPF}/niche_log_test.csv"), append = T, row.names = F, 
+                      col.names = F, sep = ",")
+          } else {# if there's data
+            
+            tmp_dummy_success = data.frame(
+              studyid = studyid, 
+              individual  = ind[j],
+              scientificname = scientificname,
+              year = i,
+              status = 0,
+              week = w)
+            
+            # logfile_template$studyid <- studyid
+            write.table(tmp_dummy_success, glue("{.outPF}/niche_log_test.csv"), append = T, row.names = F, 
+                        col.names = F, sep = ",")
+            
+            print(paste0(unique(evt_tmp$n_indiv_week_year), ' has NA in niche determinant, moving to the next week'))
+          } # else
+            
       }, error = function(e){cat(glue("ERROR: unspecified error in fitting niche determinant for ind {ind[j]}, yr {i}", 
                                       "\n"))})
       
       
-      
-      if( any(is.na(determinant[c('tmax','tmin', 'ndvi', 'elev')])) ){
-        
-        tmp_dummy_success = data.frame(
-          studyid = studyid, 
-          individual  = ind[j],
-          scientificname = scientificname,
-          year = i,
-          status = 0,
-          week = w)
-        
-        # logfile_template$studyid <- studyid
-        write.table(tmp_dummy_success, glue("{.outPF}/niche_log_test.csv"), append = T, row.names = F, 
-                    col.names = F, sep = ",")
-        
-        print(paste0(unique(evt_tmp$n_indiv_week_year), ' has NA in niche determinant, moving to the next week'))
-        
-        
-        
-        next
-      }
-      
-      # If there is non NA in the predictor variables
-      
-      
-      write.table(determinant_df, glue("{.outPF}/niche_determinant_anthropause_test.csv"), append = T, row.names = F, 
-                  col.names = F, sep = ",")
-      
-      
-      
-      tmp_dummy_success = data.frame(
-        studyid = studyid, 
-        individual  = ind[j],
-        scientificname = scientificname,
-        year = i,
-        status = 1,
-        week = w)
-      
-      # logfile_template$studyid <- studyid
-      write.table(tmp_dummy_success, glue("{.outPF}/niche_log_test.csv"), append = T, row.names = F, 
-                  col.names = F, sep = ",")
-      
-    }
-    
+  
   } # fi
   #  } # fi end the check whether individual has been previously considered
 } #i (end loop through years) : #j (end loop through individuals)
@@ -296,7 +288,3 @@ for(j in 1:length(unique(ind)) ){
 #---- Finalize script ----#
 
 message(glue('Script complete in {diffmin(t0)} minutes'))
-# 
-# }
-# 
-# }

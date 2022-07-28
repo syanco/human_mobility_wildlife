@@ -373,10 +373,17 @@
   ##-- Niche Breadth --##
     
     #- Calculate MVNH Breadth -#
+      
+      # Create csv to store results
+      echo "total, tmax, tmin, ndvi, elev, dist2road, cor, week, individual, scientificname, studyid, year" > ./out/niche_determinant_anthropause_test.csv
+
+      # Make log file to track successful outputs
+      echo "studyid, individual, scientificname, year, status, week" > out/niche_log.csv
+  
       # Inputs: db:event_clean  + out filepath + no. cores
       # Outputs: csv 
       
-      sbatch $src/hpc/run_calc_space_use.sh
+      sbatch $src/hpc/run_calc_niche_breadth.sh
     #
     
     #- Join annotations to niche breadth
