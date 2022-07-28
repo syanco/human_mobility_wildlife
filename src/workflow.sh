@@ -343,11 +343,7 @@
       # Rscript $src/workflow/calc-space-use.r
     
     #
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                                                 #
-#             JULY WORKFLOW BOOKMARK              #
-#                                                 #
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
     #- Fit space use models -#
       
       # Inputs: space use csv + trait csv + no. cores
@@ -385,7 +381,11 @@
       
       sbatch $src/hpc/run_calc_niche_breadth.sh
     #
-    
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                                                 #
+#             JULY WORKFLOW BOOKMARK              #
+#                                                 #
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$    
     #- Join annotations to niche breadth
       # TODO: Scott find code?  Write new code?  What the hell happened?!
     #
