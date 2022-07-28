@@ -25,7 +25,7 @@ if(interactive()) {
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
   .outP <- file.path(.wd,'out/single_species_models/area')
 
-  .cores <- 1
+  .cores <- 20
   .minsp <- 10
   .iter <- 5000
   .thin <- 4
