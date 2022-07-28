@@ -120,7 +120,13 @@ traits <- read_csv(.traitPF)
 
 # combine data
 dat <- size %>% 
-  left_join(traits, by = c("species" = "Species"))
+  left_join(traits, by = c("species" = "Species")) %>% 
+  mutate(diet = case_when(Diet.PlantO >= 50 ~ "Herbivore",
+                          Diet.Fruit >= 50 ~ "Frugivore",
+                          Diet.Scav >= 50 ~ "Savenger",
+                          Diet.Inv >= 50 ~ "Insectivore",
+                          (Diet.Vend+Diet.Vect+Diet.Vfish) >= 50 ~ "Carnivore",
+                          TRUE ~ "Omnivore"))
 
 
 # ==== Perform analysis ====
