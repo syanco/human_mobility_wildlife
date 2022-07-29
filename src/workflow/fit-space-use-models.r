@@ -88,26 +88,7 @@ message("Loading data...")
 # load and process data
 size <- read_csv("out/dbbmm_size.csv") %>%
   filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) %>%
-  mutate(
-    log_area = log(area), #get log of weekly area use
-    log_area_scale = scale(log_area), # standardize it
-    sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
-    # log_sg_norm = log(sg_norm),
-    ghm_scale = scale(ghm),
-    ndvi_scale = scale(ndvi),
-    lst_scale = scale(lst),
-    ind_f = as.factor(ind_id), # create factor version of ind for REs
-    grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
-    # trt_new = gsub('_.*','',trt),
-    year_f = factor(year), # create year factor
-    # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
-    # sp2 = gsub(" ", "_", species),
-    wk_n = as.numeric(substring(wk, 2)), # extract week number
-    ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
-    study_f = as.factor(study_id) # make study id factor
-  ) %>%
-  distinct()
+  filter(study_id != 1891587670) 
 
 # get ind count per species
 sp_sum <- size %>%
@@ -135,8 +116,26 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
 
   #filter data
   dat <- size %>%
-    filter(species == sp)
-
+    filter(species == sp) %>% 
+    mutate(
+      log_area = log(area), #get log of weekly area use
+      log_area_scale = scale(log_area), # standardize it
+      sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
+      # log_sg_norm = log(sg_norm),
+      ghm_scale = scale(ghm),
+      ndvi_scale = scale(ndvi),
+      lst_scale = scale(lst),
+      ind_f = as.factor(ind_id), # create factor version of ind for REs
+      grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
+      # trt_new = gsub('_.*','',trt),
+      year_f = factor(year), # create year factor
+      # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
+      # sp2 = gsub(" ", "_", species),
+      wk_n = as.numeric(substring(wk, 2)), # extract week number
+      ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
+      study_f = as.factor(study_id) # make study id factor
+    ) %>%
+    distinct() 
   # fit model
   mod <- brm(
     form,

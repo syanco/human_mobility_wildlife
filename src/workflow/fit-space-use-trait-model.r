@@ -131,7 +131,7 @@ dat <- size %>%
 
 # ==== Perform analysis ====
 
-#declare model form
+# declare model form
 form <-  bf(log_area_scale ~ sg_norm*ghm_scale*diet + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)

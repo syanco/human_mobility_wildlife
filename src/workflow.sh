@@ -351,6 +351,7 @@
        
       # SLURM
       sbatch $src/hpc/run_fit_space_use_models.sh
+      sbatch $src/hpc/run_fit_space_use_sg_models.sh
       sbatch $src/hpc/run_fit_space_use_trait_model.sh
       
       # ON DEMAND:

@@ -449,7 +449,7 @@ for(i in 1:length(fl)){
                                 # ndraws=100,
                                 re_formula = NA)
   (ce_plot_list[[i]] <-  plot(ce_int, plot = FALSE)[[1]] +
-      # theme_tufte() +
+      theme_void() +
       labs(title = out$species,
            subtitle = "Conditional Effects") +
       xlab("Human Mobility") +

@@ -19,12 +19,12 @@ Options:
 ' -> doc
 
 if(interactive()) {
-
+  
   .wd <- getwd()
   
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
   .outP <- file.path(.wd,'out/single_species_models/area')
-
+  
   .cores <- 20
   .minsp <- 10
   .iter <- 5000
@@ -32,7 +32,7 @@ if(interactive()) {
   
 } else {
   library(docopt)
-
+  
   ag <- docopt(doc, version = '0.1\n')
   
   .wd <- getwd()
@@ -88,26 +88,7 @@ message("Loading data...")
 # load and process data
 size <- read_csv("out/dbbmm_size.csv") %>%
   filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) %>%
-  mutate(
-    log_area = log(area), #get log of weekly area use
-    log_area_scale = scale(log_area), # standardize it
-    sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
-    # log_sg_norm = log(sg_norm),
-    ghm_scale = scale(ghm),
-    ndvi_scale = scale(ndvi),
-    lst_scale = scale(lst),
-    ind_f = as.factor(ind_id), # create factor version of ind for REs
-    grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
-    # trt_new = gsub('_.*','',trt),
-    year_f = factor(year), # create year factor
-    # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
-    # sp2 = gsub(" ", "_", species),
-    wk_n = as.numeric(substring(wk, 2)), # extract week number
-    ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
-    study_f = as.factor(study_id) # make study id factor
-  ) %>%
-  distinct()
+  filter(study_id != 1891587670) 
 
 # get ind count per species
 sp_sum <- size %>%
@@ -121,22 +102,41 @@ registerDoMC(.cores)
 # ==== Perform analysis ====
 
 #declare model form
-form <-  bf(log_area_scale ~ sg_norm*ghm_scale + ndvi_scale + lst_scale + (1 |grp) + ar(time = wk, gr = grp))
+form <-  bf(log_area_scale ~ sg_norm + ndvi_scale + lst_scale + (1 |grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
 # loop through species
 foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
-
+  
   # get focal species
   sp <- sp_sum$species[i]
-
+  
+  
   message(glue("Strating model for {sp}..."))
-
-  #filter data
+  
   dat <- size %>%
-    filter(species == sp)
-
+    filter(species == sp) %>% 
+    mutate(
+      log_area = log(area), #get log of weekly area use
+      log_area_scale = scale(log_area), # standardize it
+      sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
+      # log_sg_norm = log(sg_norm),
+      ghm_scale = scale(ghm),
+      ndvi_scale = scale(ndvi),
+      lst_scale = scale(lst),
+      ind_f = as.factor(ind_id), # create factor version of ind for REs
+      grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
+      # trt_new = gsub('_.*','',trt),
+      year_f = factor(year), # create year factor
+      # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
+      # sp2 = gsub(" ", "_", species),
+      wk_n = as.numeric(substring(wk, 2)), # extract week number
+      ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
+      study_f = as.factor(study_id) # make study id factor
+    ) %>%
+    distinct()    
+  
   # fit model
   mod <- brm(
     form,
@@ -147,17 +147,17 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
     iter = .iter,
     thin = .thin
   )
-
+  
   #stash results into named list
   out <- list(
     species = sp,
     data = dat,
     model = mod
   )
-
+  
   #write out results
   save(out, file = glue("{.outP}/{sp}_{Sys.Date()}.rdata"))
-
+  
 } # i
 
 # ==== Finalize script ====
