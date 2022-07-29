@@ -1,5 +1,8 @@
 # quick script to pull info from single speceis use area models 
 
+# CONDA:  brms
+
+
 library(ggplot2)
 library(tidyverse)
 library(brms)
@@ -65,7 +68,7 @@ for(i in 1:length(fl)){
   
   # Conditional Effects Plot for interaction
   ce_int <- conditional_effects(x=out$model, 
-                                effects = "sg_norm:ghm",
+                                effects = "sg_norm:ghm_scale",
                                 # int_conditions = list(ghm = seq(0, 1, by = 0.25)),
                                 # rug = T,
                                 # points = T,
@@ -91,7 +94,7 @@ for(i in 1:length(fl)){
   
   # Conditional Effects Plot for GHM
   ce_ghm <- conditional_effects(x=out$model, 
-                                effects = "ghm",
+                                effects = "ghm_scale",
                                 # rug = T,
                                 # points = T,
                                 re_formula = NA)

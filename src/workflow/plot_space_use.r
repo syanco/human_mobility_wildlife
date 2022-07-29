@@ -142,9 +142,9 @@ modout_df <- modout_df %>%
                                    T ~ NA_real_))
 
 
-#---- Make Plot ----#
+#---- Make Plots ----#
 
-# FIG 2
+#-- Coef "table" plot --#
 
 pal <- c("#E66100", "#5D3A9B")
 
@@ -193,7 +193,10 @@ pal <- c("#E66100", "#5D3A9B")
 
 pMob|pGHM|pInter
 
-# FIG 3
+
+
+#-- Dot and whisker coef plot --#
+#
 pal2 <- c(pal, "#808080")
 modout_df <- modout_df %>% 
   filter(Species != "Ursus arctos",
@@ -416,6 +419,56 @@ modout_df <- modout_df %>%
 
 (dietMod|dietMob|dietInter)/(migMod|migMob|migInter)/(taxMod|taxMob|taxInter)/(massMod|massMob|massInter)
 
+
+#-- Conditional effects plots --#
+fl <- list.files("out/single_species_models/area/")
+ce_plot_list <- list()
+
+pal3 <- c("#D55E00", "#009E73")
+
+for(i in 1:length(fl)){
+  
+  #load the model, species, and data
+  load(glue("out/single_species_models/area/{fl[i]}")) 
+  
+  # get observed quantiles of ghm to set "low" and "high" human mod
+  ghmq <- quantile(out$data$ghm_scale, probs = c(0.10, 0.90), na.rm = T)
+  sgq <- quantile(out$data$sg_norm, probs = c(0.25, 0.75), na.rm = T)
+  # sg_seq <- seq(as.numeric(sgq[1]), as.numeric(sgq[2]), length.out = 100)
+  
+  
+  
+  
+  # Conditional Effects Plot for interaction
+  ce_int <- conditional_effects(x=out$model, 
+                                effects = "sg_norm:ghm_scale",
+                                int_conditions = list(ghm_scale = ghmq),
+                                rug = T,
+                                # points = T,
+                                # spaghetti = T,
+                                # ndraws=100,
+                                re_formula = NA)
+  (ce_plot_list[[i]] <-  plot(ce_int, plot = FALSE)[[1]] +
+      # theme_tufte() +
+      labs(title = out$species,
+           subtitle = "Conditional Effects") +
+      xlab("Human Mobility") +
+      ylab("Space Use")+
+      scale_color_manual(values = pal3, name = "Human \n Modification",
+                         labels = c("High", "Low")) +
+      scale_fill_manual(values = pal3, name = "Human \n Modification",
+                        labels = c("High", "Low"))
+    
+    # theme(lege)
+  )# geom_point(data = out$data, aes(x = sg_norm, y = log_area, size = ghm), alpha = 0.2, inherit.aes = F)  
+
+  }
+
+plot(ce_plot_list[[1]])
+
+pdf("figs/int_cond_07292022.pdf")
+for(i in 1:length(fl)){plot(ce_plot_list[[i]])}
+dev.off()
 #---- Save output ---#
 message(glue('Saving to {.outPF}'))
 
