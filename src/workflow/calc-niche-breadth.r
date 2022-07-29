@@ -141,10 +141,11 @@ registerDoMC(.nc)
 #               col.names = T, sep = ",")
 # }
 
-
-for(j in 1:length(unique(ind)) ){
-  # j <- 100
-  for(i in unique(yearvec)){
+foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
+  foreach(i = unique(yearvec), .errorhandling = "pass", .inorder = F) %dopar% {
+# for(j in 1:length(unique(ind)) ){
+#   # j <- 100
+#   for(i in unique(yearvec)){
     # i <- 2019
     # print(paste0('Data for individual ', ind[j], ' year ', i))
     
@@ -213,7 +214,7 @@ for(j in 1:length(unique(ind)) ){
                   col.names = F, sep = ",")
       
       
-      next}
+      } else{ # if no weeks in data
     
     
     # i <- 10
@@ -281,9 +282,11 @@ for(j in 1:length(unique(ind)) ){
       
       
   
-  } # fi
-  #  } # fi end the check whether individual has been previously considered
+  } # for w in wks
+      } # else (if wks > 0)
+        #  } # fi end the check whether individual has been previously considered
 } #i (end loop through years) : #j (end loop through individuals)
+
 
 #---- Finalize script ----#
 
