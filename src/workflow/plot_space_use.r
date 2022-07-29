@@ -229,7 +229,7 @@ modout_df <- modout_df %>%
     geom_vline(xintercept = 0, linetype = "dashed")+
     theme_tufte() +
     ggtitle("Human Mobility") +
-    ylab("Diet Guild")+
+    ylab("")+
     xlab("")+
     facet_wrap(~diet, ncol = 1, strip.position="left", scales = "free_y")+
     theme(axis.text.y = element_blank(),
@@ -248,7 +248,7 @@ modout_df <- modout_df %>%
     geom_vline(xintercept = 0, linetype = "dashed")+
     theme_tufte() +
     ggtitle("Interaction") +
-    ylab("Diet Guild")+
+    ylab("")+
     xlab("")+
     facet_wrap(~diet, ncol = 1, strip.position="left", scales = "free_y")+
     theme(axis.text.y = element_blank(),
@@ -284,7 +284,7 @@ modout_df <- modout_df %>%
     scale_color_manual(values = pal2)+
     geom_vline(xintercept = 0, linetype = "dashed")+
     theme_tufte() +
-    ylab("Migratory Strategy")+
+    ylab("")+
     xlab("")+
     facet_wrap(~migratory, ncol = 1, strip.position="left", scales = "free_y")+
     theme(axis.text.y = element_blank(),
@@ -302,7 +302,7 @@ modout_df <- modout_df %>%
     scale_color_manual(values = pal2)+
     geom_vline(xintercept = 0, linetype = "dashed")+
     theme_tufte() +
-    ylab("Migratory Strategy")+
+    ylab("")+
     xlab("")+
     facet_wrap(~migratory, ncol = 1, strip.position="left", scales = "free_y")+
     theme(axis.text.y = element_blank(),
@@ -338,7 +338,7 @@ modout_df <- modout_df %>%
     scale_color_manual(values = pal2)+
     geom_vline(xintercept = 0, linetype = "dashed")+
     theme_tufte() +
-    ylab("Species Group")+
+    ylab("")+
     xlab("")+
     facet_wrap(~species_group, ncol = 1, strip.position="left", scales = "free_y")+
     theme(axis.text.y = element_blank(),
@@ -356,7 +356,7 @@ modout_df <- modout_df %>%
     scale_color_manual(values = pal2)+
     geom_vline(xintercept = 0, linetype = "dashed")+
     theme_tufte() +
-    ylab("Species Group")+
+    ylab("")+
     xlab("")+
     facet_wrap(~species_group, ncol = 1, strip.position="left", scales = "free_y")+
     theme(axis.text.y = element_blank(),
@@ -392,7 +392,7 @@ modout_df <- modout_df %>%
     scale_color_manual(values = pal2)+
     geom_vline(xintercept = 0)+
     theme_tufte() +
-    ylab("log(body mass)")+
+    ylab("")+
     xlab("")+
     # facet_wrap(~species_group, ncol = 1, strip.position="left", scales = "free_y")+
     theme(legend.position = "none")
@@ -408,7 +408,7 @@ modout_df <- modout_df %>%
     scale_color_manual(values = pal2)+
     geom_vline(xintercept = 0)+
     theme_tufte() +
-    ylab("log(body mass)")+
+    ylab("")+
     xlab("")+
     # facet_wrap(~species_group, ncol = 1, strip.position="left", scales = "free_y")+
     theme(legend.position = "none")
