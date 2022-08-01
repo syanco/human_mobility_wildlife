@@ -104,7 +104,7 @@ breadth <- read_csv(.datPF) %>%
 
 # get ind count per species
 sp_sum <- breadth %>%
-  group_by(species) %>%
+  group_by(scientificname) %>%
   summarize(nind = length(unique(ind_f))) %>%
   filter(nind > .minsp) #require a minimum of 10 individuals
 
@@ -122,13 +122,13 @@ print(form)
 foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   
   # get focal species
-  sp <- sp_sum$species[i]
+  sp <- sp_sum$scientificname[i]
   
   
   message(glue("Strating model for {sp}..."))
   
   dat <- breadth %>%
-    filter(species == sp) %>% 
+    filter(scientificname == sp) %>% 
     mutate(
       sqrt_breadth = sqrt(area), #get log of weekly area use
       sqrt_breadth_scale = scale(sqrt_breadth), # standardize it
@@ -143,9 +143,9 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       year_f = factor(year), # create year factor
       # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
       # sp2 = gsub(" ", "_", species),
-      wk_n = as.numeric(substring(wk, 2)), # extract week number
-      ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
-      study_f = as.factor(study_id) # make study id factor
+      wk_n = as.numeric(substring(week, 2)), # extract week number
+      ts = parse_date_time(paste(year, week, 01, sep = "-"), "%Y-%U-%u"), # make better date format
+      study_f = as.factor(studyid) # make study id factor
     ) %>%
     distinct()    
   
