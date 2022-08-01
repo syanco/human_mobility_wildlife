@@ -113,7 +113,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   # get focal species
   sp <- sp_sum$species[i]
 
-  message(glue("Strating model for {sp}..."))
+  message(glue("Starting model for {sp}..."))
 
   #filter data
   dat <- size %>%
