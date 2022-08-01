@@ -393,6 +393,7 @@
 
     #- Fit niche breadth models -#
       sbatch $src/hpc/run_fit_niche_breadth_sg_models.sh
+      sbatch $src/hpc/run_fit_niche_breadth_models.sh
     #
   
     #- Generate model results and diagnostic sheets-#

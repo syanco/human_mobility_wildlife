@@ -27,7 +27,7 @@ if(interactive()) {
   .wd <- getwd()
   
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
-  .outP <- file.path(.wd,'out/single_species_models/area')
+  .outP <- file.path(.wd,'out/single_species_models/area_trait')
   .traitPF <- file.path(.wd, 'raw_data/anthropause_data_sheet.csv')
   
   .cores <- 4
@@ -127,7 +127,14 @@ dat <- size %>%
                           Diet.Inv >= 50 ~ "Insectivore",
                           (Diet.Vend+Diet.Vect+Diet.Vfish) >= 50 ~ "Carnivore",
                           TRUE ~ "Omnivore"))
+mammals <- dat %>% 
+  filter(Family == "Cervidae" | Family == "Canidae" | Family == "Ursidae" |
+           Family == "Felidae" | Family == "Antilocapridae")
 
+birds <- dat %>% 
+  filter(Family == "Accipitridae" | Family == "Falconidae" | Family == "Gruidae" |
+           Family == "Cathartidae" | Family == "Anatidae" | Family == "Ardeidae" | 
+           Family == "Corvidae" | Family == "Rallidae") 
 
 # ==== Perform analysis ====
 
@@ -139,9 +146,9 @@ print(form)
 message("Strating model...")
 
 # fit model
-mod <- brm(
+mod_mammal <- brm(
   form,
-  data = dat,
+  data = mammals,
   # family = Gamma(link = "log"),
   inits = 0,
   cores = .cores,
@@ -150,14 +157,33 @@ mod <- brm(
 )
 
 #stash results into named list
-out <- list(
+out_mammals <- list(
   data = dat,
   model = mod
 )
 
 #write out results
-save(out, file = glue("{.outP}/size_trait_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/mammal_size_trait_mod_{Sys.Date()}.rdata"))
 
+# fit model
+mod_birds <- brm(
+  form,
+  data = birds,
+  # family = Gamma(link = "log"),
+  inits = 0,
+  cores = .cores,
+  iter = .iter,
+  thin = .thin
+)
+
+#stash results into named list
+out_birds <- list(
+  data = dat,
+  model = mod
+)
+
+#write out results
+save(out, file = glue("{.outP}/bird_size_trait_mod_{Sys.Date()}.rdata"))
 
 # ==== Finalize script ====
 message(glue('Script complete in {diffmin(t0)} minutes'))
