@@ -151,7 +151,7 @@ mod_mammal <- brm(
   data = mammals,
   # family = Gamma(link = "log"),
   inits = 0,
-  cores = .cores,
+  cores = .cores/2,
   iter = .iter,
   thin = .thin
 )
@@ -171,7 +171,7 @@ mod_birds <- brm(
   data = birds,
   # family = Gamma(link = "log"),
   inits = 0,
-  cores = .cores,
+  cores = .cores/2,
   iter = .iter,
   thin = .thin
 )
