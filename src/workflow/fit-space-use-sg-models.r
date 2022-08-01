@@ -88,7 +88,8 @@ message("Loading data...")
 # load and process data
 size <- read_csv("out/dbbmm_size.csv") %>%
   filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) 
+  filter(study_id != 1891587670) %>%
+  mutate(ind_f = as.factor(ind_id)) # create factor version of ind for REs)
 
 # get ind count per species
 sp_sum <- size %>%
@@ -125,7 +126,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       ghm_scale = scale(ghm),
       ndvi_scale = scale(ndvi),
       lst_scale = scale(lst),
-      ind_f = as.factor(ind_id), # create factor version of ind for REs
+      
       grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
       # trt_new = gsub('_.*','',trt),
       year_f = factor(year), # create year factor

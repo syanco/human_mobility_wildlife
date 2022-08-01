@@ -3,7 +3,7 @@
 #SBATCH -t 1-
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
-#SBATCH --partition day
+#SBATCH --partition pi_jetz
 #SBATCH -c 24
 #SBATCH --mem-per-cpu 10G
 #SBATCH -J fit_space_use_sg_mods
@@ -13,7 +13,7 @@ module load miniconda
 conda activate brms
 
 # Declare WD
-wd=~/project/covid-19_movement
+wd=/gpfs/loomis/project/jetz/sy522/covid-19_movement
 
 cd $wd
 
