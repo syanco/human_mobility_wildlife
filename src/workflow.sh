@@ -43,7 +43,7 @@
 ####----  Initialization  ----####
   
   # define working directory
-  wd=~/project/covid-19_movement
+  wd=/gpfs/loomis/project/jetz/sy522/covid-19_movement
   src=$wd/analysis/src
   
   # Go to working directory
@@ -362,6 +362,9 @@
   
     #- Generate model results and diagnostic sheets-#
       # TODO: Scott work scratch code into workflow
+      # 
+      # Only runs interactively:
+      plot_space_use.r
     #
 
   ##
