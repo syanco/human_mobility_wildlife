@@ -390,12 +390,9 @@
 #             JULY WORKFLOW BOOKMARK              #
 #                                                 #
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$    
-    #- Join annotations to niche breadth
-      # TODO: Scott find code?  Write new code?  What the hell happened?!
-    #
-    
+
     #- Fit niche breadth models -#
-      # TODO: Scott work scratch code into workflow
+      sbatch $src/hpc/run_fit_niche_breadth_sg_models.sh
     #
   
     #- Generate model results and diagnostic sheets-#

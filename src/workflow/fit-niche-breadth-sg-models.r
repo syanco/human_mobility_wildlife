@@ -103,7 +103,7 @@ breadth <- read_csv(.datPF) %>%
                            "week" = "wk"))
 
 # get ind count per species
-sp_sum <- size %>%
+sp_sum <- breadth %>%
   group_by(species) %>%
   summarize(nind = length(unique(ind_f))) %>%
   filter(nind > .minsp) #require a minimum of 10 individuals
@@ -127,7 +127,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   
   message(glue("Strating model for {sp}..."))
   
-  dat <- size %>%
+  dat <- breadth %>%
     filter(species == sp) %>% 
     mutate(
       sqrt_breadth = sqrt(area), #get log of weekly area use
