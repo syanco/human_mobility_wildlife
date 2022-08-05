@@ -32,8 +32,8 @@ if(interactive()) {
   
   .cores <- 4
   .minsp <- 10
-  .iter <- 5000
-  .thin <- 4
+  .iter <- 500
+  .thin <- 1
   
 } else {
   library(docopt)
@@ -98,8 +98,10 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   mutate(
     log_area = log(area), #get log of weekly area use
     log_area_scale = scale(log_area), # standardize it
-    sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
-    # log_sg_norm = log(sg_norm),
+    sg_norm = sg / cbg_area, # normalize safegraph data by size of the CBG
+    sg_sqrt = sqrt(sg_norm),
+    sg_scale = scale(sg_sqrt),
+        # log_sg_norm = log(sg_norm),
     ghm_scale = scale(ghm),
     ndvi_scale = scale(ndvi),
     lst_scale = scale(lst),
@@ -116,7 +118,11 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   distinct()
 
 message("Loading trait data...")
-traits <- read_csv(.traitPF)
+traits <- read_csv(.traitPF) %>% 
+  mutate(mig_code = case_when(migratory == "Partial" ~ "Partial Migrant",
+                              migratory == "Complete" ~ "Complete Migrant",
+                              migratory == "migratory" ~ "Complete Migrant",
+                              migratory == "non-migratory" ~ "Resident"))
 
 # combine data
 dat <- size %>% 
@@ -139,7 +145,7 @@ birds <- dat %>%
 # ==== Perform analysis ====
 
 # declare model form
-form <-  bf(log_area_scale ~ sg_norm*ghm_scale*diet + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
+form <-  bf(log_area ~ sg_scale*ghm_scale*mig_code + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
@@ -158,8 +164,8 @@ mod_mammal <- brm(
 
 #stash results into named list
 out_mammals <- list(
-  data = dat,
-  model = mod
+  data = mammals,
+  model = mod_mammal
 )
 
 #write out results
@@ -178,8 +184,8 @@ mod_birds <- brm(
 
 #stash results into named list
 out_birds <- list(
-  data = dat,
-  model = mod
+  data = birds,
+  model = mod_birds
 )
 
 #write out results

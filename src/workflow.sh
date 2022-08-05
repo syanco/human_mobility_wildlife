@@ -386,11 +386,7 @@
       
       sbatch $src/hpc/run_calc_niche_breadth.sh
     #
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                                                 #
-#             JULY WORKFLOW BOOKMARK              #
-#                                                 #
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$    
+  
 
     #- Fit niche breadth models -#
       sbatch $src/hpc/run_fit_niche_breadth_sg_models.sh
@@ -403,8 +399,7 @@
     #
 
   ##
-  
-  
+
   ##-- Step Selection Function --##
 
     #- Generate background points
