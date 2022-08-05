@@ -4,14 +4,14 @@
 
 '
 Usage:
-fit-space-use-models.r <dat> <out> <trait> <cores> [<iter> <thin>]
+fit-space-use-models.r <nichedat> <vardat> <trait> <out> <cores> [<minsp> <iter> <thin>]
 fit-space-use-models.r (-h | --help)
 
 
 Parameters:
-dat: path to input csv file.
+nichedat: path to input niche breadth csv file.
+vardat: path to dbbmm data csv with covars
 out: path to output directory.
-trait: path to species trait csv
 cores: number of HPC cores 
 iter: MCMC iterations
 thin: MCMC thin rate
@@ -26,9 +26,10 @@ if(interactive()) {
   
   .wd <- getwd()
   
-  .datPF <- file.path(.wd,'out/dbbmm_size.csv')
-  .outP <- file.path(.wd,'out/single_species_models/area_trait')
+  .datPF <- file.path(.wd,'out/niche_determinant_anthropause.csv')
+  .varPF <- file.path(.wd, 'out/dbbmm_size.csv')
   .traitPF <- file.path(.wd, 'raw_data/anthropause_data_sheet.csv')
+  .outP <- file.path(.wd,'out/single_species_models/area_trait')
   
   .cores <- 4
   .minsp <- 10
@@ -91,29 +92,41 @@ source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
 #---- Load data ----#
 message("Loading data...")
 
+dbbmms <- read_csv(.varPF)
+
 # load and process data
-size <- read_csv("out/dbbmm_size.csv") %>%
-  filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) %>%
-  mutate(
-    log_area = log(area), #get log of weekly area use
-    log_area_scale = scale(log_area), # standardize it
-    sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
-    # log_sg_norm = log(sg_norm),
-    ghm_scale = scale(ghm),
-    ndvi_scale = scale(ndvi),
-    lst_scale = scale(lst),
-    ind_f = as.factor(ind_id), # create factor version of ind for REs
-    grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
-    # trt_new = gsub('_.*','',trt),
-    year_f = factor(year), # create year factor
-    # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
-    # sp2 = gsub(" ", "_", species),
-    wk_n = as.numeric(substring(wk, 2)), # extract week number
-    ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
-    study_f = as.factor(study_id) # make study id factor
-  ) %>%
-  distinct()
+breadth <- read_csv(.datPF) %>%
+  filter(studyid != 351564596) %>%
+  filter(studyid != 1891587670) %>%
+  mutate(ind_f = as.factor(individual)) %>%
+  distinct()    %>% 
+  left_join(dbbmms, by = c("scientificname" = "species", 
+                           "individual" = "ind_id", 
+                           "year" = "year", 
+                           "studyid" = "study_id", 
+                           "week" = "wk")) %>% 
+    mutate(sqrt_breadth = sqrt(total), #get log of weekly area use
+           sqrt_breadth_scale = scale(sqrt_breadth), # standardize it
+           sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
+           # log_sg_norm = log(sg_norm),
+           ghm_scale = scale(ghm),
+           ndvi_scale = scale(ndvi.y),
+           lst_scale = scale(lst.y),
+           
+           grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
+           # trt_new = gsub('_.*','',trt),
+           year_f = factor(year), # create year factor
+           # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
+           # sp2 = gsub(" ", "_", species),
+           wk_n = as.numeric(substring(week, 2)), # extract week number
+           ts = parse_date_time(paste(year, week, 01, sep = "-"), "%Y-%U-%u"), # make better date format
+           study_f = as.factor(studyid)) # make study id factor)
+
+# get ind count per species
+sp_sum <- breadth %>%
+  group_by(scientificname) %>%
+  summarize(nind = length(unique(ind_f))) %>%
+  filter(nind > .minsp) #require a minimum of 10 individuals
 
 message("Loading trait data...")
 traits <- read_csv(.traitPF)
