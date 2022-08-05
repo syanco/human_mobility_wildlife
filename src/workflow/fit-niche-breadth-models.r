@@ -130,7 +130,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   dat <- breadth %>%
     filter(scientificname == sp) %>% 
     mutate(
-      sqrt_breadth = sqrt(total), #get log of weekly area use
+      sqrt_breadth = sqrt(total), #get sqrt weekly niche breadth
       sqrt_breadth_scale = scale(sqrt_breadth), # standardize it
       sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
       # log_sg_norm = log(sg_norm),

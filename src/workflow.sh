@@ -43,7 +43,7 @@
 ####----  Initialization  ----####
   
   # define working directory
-  wd=/gpfs/loomis/project/jetz/sy522/covid-19_movement
+  wd=/gpfs/loomis/pi/jetz/sy522/covid-19_movement
   src=$wd/analysis/src
   
   # Go to working directory
