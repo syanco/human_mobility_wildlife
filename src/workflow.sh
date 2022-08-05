@@ -394,6 +394,7 @@
 
     #- Fit niche breadth models -#
       sbatch $src/hpc/run_fit_niche_breadth_sg_models.sh
+      sbatch $src/hpc/run_fit_niche_breadth_ghm_models.sh
       sbatch $src/hpc/run_fit_niche_breadth_models.sh
     #
   
