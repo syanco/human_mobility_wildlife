@@ -6,8 +6,7 @@
 #SBATCH --partition pi_jetz
 #SBATCH -c 24
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J fit_space_use_sg_mods
-
+#SBATCH -J fit_niche_ghm
 # Load conda env
 module load miniconda
 conda activate brms
