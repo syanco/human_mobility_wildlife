@@ -18,4 +18,4 @@ wd=/gpfs/loomis/pi/jetz/sy522/covid-19_movement
 cd $wd
 
 # Execute model script 
-Rscript $wd/analysis/src/workflow/fit-niche-breadth-sg-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche 24 10 10000 5
+Rscript $wd/analysis/src/workflow/fit-niche-breadth-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche 24 10 10000 5
