@@ -4,7 +4,7 @@ if(interactive()) {
   
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
   .test <- TRUE
-  rd <- here::here
+  # rd <- here::here
   .datPF <- file.path(.wd,'analysis/')
   .outPF <- file.path(.wd,'analysis/')
   
@@ -12,11 +12,11 @@ if(interactive()) {
   
 } else {
   library(docopt)
-  library(rprojroot)
+  # library(rprojroot)
   
   .wd <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement'
-  .script <-  thisfile()
-  rd <- is_rstudio_project$make_fix_file(.script)
+  # .script <-  thisfile()
+  # rd <- is_rstudio_project$make_fix_file(.script)
   .datPF <- file.path(.wd,'out/')
   .outPF <- file.path(.wd,'out/')
   

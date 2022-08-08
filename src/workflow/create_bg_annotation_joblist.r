@@ -42,7 +42,7 @@ start_ix <- seq(from = 1, to = n_total, by = n_events)
 end_ix <- c(seq(from = n_events, to = n_total, by = n_events),n_total)
 
 
-joblist <- data.frame("string" = rep(paste0(" module load miniconda; conda activate move; Rscript ",.datPF,"annotate-background-sg-ghm.r "), times = n),
+joblist <- data.frame("string" = rep(paste0(" module load miniconda; conda activate covid; Rscript ",.datPF,"annotate-background-sg-ghm.r "), times = n),
                       "arg1" = start_ix,
                       "arg2" = end_ix,
                       "arg3" = seq(from = 1, to = n, by = 1))

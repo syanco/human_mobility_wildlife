@@ -448,10 +448,10 @@
     Rscript $src/workflow/create_bg_annotation_joblist.r
 
     module load dSQ
-    dsq --job-file $src/workflow/annotation-joblist.txt --mem-per-cpu 100g -t 2- 
+    dsq --job-file $src/hpc/annotation-joblist.txt --mem-per-cpu 100g -t 2- -p pi_jetz
 
     # UPDATE WITH DATE
-    #sbatch dsq-joblist-2022-05-27.sh
+    sbatch dsq-annotation-joblist-2022-08-08.sh
   ##
 
 

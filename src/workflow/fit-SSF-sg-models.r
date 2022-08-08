@@ -143,15 +143,21 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   # get focal species
   sp <- sp_sum$taxon_canonical_name[i]
   
+  # 
+  # #---- Initialize database ----#
+  # message(glue("Initializing database connection for {sp}..."))
+  # 
+  # invisible(assert_that(file.exists(.dbPF)))
+  # db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
+  # invisible(assert_that(length(dbListTables(db))>0))
   
-  #---- Initialize database ----#
-  message(glue("Initializing database connection for individual {ind[j]}, year {yearvec[i]}..."))
+  # evt0 <- tbl(db, "")
   
-  invisible(assert_that(file.exists(.dbPF)))
-  db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
-  invisible(assert_that(length(dbListTables(db))>0))
+  indls <- indtb %>% 
+    filter(taxon_canonical_name == sp) %>% 
+    pull(individual_id)
   
-  message(glue("Starting model for {sp}..."))
+  ndvi <- read_csv(glue("out/ssf-background-pts/annotated/{indls[1]}_ndvi_1.csv"))
   
   dat <- breadth %>%
     filter(scientificname == sp) %>% 
@@ -174,6 +180,8 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       study_f = as.factor(studyid) # make study id factor
     ) %>%
     distinct()    
+  
+  message(glue("Starting model for {sp}..."))
   
   # fit model
   mod <- brm(
