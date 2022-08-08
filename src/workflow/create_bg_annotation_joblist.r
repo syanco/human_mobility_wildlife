@@ -1,7 +1,7 @@
 if(interactive()) {
   library(here)
   
-  .wd <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement'
+  .wd <- '~/projects/covid-19_movement'
   .test <- TRUE
   # rd <- here::here
   
@@ -35,10 +35,11 @@ n_total <- length(files)
 
 
 n <- 150
-n_events <- floor(n_total/n)
+n_events <- round(n_total/n)
+# n_events <- ifelse((n_total/n)==n_events, n_events, n_events)
 
-start_ix <- seq(from = 1, to = n*n_events, by = n_events)
-end_ix <- seq(from = n_events, to = n_total, by = n_events)
+start_ix <- seq(from = 1, to = n_total, by = n_events)
+end_ix <- c(seq(from = n_events, to = n_total, by = n_events),n_total)
 
 
 joblist <- data.frame("string" = rep(paste0(" module load miniconda; conda activate move; Rscript ",.datPF,"annotate-background-sg-ghm.r "), times = n),
