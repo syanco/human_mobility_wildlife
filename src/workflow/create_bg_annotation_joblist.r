@@ -1,7 +1,7 @@
 if(interactive()) {
   library(here)
   
-  .wd <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement'
+  .wd <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement'
   .test <- TRUE
   # rd <- here::here
   
@@ -12,7 +12,7 @@ if(interactive()) {
   library(docopt)
   # library(rprojroot)
   
-  .wd <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement'
+  .wd <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement'
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
