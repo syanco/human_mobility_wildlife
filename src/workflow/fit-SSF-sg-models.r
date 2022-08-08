@@ -170,29 +170,25 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
     # load the pts
      
     # Load data (and format for stoat)
-    pts <- read_csv(glue("out/ssf-background-pts/individual-files/{indls[1]}.csv")) %>% 
+    pts <- read_csv(glue("out/ssf-background-pts/individual-files/{indls[i]}.csv")) %>% 
       mutate(lng = x2_,
              lat = y2_,
              date = format(t2_, format = '%Y-%m-%d'))
     
     # annotate and store results
-    sp_out[[1]] <- start_annotation_simple(pts, vars) %>%
+    message(glue("Annotating individual {j} of {length(indls)}"))
+    sp_out[[i]] <- start_annotation_simple(pts, vars) %>%
       select(-product) %>% 
       pivot_wider(names_from = variable, values_from = value, 
                   id_cols = c("x1_", "x2_", "y1_", "y2_", "sl_", "direction_p", 
                               "ta_", "t1_", "t2_", "dt_", "step_id_", "case_"))
-  }
+  } # j
   
-  
-  
-  dat0 <- pts %>% 
-    left_join(ndvi)
-  
-  dat <- breadth %>%
-    filter(scientificname == sp) %>% 
+  # combine outputs into single df
+  dat0 <- do.call("rbind", sp_out)  
+
+  dat <- dat %>%
     mutate(
-      sqrt_breadth = sqrt(total), #get log of weekly area use
-      sqrt_breadth_scale = scale(sqrt_breadth), # standardize it
       sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
       # log_sg_norm = log(sg_norm),
       ghm_scale = scale(ghm),
