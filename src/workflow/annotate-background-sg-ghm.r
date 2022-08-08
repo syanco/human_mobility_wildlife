@@ -14,13 +14,13 @@ if(interactive()) {
   library(docopt)
   # library(rprojroot)
   
-  .wd <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement'
+  .wd <- getwd()
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   .datPF <- file.path(.wd,'out/')
   .outPF <- file.path(.wd,'out/')
   
-  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   
 }
 

@@ -433,11 +433,7 @@
     #   * Add conda environment for mosey_env
   
   ##
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-#                                                 #
-#             JULY WORKFLOW BOOKMARK              #
-#                                                 #
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
     #- SafeGraph and GHM annotations for background pts
     
     # Inputs: Background csvs
@@ -454,6 +450,11 @@
     sbatch dsq-annotation-joblist-2022-08-08.sh
   ##
 
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#                                                 #
+#             JULY WORKFLOW BOOKMARK              #
+#                                                 #
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
   
 ####

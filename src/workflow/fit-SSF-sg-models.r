@@ -71,6 +71,7 @@ suppressWarnings(
     library(amt)
     library(glmmTMB)
     library(RSQLite)
+    library(rstoat)
   }))
 
 # # Manage package conflicts
@@ -81,6 +82,7 @@ suppressWarnings(
 
 # load breezy functions
 source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
+source(file.path(.wd,'analysis/src/funs/big_stoat.r'))
 
 # check arg inputs
 .minsp <- ifelse(is.null(.minsp), 10, as.numeric(.minsp))
@@ -136,6 +138,18 @@ registerDoMC(.cores)
 # form <-  bf(sqrt_breadth ~ sg_norm + ndvi_scale + lst_scale + (1 |grp) + ar(time = week, gr = grp))
 # message("Fitting models with formula:")
 # print(form)
+vars <- list(list(id = "MODIS/061/MOD11A1",
+                  static = FALSE,
+                  reducers = list("mean"),
+                  s_buff = 1000,
+                  t_buff = 1,
+                  bands = list("LST_Day_1km")),
+             list(id = "MODIS/MOD09GA_006_NDVI",
+                  static = FALSE,
+                  reducers = list("mean"),
+                  s_buff = 1000,
+                  t_buff = 1,
+                  bands = list("NDVI")))
 
 # loop through species
 foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
@@ -143,21 +157,36 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   # get focal species
   sp <- sp_sum$taxon_canonical_name[i]
   
-  # 
-  # #---- Initialize database ----#
-  # message(glue("Initializing database connection for {sp}..."))
-  # 
-  # invisible(assert_that(file.exists(.dbPF)))
-  # db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
-  # invisible(assert_that(length(dbListTables(db))>0))
-  
-  # evt0 <- tbl(db, "")
-  
+  # list of individuals within species
   indls <- indtb %>% 
     filter(taxon_canonical_name == sp) %>% 
     pull(individual_id)
   
-  ndvi <- read_csv(glue("out/ssf-background-pts/annotated/{indls[1]}_ndvi_1.csv"))
+  # init empty list to stor annos
+  sp_out <- list()
+  
+  # loop through individuals
+  for(j in 1:length(indls)){
+    # load the pts
+     
+    # Load data (and format for stoat)
+    pts <- read_csv(glue("out/ssf-background-pts/individual-files/{indls[1]}.csv")) %>% 
+      mutate(lng = x2_,
+             lat = y2_,
+             date = format(t2_, format = '%Y-%m-%d'))
+    
+    # annotate and store results
+    sp_out[[1]] <- start_annotation_simple(pts, vars) %>%
+      select(-product) %>% 
+      pivot_wider(names_from = variable, values_from = value, 
+                  id_cols = c("x1_", "x2_", "y1_", "y2_", "sl_", "direction_p", 
+                              "ta_", "t1_", "t2_", "dt_", "step_id_", "case_"))
+  }
+  
+  
+  
+  dat0 <- pts %>% 
+    left_join(ndvi)
   
   dat <- breadth %>%
     filter(scientificname == sp) %>% 

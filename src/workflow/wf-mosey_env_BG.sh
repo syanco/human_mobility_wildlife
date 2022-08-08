@@ -58,7 +58,7 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 # need to use tail to remove first line, which is the header
 # study ids have \r suffix. Need to remove these
 indIds=($(mlr --csv --opprint cut -f ind out/ssf-background-pts/bg-log.csv | tail -n +2))
-indIds=${indIds[@]%$'\r'} # remove \r suffix
+indIds=(${indIds[@]%$'\r'} ) # remove \r suffix
 
 # cd $csvP
 
@@ -69,13 +69,13 @@ for IND in $indIds; do
   geePts=$geePtsP/$IND
 
   #---- Upload file to GCS
-  echo Uploading $IND to gcs...
-  gsutil -q cp -r $csvP/${IND}.csv $gcsCSV
+  # echo Uploading $IND to gcs...
+  # gsutil -q cp -r $csvP/${IND}.csv $gcsCSV
 
   #---- Import file into GEE
   echo Starting GEE import task for individual $IND...
   
-  earthengine upload table $gcsCSV --asset_id $geePts --x_column lon --y_column lat --force
+  earthengine upload table $gcsCSV --asset_id $geePts --x_column x2_ --y_column y2_ --force
 done
 
 
