@@ -40,7 +40,7 @@ cd $wd
 geePtsP=users/syanco/covid-mvmnt/bg-pts #folder holding the gee point datasets
 gcsBucket=covid-mvmnt-bucket
 gcsInP=ingest_gee #This holds the csvs that will be imported to gee
-gcsOutP=annotated #This is the output folder for annotated csvs (excluding bucket)
+gcsOutP=bg_annotated #This is the output folder for annotated csvs (excluding bucket)
 csvP=out/ssf-background-pts/individual-files #local folder that holds the csv files to be ingested into gee
 annoP=out/ssf-background-pts/annotated #local folder that holds the annotated csv files
 envP=analysis/ctfs/env.csv

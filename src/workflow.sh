@@ -443,7 +443,8 @@
     # Inputs: Background csvs
     # Outputs: csv per job (event_id + cbg info)
 
-    module load R/4.1.0-foss-2020b
+    # module load R/4.1.0-foss-2020b
+    conda activate covid
     Rscript $src/workflow/create_bg_annotation_joblist.r
 
     module load dSQ
