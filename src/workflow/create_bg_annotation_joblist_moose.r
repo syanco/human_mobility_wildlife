@@ -34,7 +34,7 @@ files <- list.files(paste0(.wd,'/out/ssf-background-pts/moose'),full.names = TRU
 n_total <- length(files)
 
 
-n <- 16
+n <- 64
 n_events <- round(n_total/n)
 # n_events <- ifelse((n_total/n)==n_events, n_events, n_events)
 

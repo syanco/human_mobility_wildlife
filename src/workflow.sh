@@ -441,14 +441,14 @@
 
     # module load R/4.1.0-foss-2020b
     conda activate covid
-    Rscript $src/workflow/create_bg_annotation_joblist.r
+    # Rscript $src/workflow/create_bg_annotation_joblist.r
     Rscript $src/workflow/create_bg_annotation_joblist_moose.r
 
     module load dSQ
     dsq --job-file $src/hpc/annotation-joblist.txt --mem-per-cpu 100g -t 2- -p pi_jetz
 
     # UPDATE WITH DATE
-    sbatch dsq-annotation-joblist-2022-08-08.sh
+    sbatch dsq-annotation-joblist-2022-08-10.sh
   ##
 
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

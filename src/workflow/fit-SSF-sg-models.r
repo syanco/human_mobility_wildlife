@@ -26,6 +26,7 @@ if(interactive()) {
   
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   .bgP <- file.path(.wd, "out/ssf-background-pts/annotated")
+  .bgM <- file.path(.wd, "out/ssf-background-pts/moose")
   .outP <- file.path(.wd,'out/ssf-mods')
   
   .cores <- 20
@@ -153,6 +154,15 @@ registerDoMC(.cores)
 
 # loop through species
 # i <- 1
+# 
+# 
+all_files <- list.files(.bgP)
+# moose_id <- sub("\\..*", "", moose_files)
+sum(str_detect(all_files, "ghm-sg"))
+moose_ghm_files <- all_files[str_detect(all_files, "ghm-sg")]
+str_extract(moose_ghm_files, "//d")
+
+
 foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   
   # get focal species
@@ -169,16 +179,17 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   # loop through individuals
   # j <- 2
   # 
-  for(j in 1:length(indls)){
-    ndvi <- read_csv(glue("out/ssf-background-pts/annotated/{indls[i]}_ndvi_1.csv")) %>% 
+  for(j in 1:length(moose_id)){
+    ndvi <- read_csv(glue("{.bgP}/{moose_id[j]}_ndvi_1.csv")) %>% 
       mutate(lat = round(lat, 4),
              lng = round(lng, 4))      
-    tmax <- read_csv(glue("out/ssf-background-pts/annotated/{indls[i]}_tmax_1.csv")) %>% 
+    tmax <- read_csv(glue("{.bgP}/{moose_id[j]}_tmax_1.csv")) %>% 
       mutate(lat = round(lat, 4),
              lng = round(lng, 4))
-    dat0 <- read_csv(glue("out/ssf-background-pts/individual-files/{indls[i]}.csv")) %>% 
+    dat0 <- read_csv(glue("out/ssf-background-pts/individual-files/{moose_id[j]}.csv")) %>% 
       mutate(x2_ = round(x2_, 4),
              y2_ = round(y2_, 4))
+    sg_ghm <- read_csv(glue("{.bgP}/individual-{moose_id[j]}ghm-sg.csv"))
     
     
     sp_out[[j]] <- dat0 %>% 
