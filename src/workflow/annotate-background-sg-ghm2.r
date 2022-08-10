@@ -56,7 +56,7 @@ evt <- data.table::rbindlist(lapply(files[start_ix:end_ix], data.table::fread)) 
 
 message("reading in census block group geometries...")
 cbg_sf <- st_read(paste0(.wd,"/raw_data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
-cbg_area <- fread(paste0(.datPF, "event-annotations/cbg-area.csv"), colClasses = "character") %>%
+cbg_area <- fread(paste0(.datPF, "event-annotation/cbg-area.csv"), colClasses = "character") %>%
   select(cbg_2010, cbg_area_m2)
 
 
@@ -113,7 +113,7 @@ for(i in 1:length(ids)){
   d <- evt_sg_ghm %>%
     filter(individual_id == id)
   
-  fwrite(d, paste0(paste0(.outPF, "/ssf-background-points/annotated/individual-",id,".csv")))
+  fwrite(d, paste0(paste0(.outPF, "/ssf-background-points/annotated/individual-",id,"ghm-sg.csv")))
 }
 
 
