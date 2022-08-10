@@ -43,7 +43,7 @@ n <- as.numeric(args[3])
 
 #---- Collect arguments ----#
 
-files <- list.files(paste0(.outPF,'ssf-background-pts/individual-files'),full.names = TRUE)
+files <- list.files(paste0(.outPF,'ssf-background-pts/moose'),full.names = TRUE)
 
 evt <- data.table::rbindlist(lapply(files[start_ix:end_ix], data.table::fread)) %>%
   mutate("step_id" = c(1:nrow(.)),
