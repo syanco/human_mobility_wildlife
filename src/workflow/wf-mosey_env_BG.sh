@@ -57,20 +57,20 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 # Use miller to filter by run column and then take the study_id field
 # need to use tail to remove first line, which is the header
 # study ids have \r suffix. Need to remove these
-indIds=($(mlr --csv --opprint cut -f ind out/ssf-background-pts/bg-log.csv | tail -n +2))
+indIds=($(mlr --csv --opprint filter '$run == 1' then cut -f ind out/ssf-background-pts/bg-log.csv | tail -n +2))
 indIds=(${indIds[@]%$'\r'} ) # remove \r suffix
 
 # cd $csvP
 
 # Loop thorugh inds to upload to gcs and gee
-for IND in $indIds; do 
+for IND in "${indIds[@]}"; do 
 
   gcsCSV=$gcsInURL/${IND}.csv
   geePts=$geePtsP/$IND
 
   #---- Upload file to GCS
   # echo Uploading $IND to gcs...
-  # gsutil -q cp -r $csvP/${IND}.csv $gcsCSV
+  gsutil -q cp -r $csvP/${IND}.csv $gcsCSV
 
   #---- Import file into GEE
   echo Starting GEE import task for individual $IND...
@@ -112,10 +112,11 @@ colnames=(${colnames[@]%$'\r'})
 # 
 # indIds=${indIds[@]:699}
 
-for indId in $indIds; do 
-  echo "Start processing individual ${indId}"
+# check the timestampcol in 'anno_gee.r' at line 120
+for indId in "${indIds[@]}"; do 
+  echo "Start processing individual ${indIds}"
 
-  points=$geePtsP/$indId
+  points=$geePtsP/$indIds
   
   # get length of an array
   n=${#envs[@]}
@@ -138,10 +139,10 @@ for indId in $indIds; do
     # if column is not present don't pass parameters
 
     #echo "index: $i, env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
-    out=$gcsOutP/${indId}_${colnames[$i]} #do not include url, bucket, or file extension
+    out=$gcsOutP/${indIds}_${colnames[$i]} #do not include url, bucket, or file extension
     
     echo Annotating "env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
-    $MOSEYENV_SRC/anno_gee.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}
+    $MOSEYENV_SRC/anno_gee_bg.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}
     
   done
 
@@ -151,7 +152,7 @@ done
 #---- Download annotations from google ----#
 #----
 
-for IND in ${indIds}; do
+for IND in ${indIds[@]}; do
 	echo "Downloading individual ${IND}"
 
   # get length of an array

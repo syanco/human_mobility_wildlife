@@ -71,7 +71,7 @@ suppressWarnings(
     library(amt)
     library(glmmTMB)
     library(RSQLite)
-    library(rstoat)
+    # library(rstoat)
   }))
 
 # # Manage package conflicts
@@ -82,7 +82,7 @@ suppressWarnings(
 
 # load breezy functions
 source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
-source(file.path(.wd,'analysis/src/funs/big_stoat.r'))
+# source(file.path(.wd,'analysis/src/funs/big_stoat.r'))
 
 # check arg inputs
 .minsp <- ifelse(is.null(.minsp), 10, as.numeric(.minsp))
@@ -138,20 +138,21 @@ registerDoMC(.cores)
 # form <-  bf(sqrt_breadth ~ sg_norm + ndvi_scale + lst_scale + (1 |grp) + ar(time = week, gr = grp))
 # message("Fitting models with formula:")
 # print(form)
-vars <- list(list(id = "MODIS/061/MOD11A1",
-                  static = FALSE,
-                  reducers = list("mean"),
-                  s_buff = 1000,
-                  t_buff = 1,
-                  bands = list("LST_Day_1km")),
-             list(id = "MODIS/MOD09GA_006_NDVI",
-                  static = FALSE,
-                  reducers = list("mean"),
-                  s_buff = 1000,
-                  t_buff = 1,
-                  bands = list("NDVI")))
+# vars <- list(list(id = "MODIS/061/MOD11A1",
+#                   static = FALSE,
+#                   reducers = list("mean"),
+#                   s_buff = 1000,
+#                   t_buff = 1,
+#                   bands = list("LST_Day_1km")),
+#              list(id = "MODIS/MOD09GA_006_NDVI",
+#                   static = FALSE,
+#                   reducers = list("mean"),
+#                   s_buff = 1000,
+#                   t_buff = 1,
+#                   bands = list("NDVI")))
 
 # loop through species
+# i <- 1
 foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   
   # get focal species
@@ -166,58 +167,77 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   sp_out <- list()
   
   # loop through individuals
+  # j <- 2
+  # 
   for(j in 1:length(indls)){
-    # load the pts
-     
-    # Load data (and format for stoat)
-    pts <- read_csv(glue("out/ssf-background-pts/individual-files/{indls[i]}.csv")) %>% 
-      mutate(lng = x2_,
-             lat = y2_,
-             date = format(t2_, format = '%Y-%m-%d'))
+    ndvi <- read_csv(glue("out/ssf-background-pts/annotated/{indls[i]}_ndvi_1.csv")) %>% 
+      mutate(lat = round(lat, 4),
+             lng = round(lng, 4))      
+    tmax <- read_csv(glue("out/ssf-background-pts/annotated/{indls[i]}_tmax_1.csv")) %>% 
+      mutate(lat = round(lat, 4),
+             lng = round(lng, 4))
+    dat0 <- read_csv(glue("out/ssf-background-pts/individual-files/{indls[i]}.csv")) %>% 
+      mutate(x2_ = round(x2_, 4),
+             y2_ = round(y2_, 4))
     
-    # annotate and store results
-    message(glue("Annotating individual {j} of {length(indls)}"))
-    sp_out[[i]] <- start_annotation_simple(pts, vars) %>%
-      select(-product) %>% 
-      pivot_wider(names_from = variable, values_from = value, 
-                  id_cols = c("x1_", "x2_", "y1_", "y2_", "sl_", "direction_p", 
-                              "ta_", "t1_", "t2_", "dt_", "step_id_", "case_"))
+    
+    sp_out[[j]] <- dat0 %>% 
+      left_join(ndvi, by = c("x2_" = "lng", "y2_" = "lat", 
+                              "t2_" = "t2_",
+                              "case_" = "case_")) %>% 
+      left_join(tmax, by = c("x2_" = "lng", "y2_" = "lat", 
+                             "t2_" = "t2_",
+                             "case_" = "case_",
+                             "crds" = "crds")) %>% 
+      mutate(ind_id = indls[j],
+             strt = paste0(ind_id,"_",burst_))
+    
+    # for(j in 1:20){
+    #   # load the pts
+    #   
+    #   # Load data (and format for stoat)
+    #   pts <- read_csv(glue("out/ssf-background-pts/individual-files/{indls[j]}.csv")) %>% 
+    #     mutate(lng = x2_,
+    #            lat = y2_,
+    #            date = format(t2_, format = '%Y-%m-%d'))
+    #   
+    #   # annotate and store results
+    #   message(glue("Annotating individual {j} of {length(indls)}"))
+    #   sp_out[[j]] <- big_stoat(pts, vars) %>%
+    #     select(-product) %>% 
+    #     pivot_wider(names_from = variable, values_from = value, 
+    #                 id_cols = c("x1_", "x2_", "y1_", "y2_", "sl_", "direction_p", 
+    #                             "ta_", "t1_", "t2_", "dt_", "step_id_", "case_")) %>% 
+    #     mutate(ind_id = indls[j])
   } # j
   
-  # combine outputs into single df
+  
   dat0 <- do.call("rbind", sp_out)  
-
-  dat <- dat %>%
+  
+  dat <- dat0 %>%
     mutate(
-      sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
-      # log_sg_norm = log(sg_norm),
-      ghm_scale = scale(ghm),
-      ndvi_scale = scale(ndvi.y),
-      lst_scale = scale(lst.y),
-      
-      grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
-      # trt_new = gsub('_.*','',trt),
-      year_f = factor(year), # create year factor
-      # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
-      # sp2 = gsub(" ", "_", species),
-      wk_n = as.numeric(substring(week, 2)), # extract week number
-      ts = parse_date_time(paste(year, week, 01, sep = "-"), "%Y-%U-%u"), # make better date format
-      study_f = as.factor(studyid) # make study id factor
+      tmax_norm = scale(tmax),
+      ndvi_norm = scale(ndvi)
     ) %>%
     distinct()    
   
   message(glue("Starting model for {sp}..."))
   
   # fit model
-  mod <- brm(
-    form,
-    data = dat,
-    # family = Gamma(link = "log"),
-    inits = 0,
-    cores = 1,
-    iter = .iter,
-    thin = .thin
-  )
+  TMBStruc.fix = glmmTMB(case_ ~ tmax_norm + ndvi_norm + (1|burst_) + 
+                           (0 + tmax_norm | ind_id) + (0 + ndvi_norm | ind_id), 
+                         family=poisson, data=dat, doFit=FALSE) 
+  
+  #' Then fix the standard deviation of the first random term
+  TMBStruc.fix$parameters$theta[1] = log(1e3) 
+  
+  #' We need to tell `glmmTMB` not to change the variance by setting it to `NA`:
+  TMBStruc.fix$mapArg = list(theta=factor(c(NA, 1:2))) # change the 2 to however many random slopes I have
+  
+  #' Then fit the model and look at the results:
+  glmm.TMB.fixed = glmmTMB:::fitTMB(TMBStruc.fix) 
+  summary(glmm.TMB.fixed)
+  
   
   #stash results into named list
   out <- list(

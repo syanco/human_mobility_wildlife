@@ -252,7 +252,7 @@ ghm_modlist <- list.files( path=file.path(.datP, "area_ghm/"), full.names=TRUE )
 
 pal2 <- c("#E66100", "#5D3A9B") # 2 color pallete
 pal3 <- c(pal2, "#808080") # add gray to the pallete
-palnew <- c("#253C78", "#8BE8CB", "#FF3C38")
+palnew <- c("#7552A3", "#CEBEDA")
 palgray <- c("#808080", "#D3D3D3")
 
 
@@ -262,7 +262,7 @@ palgray <- c("#808080", "#D3D3D3")
 # TODO:  this just duplicates the whitetail model pending the output for muleys - rm this when that's in... 
 # !!!!!!!!! #
 
-ghm_modlist <- append(ghm_modlist, "/home/syanco/projects/covid-19_movement/out/single_species_models/area_ghm//Odocoileus virginianus_2022-08-05.rdata", after = 16)
+# ghm_modlist <- append(ghm_modlist, "/home/syanco/projects/covid-19_movement/out/single_species_models/area_ghm//Odocoileus virginianus_2022-08-05.rdata", after = 16)
 
 # !!!!!!!!! !
 
@@ -298,7 +298,7 @@ for(i in 1:length(sg_modlist)){
   if(sgdf$sg_sig == "Y"){ # If the effect is significant...
     (sg_ce_plot <-  plot(ce_sg, plot = F,
                          line_args = list("se" = F,
-                                          "color" = palnew[3]))[[1]] + 
+                                          "color" = pal2[1]))[[1]] + 
        # scale_color_manual(values = palnew[3])+         
        theme_tufte() +
        xlab("Human Mobility") +
@@ -353,7 +353,7 @@ for(i in 1:length(sg_modlist)){
   if(ghmdf$ghm_sig == "Y"){ # If the effect is significant...
     (ghm_ce_plot <-  plot(ce_ghm, plot = F,
                          line_args = list("se" = F,
-                                          "color" = palnew[3]))[[1]] + 
+                                          "color" = pal2[1]))[[1]] + 
        # scale_color_manual(values = palnew[3])+         
        theme_tufte() +
        xlab("Human Modification") +
@@ -410,19 +410,21 @@ for(i in 1:length(sg_modlist)){
   
   if(intdf$inter_sig == "Y"){ # If the effect is significant...
     (int_ce_plot <-  plot(ce_int, plot = FALSE,
-                          line_args = list("se"=F))[[1]] +
+                          line_args = list("se"=F, size = 4))[[1]] +
        theme_tufte() +
        scale_color_manual(values = palnew, name = "Human \n Modification",
                           labels = c("High", "Low")) +
        scale_fill_manual(values = palnew, name = "Human \n Modification",
                          labels = c("High", "Low")) +
-       theme(axis.line = element_line(size = .5),
+       theme(axis.line = element_line(size = 4),
              axis.text = element_blank(),
              axis.ticks = element_blank(),
              axis.title = element_blank(),
-             # aspect.ratio = 1
+             aspect.ratio = 1,
+             legend.position = "none"
              ))
     plint <- 1
+    ggsave(filename = glue("out/area_plots/{out$species}_area_int.png"), int_ce_plot)
   }else{ # ...if the effect is not significant
     (int_ce_plot <-  plot(ce_int, plot = FALSE,
                           line_args = list("se"=F))[[1]] +
@@ -460,7 +462,7 @@ fin_plots <- do.call(c, row_reduced)
 
 (comb <- wrap_plots(fin_plots, byrow = T, ncol = 4, guides = "collect", 
                     widths=c(3,5,5,5), heights = c(5)))
-ggsave(filename='out/area_plots/comb_08052022.pdf', width = 7, height = 11.5, 
+ggsave(filename='out/area_plots/comb_08092022.pdf', width = 7, height = 11.5, 
        plot = comb)
 
 
