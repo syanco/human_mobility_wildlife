@@ -32,6 +32,7 @@ suppressWarnings(
     library(lubridate)
     library(sf)
     library(raster)
+    library(RSQLite)
   }))
 
 #---- Collect arguments ----#

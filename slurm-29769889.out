@@ -1,0 +1,171 @@
+Running startup script...
+[conflicted] Will prefer foreach::accumulate over any other package
+[conflicted] Will prefer brms::ar over any other package
+[conflicted] Will prefer stats::lag over any other package
+[conflicted] Will prefer foreach::when over any other package
+Loading data...
+Rows: 83717 Columns: 16
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): species
+dbl (15): ind_id, study_id, year, wk, area, sg, ghm, cbg_area, pop, ndvi, ls...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 100960 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (1): scientificname
+dbl (12): total, tmax, tmin, lst, ndvi, elev, dist2road, cor, week, individu...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Warning message:
+One or more parsing issues, see `problems()` for details 
+Fitting models with formula:
+sqrt_breadth_scale ~ sg_norm + ndvi_scale + lst_scale + (1 | grp) + ar(time = wk, gr = grp) 
+Strating model for Alces alces...
+Strating model for Anas acuta...
+Strating model for Anas americana...
+Strating model for Anas clypeata...
+Strating model for Anas crecca...
+Strating model for Anas cyanoptera...
+Strating model for Anas platyrhynchos...
+Strating model for Anas strepera...
+Strating model for Anser...
+Strating model for Anser albifrons...
+Strating model for Antilocapra americana...
+Strating model for Buteo lagopus...
+Strating model for Canis latrans...
+Strating model for Canis lupus...
+Strating model for Cervus elaphus...
+Strating model for Chen caerulescens...
+Strating model for Chen rossii...
+Strating model for Circus cyaneus...
+Strating model for Corvus corax...
+Strating model for Grus canadensis...
+Strating model for Odocoileus virginianus...
+Strating model for Haliaeetus leucocephalus...
+Strating model for Lynx rufus...
+Strating model for Puma concolor...
+Strating model for Numenius americanus...
+Strating model for Ursus americanus...
+Strating model for Ursus arctos...
+Strating model for NA...
+Strating model for Odocoileus hemionus...
+[[1]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[2]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[3]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[4]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[5]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[6]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[7]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[8]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[9]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[10]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[11]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[12]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[13]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[14]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[15]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[16]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[17]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[18]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[19]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[20]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[21]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[22]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[23]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[24]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[25]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[26]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[27]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[28]]
+<simpleError: The following variables can neither be found in 'data' nor in 'data2':
+'wk'>
+
+[[29]]
+<simpleError: Argument 'data' does not contain observations.>
+
+Script complete in 0.25 minutes
