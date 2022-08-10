@@ -1,14 +1,14 @@
 if(interactive()) {
   # rm(list=ls())
-  # library(here)
+  library(here)
   
   .wd <- getwd()
-  # .test <- TRUE
+  .test <- TRUE
   # rd <- here::here
-  .datPF <- file.path(.wd,'out/')
-  .outPF <- file.path(.wd,'out/')
+  .datPF <- file.path(.wd,'analysis/')
+  .outPF <- file.path(.wd,'analysis/')
   
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   
 } else {
   library(docopt)
@@ -32,7 +32,6 @@ suppressWarnings(
     library(lubridate)
     library(sf)
     library(raster)
-    library(RSQLite)
   }))
 
 #---- Collect arguments ----#
@@ -42,51 +41,11 @@ start_ix <- as.numeric(args[1])
 end_ix <- as.numeric(args[2])
 n <- as.numeric(args[3])
 
-
-#---- Initialize database ----#
-message("Initializing database connection...")
-
-invisible(assert_that(file.exists(.dbPF)))
-db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
-invisible(assert_that(length(dbListTables(db))>0))
-
-indtb <- tbl(db,'individual') %>% 
-  collect()
-
-message("Disconnecting from databse...")
-dbDisconnect(db)
-
-ind <- indtb %>% 
-  pull(individual_id)
-
-# get ind count per species
-sp_sum <- indtb %>%
-  group_by(taxon_canonical_name) %>%
-  summarize(nind = length(unique(individual_id))) 
-# %>%
-#   filter(nind > .minsp) #require a minimum of 10 individuals
-
-
-# get focal species
-sp <- sp_sum$taxon_canonical_name[4]
-
-# list of individuals within species
-indls <- indtb %>% 
-  filter(taxon_canonical_name == sp) %>% 
-  pull(individual_id)
-
 #---- Collect arguments ----#
 
-bgls <- list()
+files <- list.files(paste0(.outPF,'ssf-background-pts/individual-files'),full.names = TRUE)
 
-for(j in 1:length(indls)){
-  f <- glue("out/ssf-background-pts/individual-files/{indls[j]}.csv")
-  if(file.exists(f)){
-    bgls[[j]] <- read_csv(f)
-  }
-}
-
-evt <- do.call("rbind", bgls) %>% 
+evt <- data.table::rbindlist(lapply(files[start_ix:end_ix], data.table::fread)) %>%
   mutate("step_id" = c(1:nrow(.)),
          "date" = as.character(as_date(t2_))) %>%
   filter(abs(x2_) < 180) %>%
@@ -97,7 +56,7 @@ evt <- do.call("rbind", bgls) %>%
 
 message("reading in census block group geometries...")
 cbg_sf <- st_read(paste0(.wd,"/raw_data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
-cbg_area <- fread(paste0(.datPF, "event-annotation/cbg-area.csv"), colClasses = "character") %>%
+cbg_area <- fread(paste0(.datPF, "event-annotations/cbg-area.csv"), colClasses = "character") %>%
   select(cbg_2010, cbg_area_m2)
 
 
