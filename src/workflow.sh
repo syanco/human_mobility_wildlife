@@ -449,6 +449,10 @@
 
     # UPDATE WITH DATE
     sbatch dsq-annotation-joblist-2022-08-10.sh
+    
+    ##-- ALTERNATIVE WAY --##
+    sbatch $src/hpc/run_annotate_background_ghm_sg_MOOSE.sh
+    
   ##
 
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
