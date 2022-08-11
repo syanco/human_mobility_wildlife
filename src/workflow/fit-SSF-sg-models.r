@@ -180,16 +180,18 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   # j <- 2
   # 
   for(j in 1:length(moose_id)){
-    ndvi <- read_csv(glue("{.bgP}/{moose_id[j]}_ndvi_1.csv")) %>% 
+    tmp <- list()
+    
+    tmp[[1]] <- read_csv(glue("{.bgP}/{moose_id[j]}_ndvi_1.csv")) %>% 
       mutate(lat = round(lat, 4),
              lng = round(lng, 4))      
-    tmax <- read_csv(glue("{.bgP}/{moose_id[j]}_tmax_1.csv")) %>% 
+    tmp[[2]] <- read_csv(glue("{.bgP}/{moose_id[j]}_tmax_1.csv")) %>% 
       mutate(lat = round(lat, 4),
              lng = round(lng, 4))
-    dat0 <- read_csv(glue("out/ssf-background-pts/individual-files/{moose_id[j]}.csv")) %>% 
+    tmp[[3]] <- read_csv(glue("out/ssf-background-pts/individual-files/{moose_id[j]}.csv")) %>% 
       mutate(x2_ = round(x2_, 4),
              y2_ = round(y2_, 4))
-    sg_ghm <- read_csv(glue("{.bgP}/individual-{moose_id[j]}ghm-sg.csv"))
+    tmp[[4]] <- read_csv(glue("{.bgP}/individual-{moose_id[j]}ghm-sg.csv"))
     
     
     sp_out[[j]] <- dat0 %>% 
