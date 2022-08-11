@@ -26,8 +26,8 @@ data("us_states")
   
   
   
-load('raw_data/gHM/ghm_usa.Rdata') # Load GHM
-# ghm <- raster("raw_data/gHM/gHM.tif")
+# load('/Users/diegoellis/Desktop/ghm_usa.Rdata') # Load GHM
+ghm <- raster("raw_data/gHM/gHM.tif")
 ghm_sf = st_as_stars(ghm)
 
 #---- Initialize database ----#
@@ -107,16 +107,14 @@ make_example_species_figure <- function(mosey_db, ghm, taxonomic_name, outdir_pa
     
     tmp_ind_sp = SpatialPointsDataFrame(
       coords= tmp_ind[,c('lon', 'lat')], data = tmp_ind,
-      proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0")
-      # proj4string = crs(ghm)
-      )
-    # tmp_ind_sp_tr <- spTransform(tmp_ind_sp, crs(ghm))
+      proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+    
     
     cbbox <- make_bbox(lon = tmp_ind_sp$lon, lat = tmp_ind_sp$lat, f = .4) #from ggmap
     sq_map <- get_map(location = cbbox, maptype = "satellite", source = "google")
     
     
-    ghm_sub = raster::crop( ghm,( extent(cbbox[1], cbbox[3], cbbox[2], cbbox[4]) *2) )
+    ghm_sub = raster::crop( ghm,( extent(cbbox[1], cbbox[3], cbbox[2], cbbox[4]) *100) )
     # ghm_sub = raster::crop(ghm, extent(cbbox[1], cbbox[3], cbbox[2], cbbox[4]))
     rtp <- rasterToPolygons(ghm_sub)
     # bm <- bm + geom_raster(...) # insert your raster here
@@ -127,7 +125,7 @@ make_example_species_figure <- function(mosey_db, ghm, taxonomic_name, outdir_pa
     # geom_tile(data = mean_price_per_bedroom_per_tile, aes(x = Longitude, y = Latitude, alpha = mean_price), fill="blue") + 
     #   scale_alpha(range = c(0, 0.8))
     # 
-    tmp_ind$year = factor(tmp_ind$yr) 
+    tmp_ind$year = factor(tmp_ind$year) 
     
     
     case_map = ggmap(sq_map) + 
