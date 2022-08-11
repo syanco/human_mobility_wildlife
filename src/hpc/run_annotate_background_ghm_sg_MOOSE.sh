@@ -19,4 +19,4 @@ src=$wd/analysis/src/workflow
 # Move to WD
 cd $wd
 
-Rscript $src/annotate-background-sg-ghm-MOOSE_scrath.r 15
+Rscript $src/annotate-background-sg-ghm-MOOSE_scratch.r 15
