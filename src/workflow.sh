@@ -439,19 +439,22 @@
     # Inputs: Background csvs
     # Outputs: csv per job (event_id + cbg info)
 
-    # module load R/4.1.0-foss-2020b
-    conda activate covid
-    # Rscript $src/workflow/create_bg_annotation_joblist.r
-    Rscript $src/workflow/create_bg_annotation_joblist_moose.r
-
-    module load dSQ
-    dsq --job-file $src/hpc/annotation-joblist.txt --mem-per-cpu 100g -t 2:00:00 -p pi_jetz
-
-    # UPDATE WITH DATE
-    sbatch dsq-annotation-joblist-2022-08-10.sh
+    # # module load R/4.1.0-foss-2020b
+    # conda activate covid
+    # # Rscript $src/workflow/create_bg_annotation_joblist.r
+    # Rscript $src/workflow/create_bg_annotation_joblist_moose.r
+    # 
+    # module load dSQ
+    # dsq --job-file $src/hpc/annotation-joblist.txt --mem-per-cpu 100g -t 2:00:00 -p pi_jetz
+    # 
+    # # UPDATE WITH DATE
+    # sbatch dsq-annotation-joblist-2022-08-10.sh
     
-    ##-- ALTERNATIVE WAY --##
-    sbatch $src/hpc/run_annotate_background_ghm_sg_MOOSE.sh
+      # ALTERNATIVE WAY USING FOREACH
+      # The above method keeps runign out of memore - not sure exactly why
+      # I re-wrote the scrip using MC parallelization and a submit script
+      # that calls on big mem so we cna have 100GB per core
+      sbatch $src/hpc/run_annotate_background_ghm_sg_MOOSE.sh
     
   ##
 
