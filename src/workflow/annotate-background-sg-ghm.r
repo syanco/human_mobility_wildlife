@@ -5,8 +5,8 @@ if(interactive()) {
   .wd <- getwd()
   .test <- TRUE
   # rd <- here::here
-  .datPF <- file.path(.wd,'analysis/')
-  .outPF <- file.path(.wd,'analysis/')
+  .datPF <- file.path(.wd,'out')
+  .outPF <- file.path(.wd,'out/')
   
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   
@@ -37,8 +37,10 @@ suppressWarnings(
 #---- Collect arguments ----#
 args = commandArgs(trailingOnly = TRUE)
 
-start_ix <- as.numeric(args[1])
-end_ix <- as.numeric(args[2])
+start_ix <- 1
+end_ix <- 1
+# start_ix <- as.numeric(args[1])
+# end_ix <- as.numeric(args[2])
 n <- as.numeric(args[3])
 
 #---- Collect arguments ----#
@@ -56,15 +58,29 @@ evt <- data.table::rbindlist(lapply(files[start_ix:end_ix], data.table::fread)) 
 
 message("reading in census block group geometries...")
 cbg_sf <- st_read(paste0(.wd,"/raw_data/safegraph_open_census_data_2010_to_2019_geometry/cbg.geojson"))
-cbg_area <- fread(paste0(.datPF, "event-annotations/cbg-area.csv"), colClasses = "character") %>%
+cbg_area <- fread(paste0(.datPF, "/event-annotation/cbg-area.csv"), colClasses = "character") %>%
   select(cbg_2010, cbg_area_m2)
 
+# pre-reduce the size of the cbg object to reduce memorly load for the intersection
+tic()
+  #create vector of polygon indices intersecting the points
+cbg_idx <- unique(unlist(st_intersects(evt, cbg_sf)))
+# reduc e the multipolygon object to only relevant features
+cbg_red <- cbg_sf[cbg_idx,]
+toc()
 
 message("running intersection with cbg geometries...")
-evt_cbg <- st_intersection(evt,cbg_sf) %>%
+tic()
+  # do the intersection on the reduced polygon
+evt_cbg <- st_intersection(evt, cbg_red) %>%
   st_drop_geometry() %>%
   mutate(cbg_2010 = as.character(CensusBlockGroup)) %>%
   left_join(., cbg_area, by = "cbg_2010")
+toc()
+# evt_cbg <- st_intersects(evt,cbg_sf) %>%
+#   st_drop_geometry() %>%
+#   mutate(cbg_2010 = as.character(CensusBlockGroup)) %>%
+#   left_join(., cbg_area, by = "cbg_2010")
 
 
 reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)

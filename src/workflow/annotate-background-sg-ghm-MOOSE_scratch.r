@@ -97,8 +97,13 @@ foreach(j = 1:length(indls), .errorhandling = "pass", .inorder = F) %dopar% {
     cbg_area <- fread(paste0(.datPF, "event-annotation/cbg-area.csv"), colClasses = "character") %>%
       select(cbg_2010, cbg_area_m2)
     
+    bg_idx <- unique(unlist(st_intersects(evt, cbg_sf)))
+    # reduc e the multipolygon object to only relevant features
+    cbg_red <- cbg_sf[cbg_idx,]
+
     message("running intersection with cbg geometries...")
-    evt_cbg <- st_intersection(evt,cbg_sf) %>%
+    # do the intersection on the reduced polygon
+    evt_cbg <- st_intersection(evt, cbg_red) %>%
       st_drop_geometry() %>%
       mutate(cbg_2010 = as.character(CensusBlockGroup)) %>%
       left_join(., cbg_area, by = "cbg_2010")
@@ -137,7 +142,7 @@ foreach(j = 1:length(indls), .errorhandling = "pass", .inorder = F) %dopar% {
     
     # head(evt_sg_ghm)
     message("exporting individual...")
-    fwrite(evt_sg_ghm, paste0(paste0(.outPF, "/ssf-background-points/annotated/individual-",id,"-sg-ghm.csv")))
+    fwrite(evt_sg_ghm, paste0(paste0(.outPF, "/ssf-background-points/annotated/moose/individual-",id,"-sg-ghm.csv")))
     
   } else {
     
