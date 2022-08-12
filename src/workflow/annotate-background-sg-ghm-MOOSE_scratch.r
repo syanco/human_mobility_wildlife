@@ -97,7 +97,7 @@ foreach(j = 1:length(indls), .errorhandling = "pass", .inorder = F) %dopar% {
     cbg_area <- fread(paste0(.datPF, "event-annotation/cbg-area.csv"), colClasses = "character") %>%
       select(cbg_2010, cbg_area_m2)
     
-    bg_idx <- unique(unlist(st_intersects(evt, cbg_sf)))
+    cbg_idx <- unique(unlist(st_intersects(evt, cbg_sf)))
     # reduc e the multipolygon object to only relevant features
     cbg_red <- cbg_sf[cbg_idx,]
 
