@@ -108,7 +108,7 @@ foreach(j = 1:length(indls), .errorhandling = "pass", .inorder = F) %dopar% {
       mutate(cbg_2010 = as.character(CensusBlockGroup)) %>%
       left_join(., cbg_area, by = "cbg_2010")
     
-    reformatted_files_daily <- list.files(paste0(.datPF,"safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
+    reformatted_files_daily <- list.files(paste0("processed_data","safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
     
     # combine all data
     message("reading in safegraph data...")
