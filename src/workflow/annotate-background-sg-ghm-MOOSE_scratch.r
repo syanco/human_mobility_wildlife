@@ -108,7 +108,7 @@ foreach(j = 1:length(indls), .errorhandling = "pass", .inorder = F) %dopar% {
       mutate(cbg_2010 = as.character(CensusBlockGroup)) %>%
       left_join(., cbg_area, by = "cbg_2010")
     
-    reformatted_files_daily <- list.files(paste0("processed_data","safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
+    reformatted_files_daily <- list.files(paste0("processed_data/","safegraph/counties-dates-2-10-22-reformatted/daily-data"), full.names = TRUE)
     
     # combine all data
     message("reading in safegraph data...")
@@ -141,7 +141,7 @@ foreach(j = 1:length(indls), .errorhandling = "pass", .inorder = F) %dopar% {
     evt_sg_ghm <- left_join(evt_sg, evt_ghm, by = "step_id")
     
     # head(evt_sg_ghm)
-    message("exporting individual...")
+    message(glue("exporting individual {j} of {length(indls)}..."))
     fwrite(evt_sg_ghm, paste0(paste0(.outPF, "/ssf-background-points/annotated/moose/individual-",id,"-sg-ghm.csv")))
     
   } else {
