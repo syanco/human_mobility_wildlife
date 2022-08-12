@@ -142,7 +142,7 @@ foreach(j = 1:length(indls), .errorhandling = "pass", .inorder = F) %dopar% {
     
     # head(evt_sg_ghm)
     message(glue("exporting individual {j} of {length(indls)}..."))
-    fwrite(evt_sg_ghm, glue("{.outPF}ssf-background-points/annotated/moose/individual-{indls[j]}-sg-ghm.csv")))
+    fwrite(evt_sg_ghm, glue("{.outPF}ssf-background-pts/annotated/moose/individual-{indls[j]}-sg-ghm.csv"))
     
   } else {
     
