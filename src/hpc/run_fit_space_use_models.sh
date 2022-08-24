@@ -13,7 +13,7 @@ module load miniconda
 conda activate brms
 
 # Declare WD
-wd=/gpfs/loomis/project/jetz/sy522/covid-19_movement
+wd=/gpfs/loomis/pi/jetz/sy522/covid-19_movement
 
 cd $wd
 
