@@ -114,7 +114,7 @@ registerDoMC(.cores)
 # ==== Perform analysis ====
 
 #declare model form
-form <-  bf(sqrt_breadth ~ ghm_scale + ndvi_scale + lst_scale + (1 |grp) + ar(time = week, gr = grp))
+form <-  bf(sqrt_breadth_scale ~ ghm_scale + ndvi_scale + lst_scale + (1 |grp) + ar(time = week, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
