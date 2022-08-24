@@ -57,6 +57,9 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 # Use miller to filter by run column and then take the study_id field
 # need to use tail to remove first line, which is the header
 # study ids have \r suffix. Need to remove these
+# 
+# !!!!!!! TODO:  currently everythi9ng but moose are set to 0 - MODIFY!!!!!
+# 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 indIds=($(mlr --csv --opprint filter '$run == 1' then cut -f ind out/ssf-background-pts/bg-log.csv | tail -n +2))
 indIds=(${indIds[@]%$'\r'} ) # remove \r suffix
 
@@ -113,10 +116,10 @@ colnames=(${colnames[@]%$'\r'})
 # indIds=${indIds[@]:699}
 
 # check the timestampcol in 'anno_gee.r' at line 120
-for indId in "${indIds[@]}"; do 
-  echo "Start processing individual ${indIds}"
+for IND in "${indIds[@]}"; do 
+  echo "Start processing individual ${IND}"
 
-  points=$geePtsP/$indIds
+  points=$geePtsP/${IND}
   
   # get length of an array
   n=${#envs[@]}
@@ -139,7 +142,7 @@ for indId in "${indIds[@]}"; do
     # if column is not present don't pass parameters
 
     #echo "index: $i, env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
-    out=$gcsOutP/${indIds}_${colnames[$i]} #do not include url, bucket, or file extension
+    out=$gcsOutP/${IND}_${colnames[$i]} #do not include url, bucket, or file extension
     
     echo Annotating "env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
     $MOSEYENV_SRC/anno_gee_bg.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}

@@ -69,11 +69,10 @@ suppressWarnings(
     library(glue)
     # library(foreach)
     # library(doMC)
-    library(amt)
-    library(glmmTMB)
+    # library(amt)
+    # library(glmmTMB)
+    library(brms)
     library(RSQLite)
-    library(broom)
-    library(broom.mixed)
     # library(rstoat)
   }))
 
@@ -155,7 +154,7 @@ registerDoMC(.cores)
 #                   bands = list("NDVI")))
 
 # loop through species
-i <- 1
+# i <- 1
 # 
 # 
 # all_files <- list.files(.bgP)
@@ -168,7 +167,8 @@ i <- 1
 foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   
   # get focal species
-  sp <- sp_sum$taxon_canonical_name[i]
+  #sp <- sp_sum$taxon_canonical_name[i]
+  sp <- 'Alces alces'
   
   # get list of ind for ssf
   fl <- list.files(glue("{.bgM}"))
@@ -217,11 +217,12 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
                                  "case_" = "case_",
                                  "burst_" = "burst_")) %>% 
         mutate(ind_id = ind,
-               strt = paste0(ind,"_",step_id_.x))
+               strt = paste0(ind,"_",burst_))
     },error=function(e) e)
     
     
     if(inherits(o, "error")) next
+    
     
   } # j
   
@@ -229,96 +230,42 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   dat0 <- do.call("rbind", sp_out)  
   
   dat <- dat0 %>%
-    filter(ndvi > 0 & ndvi <1) %>% 
     mutate(
       tmax_norm = scale(tmax),
       ndvi_norm = scale(ndvi),
       cbg_km = cbg_area_m2/1000000,
       sg_norm = safegraph_daily_count/cbg_km,
-      ghm_norm = scale(ghm),
-      ind_f = as.numeric(as.factor(ind_id)),
-      an_ID = as.numeric(ind_f),
+      ind_f = as.factor(ind_id),
       burst_f = as.factor(burst_),
-      strt_n = as.numeric(as.factor(strt)),
-      case = as.numeric(case_),
-      yr = as.factor(year(t2_))
+      case = as.numeric(case_)
       
     ) %>%
     distinct()    
   
-  
   message(glue("Starting model for {sp}..."))
+  form <- bf(case ~ sg_norm + ndvi_norm + tmax_norm + 
+               (1|strt) + 
+               (0 + sg_norm | ind_f) + (0 + ndvi_norm | ind_f) + (0 + sg_norm | ind_f))
+  # set priors
+  get_prior(form, data = dat)
+  p <- set_prior(prior="normal(0, 1000000)", class = "sd", group = "strt")
+  #fit model
+  mod <- brm(
+    form,
+    data = dat,
+    family = poisson,
+    inits = 0,
+    cores = 1,
+    iter = 1000,
+    thin = 1,
+    prior = p
+  )
   
-  # fit SG model
-  mod_sg = glmmTMB(case ~ sg_norm + 
-                     ndvi_norm + tmax_norm +
-                     (1|strt_n) +
-                   (0 + sg_norm| ind_f) +
-                   (0 + tmax_norm | ind_f) + (0 + ndvi_norm | ind_f),
-                   family=poisson, data=dat, doFit=FALSE) 
-  
-  #' Then fix the standard deviation of the first random term
-  mod_sg$parameters$theta[1] = log(1e3) 
-  
-  #' We need to tell `glmmTMB` not to change the variance by setting it to `NA`:
-  mod_sg$mapArg = list(theta=factor(c(NA, 1:3))) # change the 2 to however many random slopes I have
-  
-  #' Then fit the model and look at the results:
-  fit_mod_sg = glmmTMB:::fitTMB(mod_sg) 
-  
-  (sg_t <- broom.mixed::tidy(fit_mod_sg, effects = "fixed", conf.int = T,
-                             exponentiate = T))
-  ggplot(sg_t) +
-    geom_point(aes(y=term, x = estimate))+
-    geom_errorbar(aes(y=term, xmin = conf.low, xmax= conf.high), width = 0.25)+
-    geom_vline(aes(xintercept = 1), linetype = "dashed") +
-    theme_minimal()
-  
-  # fit GHM model
-  mod_ghm = glmmTMB(case_ ~ ghm_norm + 
-                      tmax_norm + ndvi_norm +
-                      (1|strt_n) + 
-                      (0 + ghm_norm | ind_f)+
-                      (0 + tmax_norm | ind_f) + (0 + ndvi_norm | ind_f),
-                    family=poisson, data=dat, doFit=FALSE) 
-  
-  #' Then fix the standard deviation of the first random term
-  mod_ghm$parameters$theta[1] = log(1e3) 
-  
-  #' We need to tell `glmmTMB` not to change the variance by setting it to `NA`:
-  mod_ghm$mapArg = list(theta=factor(c(NA, 1:3))) # change the 2 to however many random slopes I have
-  
-  #' Then fit the model and look at the results:
-  fit_mod_ghm = glmmTMB:::fitTMB(mod_ghm) 
-  (ghm_t <- broom.mixed::tidy(fit_mod_ghm, effects = "fixed", conf.int = T,
-                              exponentiate = T))
-  
-  # fit INT model
-  mod_int = glmmTMB(case_ ~ sg_norm*ghm + 
-                      # tmax_norm + ndvi_norm + # covars
-                      # log(sl_.x) + cos(ta_.x) + # the "integrated" part
-                      (1|strt_n) + # conditional strata
-                      (0 + sg_norm | ind_id) + (0 + ghm | ind_id) + # REs
-                      (0 + sg_norm:ghm | ind_id), 
-                    # (0 + log(sl_.x)| ind_id) + (0 + cos(ta_.x)|ind_id) ,
-                    # (0 + tmax_norm | ind_id) + (0 + ndvi_norm|ind_id), 
-                    family=poisson, data=dat, doFit=FALSE) 
-  
-  #' Then fix the standard deviation of the first random term
-  mod_int$parameters$theta[1] = log(1e3) 
-  
-  #' We need to tell `glmmTMB` not to change the variance by setting it to `NA`:
-  mod_int$mapArg = list(theta=factor(c(NA, 1:3))) # change the 2 to however many random slopes I have
-  
-  #' Then fit the model and look at the results:
-  fit_mod_int = glmmTMB:::fitTMB(mod_int) 
-  (int_t <- broom.mixed::tidy(fit_mod_int, effects = "fixed", conf.int = T,
-                              exponentiate = T))
   #stash results into named list
   out <- list(
     species = sp,
     data = dat,
-    model = fit_mod_int
+    model = mod
   )
   
   #write out results

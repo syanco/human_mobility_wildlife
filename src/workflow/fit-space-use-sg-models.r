@@ -103,7 +103,7 @@ registerDoMC(.cores)
 # ==== Perform analysis ====
 
 #declare model form
-form <-  bf(log_area ~ sg_norm + ndvi_scale + lst_scale + (1 |grp) + ar(time = wk, gr = grp))
+form <-  bf(log_area_scale ~ sg_norm + ndvi_scale + lst_scale + (1 |grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
