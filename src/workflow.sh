@@ -454,7 +454,7 @@
       # The above method keeps runign out of memore - not sure exactly why
       # I re-wrote the scrip using MC parallelization and a submit script
       # that calls on big mem so we cna have 100GB per core
-      sbatch $src/hpc/run_annotate_background_ghm_sg_MOOSE.sh
+      sbatch $src/hpc/run_annotate_background_ghm_sg_ALL.sh
     
   ##
 
