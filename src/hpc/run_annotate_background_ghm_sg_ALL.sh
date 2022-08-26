@@ -5,7 +5,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=scott.yanco@yale.edu
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=50g -t 3-
+#SBATCH --mem-per-cpu=50g -t 2-
 #SBATCH --partition=bigmem
 
 # module load R
