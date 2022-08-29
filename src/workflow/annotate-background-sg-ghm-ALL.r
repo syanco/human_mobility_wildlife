@@ -92,7 +92,7 @@ foreach(i = 1:length(sp), .errorhandling = "pass", .inorder = F)%do%{
     if(file.exists(f)){
       #check if we've already completed the annotation 
       #TURN THIS OFF TO OVERWRITE (OR TODO add an overwrite flag)
-      if(file.exists( glue("{.outPF}ssf-background-pts/annotated/sindividual-{indls[j]}-sg-ghm.csv"))){
+      if(!file.exists( glue("{.outPF}ssf-background-pts/annotated/sindividual-{indls[j]}-sg-ghm.csv"))){
         evt <- read_csv(f)%>% 
           mutate("step_id" = c(1:nrow(.)),
                  "date" = as.character(as_date(t2_))) %>%
