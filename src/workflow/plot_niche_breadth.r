@@ -317,8 +317,9 @@ for(i in 1:length(sg_modlist)){
 
 # combine dfs
 res_out_df <- do.call("rbind", res_out)
-write_csv(x=res_out_df, file = glue(""))
+write_csv(x=res_out_df, file = glue("out/niche_mod_summary_{Sys.Date()}.csv"))
 
+# combine plots and save out
 row_reduced <- row[which(pl==1)]
 fin_plots <- do.call(c, row_reduced)
 

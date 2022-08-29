@@ -84,168 +84,18 @@ traits <- read_csv(.traitPF)
 # message('Loading interaction models...')
 int_modlist <- list.files( path=file.path(.datP, "area/"), full.names=TRUE )
 # 
-# int_modout <- matrix(nrow = length(int_modlist), ncol = 10)
-# 
-# for(i in 1:length(int_modlist)){
-#   load(int_modlist[i])
-#   out$model
-#   fe <- fixef(out$model)
-#   m <- matrix(c(out$species, 
-#                 as.numeric(fe["sg_norm", "Estimate"]),
-#                 fe["sg_norm", "Q2.5"],
-#                 fe["sg_norm", "Q97.5"],
-#                 fe["ghm_scale", "Estimate"],
-#                 fe["ghm_scale", "Q2.5"],
-#                 fe["ghm_scale", "Q97.5"],
-#                 fe["sg_norm:ghm_scale", "Estimate"],
-#                 fe["sg_norm:ghm_scale", "Q2.5"],
-#                 fe["sg_norm:ghm_scale", "Q97.5"]),
-#               nrow = 1)
-#   
-#   int_modout[i,] <- m
-# }
-# 
-# int_modout_df <- as.data.frame(int_modout)
-# colnames(int_modout_df) <- c("species",
-#                              "sg_norm",
-#                              "sg_norm_lci",
-#                              "sg_norm_uci",
-#                              "ghm",
-#                              "ghm_lci",
-#                              "ghm_uci",
-#                              "inter",
-#                              "inter_lci",
-#                              "inter_uci")
-# cols <- c(2:10)
-# int_modout_df[,cols] = apply(int_modout_df[,cols], 2, function(x) as.numeric(x))
-# int_modout_df <- int_modout_df %>% 
-#   mutate(Species = gsub("_", " ", int_modout_df$species)) %>% 
-#   left_join(traits) %>% 
-#   #TODO: go over these def siwth group
-#   mutate(diet = case_when(Diet.PlantO >= 50 ~ "Herbivore",
-#                           Diet.Fruit >= 50 ~ "Frugivore",
-#                           Diet.Scav >= 50 ~ "Savenger",
-#                           Diet.Inv >= 50 ~ "Insectivore",
-#                           (Diet.Vend+Diet.Vect+Diet.Vfish) >= 50 ~ "Carnivore",
-#                           TRUE ~ "Omnivore"),
-#          ghm_sign = case_when(ghm < 0 ~ "n",
-#                               ghm >= 0 ~ "p"),
-#          sg_sign = case_when(sg_norm < 0 ~ "n",
-#                              sg_norm >= 0 ~ "p"),
-#          inter_sign = case_when(inter < 0 ~ "n",
-#                                 inter >= 0 ~ "p"),
-#          ghm_sig = case_when((ghm_lci < 0 & 0 < ghm_uci) ~ "N",
-#                              TRUE ~ "Y"),
-#          sg_sig = case_when((sg_norm_lci < 0 & 0 < sg_norm_uci) ~ "N",
-#                             TRUE ~ "Y"),
-#          inter_sig = case_when((inter_lci < 0 & 0 < inter_uci) ~ "N",
-#                                TRUE ~ "Y"),
-#          ghm_display = case_when(ghm_sig == "Y" ~ ghm,
-#                                  T ~ NA_real_),
-#          sg_display = case_when(sg_sig == "Y" ~ sg_norm,
-#                                 T ~ NA_real_),
-#          inter_display = case_when(inter_sig == "Y" ~ inter,
-#                                    T ~ NA_real_))
-# 
-# 
-# 
+ 
 # #-- SG Models --#
 # 
 # message('Loading interaction models...')
 # 
 sg_modlist <- list.files( path=file.path(.datP, "area_sg/"), full.names=TRUE )
-# 
-# sg_modout <- matrix(nrow = length(sg_modlist), ncol = 4)
-# 
-# for(i in 1:length(sg_modlist)){
-#   load(sg_modlist[i])
-#   # out$model
-#   fe <- fixef(out$model)
-#   m <- matrix(c(out$species, 
-#                 as.numeric(fe["sg_norm", "Estimate"]),
-#                 fe["sg_norm", "Q2.5"],
-#                 fe["sg_norm", "Q97.5"]),
-#               nrow = 1)
-#   
-#   sg_modout[i,] <- m
-# }
-# 
-# sg_modout_df <- as.data.frame(sg_modout)
-# colnames(sg_modout_df) <- c("species",
-#                             "sg_norm",
-#                             "sg_norm_lci",
-#                             "sg_norm_uci")
-# cols <- c(2:4)
-# sg_modout_df[,cols] = apply(sg_modout_df[,cols], 2, function(x) as.numeric(x))
-# sg_modout_df <- sg_modout_df %>% 
-#   mutate(Species = gsub("_", " ", sg_modout_df$species)) %>% 
-#   left_join(traits) %>% 
-#   #TODO: go over these def siwth group
-#   mutate(diet = case_when(Diet.PlantO >= 50 ~ "Herbivore",
-#                           Diet.Fruit >= 50 ~ "Frugivore",
-#                           Diet.Scav >= 50 ~ "Savenger",
-#                           Diet.Inv >= 50 ~ "Insectivore",
-#                           (Diet.Vend+Diet.Vect+Diet.Vfish) >= 50 ~ "Carnivore",
-#                           TRUE ~ "Omnivore"),
-#          sg_sign = case_when(sg_norm < 0 ~ "n",
-#                              sg_norm >= 0 ~ "p"),
-#          sg_sig = case_when((sg_norm_lci < 0 & 0 < sg_norm_uci) ~ "N",
-#                             TRUE ~ "Y"),
-#          sg_display = case_when(sg_sig == "Y" ~ sg_norm,
-#                                 T ~ NA_real_),
-#          code = factor(case_when(sg_sig == "Y" & sg_sign == "n" ~ "Neg",
-#                                  sg_sig == "Y" & sg_sign == "p" ~ "Pos",
-#                                  sg_sig == "N" ~ "Non Sig"), 
-#                        levels=c("Neg", "Pos", "Non Sig")))
-# 
+
 # #-- GHM Models --#
 # 
 # message('Loading interaction models...')
 # 
 ghm_modlist <- list.files( path=file.path(.datP, "area_ghm/"), full.names=TRUE )
-# 
-# ghm_modout <- matrix(nrow = length(ghm_modlist), ncol = 4)
-# 
-# for(i in 1:length(ghm_modlist)){
-#   load(ghm_modlist[i])
-#   # out$model
-#   fe <- fixef(out$model)
-#   m <- matrix(c(out$species, 
-#                 as.numeric(fe["ghm_scale", "Estimate"]),
-#                 fe["ghm_scale", "Q2.5"],
-#                 fe["ghm_scale", "Q97.5"]),
-#               nrow = 1)
-#   
-#   ghm_modout[i,] <- m
-# }
-# 
-# ghm_modout_df <- as.data.frame(ghm_modout)
-# colnames(ghm_modout_df) <- c("species",
-#                             "ghm_scale",
-#                             "ghm_scale_lci",
-#                             "ghm_scale_uci")
-# cols <- c(2:4)
-# ghm_modout_df[,cols] = apply(ghm_modout_df[,cols], 2, function(x) as.numeric(x))
-# ghm_modout_df <- ghm_modout_df %>% 
-#   mutate(Species = gsub("_", " ", ghm_modout_df$species)) %>% 
-#   left_join(traits) %>% 
-#   #TODO: go over these def siwth group
-#   mutate(diet = case_when(Diet.PlantO >= 50 ~ "Herbivore",
-#                           Diet.Fruit >= 50 ~ "Frugivore",
-#                           Diet.Scav >= 50 ~ "Savenger",
-#                           Diet.Inv >= 50 ~ "Insectivore",
-#                           (Diet.Vend+Diet.Vect+Diet.Vfish) >= 50 ~ "Carnivore",
-#                           TRUE ~ "Omnivore"),
-#          ghm_sign = case_when(ghm_scale < 0 ~ "n",
-#                               ghm_scale >= 0 ~ "p"),
-#          ghm_sig = case_when((ghm_scale_lci < 0 & 0 < ghm_scale_uci) ~ "N",
-#                             TRUE ~ "Y"),
-#          ghm_display = case_when(ghm_sig == "Y" ~ ghm_scale,
-#                                 T ~ NA_real_),
-#          code = factor(case_when(ghm_sig == "Y" & ghm_sign == "n" ~ "Neg",
-#                                  ghm_sig == "Y" & ghm_sign == "p" ~ "Pos",
-#                                  ghm_sig == "N" ~ "Non Sig"), 
-#                        levels=c("Neg", "Pos", "Non Sig")))
 
 
 #---- Make Plots ----#
@@ -266,7 +116,7 @@ palgray <- c("#808080", "#D3D3D3")
 
 # !!!!!!!!! !
 
-
+res_out <- list()
 row <- list()
 pl <- c()
 for(i in 1:length(sg_modlist)){
@@ -444,6 +294,10 @@ for(i in 1:length(sg_modlist)){
     plint <- 0
   }
   
+  # gather results tables
+  res_out[[i]] <- ghmdf %>% left_join(sgdf) %>% left_join(intdf)
+  
+  # gather plots
   tmp[[1]] <- wrap_elements(textGrob(glue("{out$species}"),
                                      gp = gpar(fontsize = 6)))
   tmp[[2]] <- sg_ce_plot 
@@ -457,6 +311,11 @@ for(i in 1:length(sg_modlist)){
   if(plsg == 1 | plghm == 1 | plint == 1){pl[i] <- 1}else(pl[i] <- 0)
 }
 
+# combine dfs
+res_out_df <- do.call("rbind", res_out)
+write_csv(x=res_out_df, file = glue("out/area_mod_summary_{Sys.Date()}.csv"))
+
+# combine plots and save out
 row_reduced <- row[which(pl==1)]
 fin_plots <- do.call(c, row_reduced)
 
