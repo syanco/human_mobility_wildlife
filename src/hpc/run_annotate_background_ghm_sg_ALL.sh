@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #SBATCH --job-name=ghm_annotation-moose-BG
-#SBATCH --cpus-per-task=24
+#SBATCH --cpus-per-task=12
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=scott.yanco@yale.edu
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=10g -t 3-
+#SBATCH --mem-per-cpu=20g -t 3-
 #SBATCH --partition=pi_jetz
 
 # module load R
