@@ -32,7 +32,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/projects/covid-19_movement'
+  .wd <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement'
   # rd <- here::here
   
   .outPF <- file.path(.wd,'out')
@@ -75,6 +75,8 @@ suppressWarnings(
     library(doMC)
     library(foreach)
     library(sf)
+    library(tidyverse )
+    library(glue)
   }))
 
 #Source all files in the auto load funs directory
