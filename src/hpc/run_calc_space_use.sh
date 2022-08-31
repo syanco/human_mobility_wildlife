@@ -6,7 +6,7 @@
 #SBATCH --partition pi_jetz
 #SBATCH -c 10
 #SBATCH --mem-per-cpu 20G
-#SBATCH -J calc_size_2022-02-11
+#SBATCH -J calc_size_with_TMAX-TMIN
 
 # Load conda env
 module load miniconda

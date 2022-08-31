@@ -32,11 +32,11 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/project/covid-19_movement'
+  .wd <- '~/projects/covid-19_movement'
   # rd <- here::here
   
   .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_20220303.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   .ctf <- file.path(.wd, "out/dbbmm_log.csv")
   
   .nc <- 4
@@ -209,7 +209,16 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
         filter(event_id %in% evtids) %>% 
         summarize(lst = mean(lst, na.rm = T))
       
-
+      # Get tmax
+      tmax <- evt_anno %>% 
+        filter(event_id %in% evtids) %>% 
+        summarize(tmax = mean(tmax, na.rm = T))
+      
+      # Get tmin
+      tmin <- evt_anno %>% 
+        filter(event_id %in% evtids) %>% 
+        summarize(tmin = mean(tmin, na.rm = T))
+      
       #unpack underlying data
       evt_tmp <- tmp_out$events 
       evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, 
@@ -241,7 +250,9 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                       cbg_area, 
                       pop, 
                       ndvi, 
-                      lst, 
+                      lst,
+                      tmax,
+                      tmin,
                       n, 
                       a_bb, 
                       fixmed, 
