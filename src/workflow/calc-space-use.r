@@ -92,20 +92,20 @@ invisible(assert_that(length(dbListTables(db))>0))
 # evt_sg <- tbl(db, "event_sg") %>% 
 #   collect()
 
-evt_cen <- tbl(db, "event_census") %>% 
-  collect()
+# evt_cen <- tbl(db, "event_census") %>% 
+#   collect()
 
 ind <- tbl(db,'individual') %>% 
   collect() %>% 
   pull(individual_id)
 
-dbDisconnect(db)
-
-invisible(assert_that(file.exists(.dbPF)))
-db <- dbConnect(RSQLite::SQLite(), 
-                file.path(.wd,'processed_data/mosey_mod_anno.db'), 
-                `synchronous` = NULL)
-invisible(assert_that(length(dbListTables(db))>0))
+# dbDisconnect(db)
+# 
+# invisible(assert_that(file.exists(.dbPF)))
+# db <- dbConnect(RSQLite::SQLite(), 
+#                 file.path(.wd,'processed_data/mosey_mod_anno.db'), 
+#                 `synchronous` = NULL)
+# invisible(assert_that(length(dbListTables(db))>0))
 
 evt_anno <- tbl(db, "event_clean") %>% 
   collect()
@@ -194,10 +194,10 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
         filter(event_id %in% evtids) %>% 
         summarize(ghm = mean(ghm, na.rm = T))
       
-      # Get pop density
-      pop <- evt_cen %>%
-        filter(event_id %in% evtids) %>% 
-        summarize(pop = mean(total_population_2019, na.rm = T))
+      # # Get pop density
+      # pop <- evt_cen %>%
+      #   filter(event_id %in% evtids) %>% 
+      #   summarize(pop = mean(total_population_2019, na.rm = T))
       
       # Get NDVI
       ndvi <- evt_anno %>% 
@@ -248,7 +248,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                       sg, 
                       ghm,
                       cbg_area, 
-                      pop, 
+                      # pop, 
                       ndvi, 
                       lst,
                       tmax,

@@ -333,7 +333,7 @@
       # Outputs: csv 
       
       # Create csv to store results
-      echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, pop, ndvi, lst, n, a_bb, fixmed, m_error" > ./out/dbbmm_size.csv
+      echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, ndvi, lst, tmax, tmin, n, a_bb, fixmed, m_error" > ./out/dbbmm_size.csv
 
       # SLURM:
       sbatch $src/hpc/run_calc_space_use.sh
