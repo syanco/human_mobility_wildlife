@@ -6,14 +6,14 @@
 #SBATCH --partition day
 #SBATCH -c 10
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J calc_niches
+#SBATCH -J calc_niches_with_TMAX
 
 # Load conda env
 module load miniconda
 conda activate covid
 
 # Declare WD
-wd=~/project/covid-19_movement
+wd=/gpfs/loomis/pi/jetz/sy522/covid-19_movement
 src=$wd/analysis/src/workflow
 
 # Move to WD

@@ -114,7 +114,7 @@ registerDoMC(.cores)
 # ==== Perform analysis ====
 
 #declare model form
-form <-  bf(sqrt_breadth_scale ~ sg_norm + ndvi_scale + lst_scale + (1 |grp) + ar(time = week, gr = grp))
+form <-  bf(sqrt_breadth_scale ~ sg_norm + ndvi_scale + tmax_scale + (1 |grp) + ar(time = week, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
@@ -137,7 +137,8 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       ghm_scale = scale(ghm),
       ndvi_scale = scale(ndvi.y),
       lst_scale = scale(lst.y),
-      
+      tmax_scale = scale(tmax),
+      tmin_scale = scale(tmin),
       grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
       # trt_new = gsub('_.*','',trt),
       year_f = factor(year), # create year factor
