@@ -14,7 +14,7 @@ Calculate space use before and during COVID-19 lockdowns using previously
 estimated dBBMMs
 
 Usage:
-calc-space-use.r <out> <db> <ctf> <nc> <continue>
+calc-space-use.r <out> <db> <ctf> <nc> [-c]
 calc-space-use.r (-h | --help)
 
 Parameters:
@@ -22,11 +22,12 @@ Parameters:
   --db: path to dtabase
   --ctf: path to dbbmm log file
   --nc: number of cores for parallel processing
-  --continue: T/F, check if individual was already output?
+
   
 Options:
 -h --help     Show this screen.
 -v --version     Show version.
+-c --continue   Indicates if script should first check for previous entries before calculating metrics
 ' -> doc
 
 #---- Input Parameters ----#
@@ -57,7 +58,7 @@ if(interactive()) {
   .dbPF <- makePath(ag$db)
   .ctf <- makePath(ag$ctf)
   .nc <- ag$nc
-  .continue <- ag$continue
+  .continue <- as.logical(ag$continue)
   
 }
 
