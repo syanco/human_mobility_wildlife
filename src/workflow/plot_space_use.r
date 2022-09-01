@@ -295,7 +295,7 @@ for(i in 1:length(sg_modlist)){
   }
   
   # gather results tables
-  res_out[[i]] <- ghmdf %>% left_join(sgdf) %>% left_join(intdf)
+  res_out[[i]] <- ghmdf %>% left_join(sgdf, by = c("species")) %>% left_join(intdf, by = c("species"))
   
   # gather plots
   tmp[[1]] <- wrap_elements(textGrob(glue("{out$species}"),
@@ -321,7 +321,7 @@ fin_plots <- do.call(c, row_reduced)
 
 (comb <- wrap_plots(fin_plots, byrow = T, ncol = 4, guides = "collect", 
                     widths=c(3,5,5,5), heights = c(5)))
-ggsave(filename='out/area_plots/comb_08092022.pdf', width = 7, height = 11.5, 
+ggsave(filename=glue('out/area_plots/comb_{Sys.Date()}.pdf'), width = 7, height = 11.5, 
        plot = comb)
 
 
