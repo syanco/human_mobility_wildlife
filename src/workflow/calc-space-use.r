@@ -283,7 +283,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                                   {ctf$ind_id[i]}, year {ctf$year[i]}", 
                                   "\n"))})
     # if file hasn't been written
-      } else {message(glues("Metrics for individual {ctf$ind_id[i]} already calculated and continue is set to T, gotta keep movin' on..."))}
+      } else {message(glue("Metrics for individual {ctf$ind_id[i]} already calculated and continue is set to T, gotta keep movin' on..."))}
   } else { # if continue is set to false, just do the thing
     # TODO:  this is a lot of duplicated code, should probably just make it a function but lazy...
     message(glue("Starting ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
