@@ -156,8 +156,8 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
   out_check <- existing_out %>% 
     filter(ind_id == glue("{ctf$ind_id[i]}"))
   
-  if(.continue == T){
-    if(nrow(out_check == 0)){
+  if(.continue){
+    if(nrow(out_check) == 0){
       message(glue("Starting ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
       tryCatch({
         load(glue("{.outPF}/dbbmms/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
