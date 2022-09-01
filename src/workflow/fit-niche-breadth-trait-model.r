@@ -92,7 +92,8 @@ source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
 #---- Load data ----#
 message("Loading data...")
 
-dbbmms <- read_csv(.varPF)
+dbbmms <- read_csv(.varPF) %>% 
+  distinct()
 
 # load and process data
 breadth <- read_csv(.datPF) %>%
