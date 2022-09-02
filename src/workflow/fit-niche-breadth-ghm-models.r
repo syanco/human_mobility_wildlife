@@ -135,10 +135,11 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   message(glue("Strating model for {sp}..."))
   
   dat <- breadth %>%
-    filter(scientificname == sp) %>% 
+    filter(scientificname == sp,
+           !is.infinite(total)) %>% 
     mutate(
       # sqrt_breadth = sqrt(total), #get log of weekly area use
-      breadth_scale = scale(breadth), # standardize it
+      breadth_scale = scale(total), # standardize it
       sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
       # log_sg_norm = log(sg_norm),
       ghm_scale = scale(ghm),

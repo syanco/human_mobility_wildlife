@@ -135,7 +135,8 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   message(glue("Strating model for {sp}..."))
   
   dat <- breadth %>%
-    filter(scientificname == sp) %>% 
+    filter(scientificname == sp,
+           !is.infinite(total)) %>% 
     mutate(
       # sqrt_breadth = sqrt(total), #get sqrt weekly niche breadth
       breadth_scale = scale(total), # standardize it

@@ -36,10 +36,12 @@ if(interactive()) {
   
 } else {
   library(docopt)
-  source(file.path(.wd,'analysis/src/funs/input_parse.r'))
   ag <- docopt(doc, version = '0.1\n')
   
   .wd <- getwd()
+  
+  source(file.path(.wd,'analysis/src/funs/input_parse.r'))
+  
   .dbPF <- makePath(ag$dbPF)
   .bgP <- makePath(ag$bgP)
   # .bgM <- file.path(.wd, "out/ssf-background-pts/moose")
