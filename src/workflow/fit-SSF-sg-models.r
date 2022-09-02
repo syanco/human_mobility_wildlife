@@ -155,7 +155,7 @@ registerDoMC(.cores)
 #                   bands = list("NDVI")))
 
 # loop through species
-i <- 1
+# i <- 1
 # 
 # 
 # all_files <- list.files(.bgP)
@@ -268,11 +268,11 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   
   (sg_t <- broom.mixed::tidy(fit_mod_sg, effects = "fixed", conf.int = T,
                              exponentiate = T))
-  ggplot(sg_t) +
-    geom_point(aes(y=term, x = estimate))+
-    geom_errorbar(aes(y=term, xmin = conf.low, xmax= conf.high), width = 0.25)+
-    geom_vline(aes(xintercept = 1), linetype = "dashed") +
-    theme_minimal()
+  # ggplot(sg_t) +
+  #   geom_point(aes(y=term, x = estimate))+
+  #   geom_errorbar(aes(y=term, xmin = conf.low, xmax= conf.high), width = 0.25)+
+  #   geom_vline(aes(xintercept = 1), linetype = "dashed") +
+  #   theme_minimal()
   
   # fit GHM model
   mod_ghm = glmmTMB(case_ ~ ghm_norm + 
@@ -293,36 +293,18 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   (ghm_t <- broom.mixed::tidy(fit_mod_ghm, effects = "fixed", conf.int = T,
                               exponentiate = T))
   
-  # fit INT model
-  mod_int = glmmTMB(case_ ~ sg_norm*ghm + 
-                      # tmax_norm + ndvi_norm + # covars
-                      # log(sl_.x) + cos(ta_.x) + # the "integrated" part
-                      (1|strt_n) + # conditional strata
-                      (0 + sg_norm | ind_id) + (0 + ghm | ind_id) + # REs
-                      (0 + sg_norm:ghm | ind_id), 
-                    # (0 + log(sl_.x)| ind_id) + (0 + cos(ta_.x)|ind_id) ,
-                    # (0 + tmax_norm | ind_id) + (0 + ndvi_norm|ind_id), 
-                    family=poisson, data=dat, doFit=FALSE) 
-  
-  #' Then fix the standard deviation of the first random term
-  mod_int$parameters$theta[1] = log(1e3) 
-  
-  #' We need to tell `glmmTMB` not to change the variance by setting it to `NA`:
-  mod_int$mapArg = list(theta=factor(c(NA, 1:3))) # change the 2 to however many random slopes I have
-  
-  #' Then fit the model and look at the results:
-  fit_mod_int = glmmTMB:::fitTMB(mod_int) 
-  (int_t <- broom.mixed::tidy(fit_mod_int, effects = "fixed", conf.int = T,
-                              exponentiate = T))
   #stash results into named list
   out <- list(
     species = sp,
     data = dat,
-    model = fit_mod_int
+    sg_model = mod_sg,
+    ghm_model = mod_ghm,
+    sg_tidy = sg_t,
+    ghm_tidy = ghm_t
   )
   
   #write out results
-  save(out, file = glue("{.outP}/{sp}_{Sys.Date()}.rdata"))
+  save(out, file = glue("{.outP}/{sp}_SSF_out_{Sys.Date()}.rdata"))
   
 } # i
 
