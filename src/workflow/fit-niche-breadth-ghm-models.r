@@ -94,6 +94,12 @@ dbbmms <- read_csv(.varPF) %>%
 
 # load and process data
 breadth <- read_csv(.datPF) %>%
+  distinct() %>%
+  mutate(tmax_mvnh = tmax,
+         tmin_mvnh = tmin,
+         lst_mvnh = lst,
+         ndvi_mvnh = ndvi) %>%
+  select(!tmax) %>%
   filter(studyid != 351564596) %>%
   filter(studyid != 1891587670) %>%
   mutate(ind_f = as.factor(individual)) %>%  # create factor version of ind for REs)
