@@ -3,7 +3,7 @@
 #SBATCH -t 1-
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
-#SBATCH --partition pi_jetz
+#SBATCH --partition pi_jetz, day
 #SBATCH -c 24
 #SBATCH --mem-per-cpu 10G
 #SBATCH -J fit_additive_space_use_mods
