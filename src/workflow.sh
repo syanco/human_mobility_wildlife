@@ -416,7 +416,6 @@
       # Rscript $src/workflow/generate-background-points.r
     #
     
-  ##
 
     #- Environmental annotations for background points 
 
@@ -458,6 +457,16 @@
     
   ##
 
+    #- Fit SSFs
+      # Inputs: 
+      # Outputs:  
+
+      # SLURM:
+      sbatch $src/hpc/run_fit_SSF_models.sh
+
+      # ON DEMAND:
+      # Rscript $src/workflow/generate-background-points.r
+    #
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 #                                                 #
 #             JULY WORKFLOW BOOKMARK              #

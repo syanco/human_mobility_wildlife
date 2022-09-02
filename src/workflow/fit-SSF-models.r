@@ -26,7 +26,7 @@ if(interactive()) {
   
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   .bgP <- file.path(.wd, "out/ssf-background-pts/annotated")
-  .bgM <- file.path(.wd, "out/ssf-background-pts/moose")
+  # .bgM <- file.path(.wd, "out/ssf-background-pts/moose")
   .outP <- file.path(.wd,'out/ssf-mods')
   
   .cores <- 20
@@ -40,10 +40,15 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   
   .wd <- getwd()
-  .cores <- ag$cores
-  .minsp <- ag$minsp
-  .iter  <- ag$iter
-  .thin <- ag$thin
+  .dbPF <- makePath(ag$dbPF)
+  .bgP <- makePath(ag$bgP)
+  # .bgM <- file.path(.wd, "out/ssf-background-pts/moose")
+  .outP <- makePath(ag$out)
+  
+  .cores <- makePath(ag$cores)
+  .minsp <- makePath(ag$minsp)
+  .iter <- makePath(ag$iter)
+  .thin <- makePath(ag$thin)
   
   source(file.path(.wd,'analysis/src/funs/input_parse.r'))
   
@@ -171,7 +176,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   sp <- sp_sum$taxon_canonical_name[i]
   
   # get list of ind for ssf
-  fl <- list.files(glue("{.bgM}"))
+  fl <- list.files(glue("{.bgP}"))
   
   # list of individuals within species
   # indls <- indtb %>% 
@@ -199,7 +204,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       ghm_sg <- read_csv(glue("{.bgP}/moose/individual-{ind}-sg-ghm.csv"))%>% 
         mutate(x2_ = round(x2_, 4),
                y2_ = round(y2_, 4))
-      dat0 <- read_csv(glue("{.bgM}/{ind}.csv")) %>% 
+      dat0 <- read_csv(glue("{.bgP}/{ind}.csv")) %>% 
         mutate(x2_ = round(x2_, 4),
                y2_ = round(y2_, 4))
       
