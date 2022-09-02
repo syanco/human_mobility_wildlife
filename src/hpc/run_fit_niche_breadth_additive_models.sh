@@ -6,7 +6,7 @@
 #SBATCH --partition pi_jetz
 #SBATCH -c 24
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J fit_additive_space_use_mods
+#SBATCH -J fit_niche_bredth_add_mods
 
 # Load conda env
 module load miniconda
@@ -18,4 +18,4 @@ wd=/gpfs/loomis/pi/jetz/sy522/covid-19_movement
 cd $wd
 
 # Execute model script 
-Rscript $wd/analysis/src/workflow/fit-space-use-additive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_additive 24 10 10000 5
+Rscript $wd/analysis/src/workflow/fit-niche-breadth-additive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_additive 24 10 10000 5
