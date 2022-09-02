@@ -99,7 +99,7 @@ breadth <- read_csv(.datPF) %>%
          tmin_mvnh = tmin,
          lst_mvnh = lst,
          ndvi_mvnh = ndvi) %>%
-  select(!tmax) %>%
+  select(!c(tmax, tmin, lst, ndvi)) %>%
   filter(studyid != 351564596) %>%
   filter(studyid != 1891587670) %>%
   mutate(ind_f = as.factor(individual)) %>%  # create factor version of ind for REs)
@@ -142,8 +142,8 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
       # log_sg_norm = log(sg_norm),
       ghm_scale = scale(ghm),
-      ndvi_scale = scale(ndvi.y),
-      lst_scale = scale(lst.y),
+      ndvi_scale = scale(ndvi),
+      lst_scale = scale(lst),
       tmax_scale = scale(tmax),
       tmin_scale = scale(tmin),
       grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor

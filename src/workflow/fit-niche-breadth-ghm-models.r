@@ -142,8 +142,8 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
       # log_sg_norm = log(sg_norm),
       ghm_scale = scale(ghm),
-      ndvi_scale = scale(ndvi.y),
-      lst_scale = scale(lst.y),
+      ndvi_scale = scale(ndvi),
+      lst_scale = scale(lst),
       tmax_scale = scale(tmax),
       tmin_scale = scale(tmin),
       grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
