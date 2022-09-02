@@ -178,7 +178,11 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   sp <- sp_sum$taxon_canonical_name[i]
   
   # get list of ind for ssf
-  fl <- list.files(glue("{.bgP}"))
+  fl <- tibble(files = list.files(glue("{.bgP}"))) %>% 
+    mutate(indid = str_extract(files, pattern = "^[:digit:]+")) %>% 
+    distinct(indid) %>% 
+    pull(indid)
+  
   
   # list of individuals within species
   # indls <- indtb %>% 
@@ -193,8 +197,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   # 
   for(j in 1:length(fl)){
     #get ind id
-    ind <- str_extract(fl[j], "[^.]+")
-    
+    ind <- fl[j]
     
     o <- tryCatch({
       ndvi <- read_csv(glue("{.bgP}/{ind}_ndvi_1.csv")) %>% 
@@ -203,7 +206,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       tmax <- read_csv(glue("{.bgP}/{ind}_tmax_1.csv")) %>% 
         mutate(lat = round(lat, 4),
                lng = round(lng, 4))
-      ghm_sg <- read_csv(glue("{.bgP}/moose/individual-{ind}-sg-ghm.csv"))%>% 
+      ghm_sg <- read_csv(glue("{.bgP}/sindividual-{ind}-sg-ghm.csv"))%>% 
         mutate(x2_ = round(x2_, 4),
                y2_ = round(y2_, 4))
       dat0 <- read_csv(glue("{.bgP}/{ind}.csv")) %>% 
