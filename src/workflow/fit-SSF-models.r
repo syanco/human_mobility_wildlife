@@ -76,7 +76,7 @@ suppressWarnings(
     library(glue)
     # library(foreach)
     # library(doMC)
-    library(amt)
+    # library(amt)
     library(glmmTMB)
     library(RSQLite)
     library(broom)
