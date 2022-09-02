@@ -99,7 +99,7 @@ breadth <- read_csv(.datPF) %>%
          tmin_mvnh = tmin,
          lst_mvnh = lst,
          ndvi_mvnh = ndvi) %>%
-  select(!tmax) %>%
+  select(!c(tmax, tmin, lst, ndvi)) %>%
   filter(studyid != 351564596) %>%
   filter(studyid != 1891587670) %>%
   mutate(ind_f = as.factor(individual)) %>%  # create factor version of ind for REs)
@@ -121,7 +121,7 @@ registerDoMC(.cores)
 # ==== Perform analysis ====
 
 #declare model form
-form <-  bf(sqrt_breadth_scale ~ sg_norm + ndvi_scale + tmax_scale + (1 |grp) + ar(time = week, gr = grp))
+form <-  bf(breadth_scale ~ sg_norm + ndvi_scale + tmax_scale + (1 |grp) + ar(time = week, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
@@ -137,8 +137,8 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   dat <- breadth %>%
     filter(scientificname == sp) %>% 
     mutate(
-      sqrt_breadth = sqrt(total), #get log of weekly area use
-      sqrt_breadth_scale = scale(sqrt_breadth), # standardize it
+      # sqrt_breadth = sqrt(total), #get log of weekly area use
+      breadth_scale = scale(total), # standardize it
       sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
       # log_sg_norm = log(sg_norm),
       ghm_scale = scale(ghm),

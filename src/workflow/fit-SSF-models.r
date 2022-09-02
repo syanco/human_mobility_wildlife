@@ -36,7 +36,7 @@ if(interactive()) {
   
 } else {
   library(docopt)
-  
+  source(file.path(.wd,'analysis/src/funs/input_parse.r'))
   ag <- docopt(doc, version = '0.1\n')
   
   .wd <- getwd()
