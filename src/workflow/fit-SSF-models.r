@@ -47,10 +47,10 @@ if(interactive()) {
   # .bgM <- file.path(.wd, "out/ssf-background-pts/moose")
   .outP <- makePath(ag$out)
   
-  .cores <- makePath(ag$cores)
-  .minsp <- makePath(ag$minsp)
-  .iter <- makePath(ag$iter)
-  .thin <- makePath(ag$thin)
+  .cores <- ag$cores
+  .minsp <- ag$minsp
+  .iter <- ag$iter
+  .thin <- ag$thin
   
   source(file.path(.wd,'analysis/src/funs/input_parse.r'))
   
