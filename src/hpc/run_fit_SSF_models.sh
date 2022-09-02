@@ -10,7 +10,7 @@
 
 # Load conda env
 module load miniconda
-conda activate amt_db
+conda activate brms
 
 # Declare WD
 wd=/gpfs/loomis/pi/jetz/sy522/covid-19_movement

@@ -70,12 +70,12 @@ source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
-    # library(iterators)
+    library(iterators)
     library(tidyverse)
     library(lubridate)
     library(glue)
-    # library(foreach)
-    # library(doMC)
+    library(foreach)
+    library(doMC)
     # library(amt)
     library(glmmTMB)
     library(RSQLite)
