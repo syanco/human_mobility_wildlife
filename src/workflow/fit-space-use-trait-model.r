@@ -100,7 +100,7 @@ size <- read_csv("out/dbbmm_size.csv") %>%
     log_area_scale = scale(log_area), # standardize it
     sg_norm = sg / cbg_area, # normalize safegraph data by size of the CBG
     sg_sqrt = sqrt(sg_norm),
-    sg_scale = scale(sg_sqrt),
+    sg_scale = scale(norm),
         # log_sg_norm = log(sg_norm),
     ghm_scale = scale(ghm),
     ndvi_scale = scale(ndvi),
@@ -144,17 +144,20 @@ birds <- dat %>%
 
 # ==== Perform analysis ====
 
-# declare model form
-form <-  bf(log_area ~ sg_scale*ghm_scale*mig_code + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
+
+
+#-- Mobility by Class --#
+
+form_sg <-  bf(log_area ~ sg_scale*class + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
 message("Starting model...")
 
 # fit model
-mod_mammal <- brm(
-  form,
-  data = mammals,
+mod_sg <- brm(
+  form_sg,
+  data = dat,
   # family = Gamma(link = "log"),
   inits = 0,
   cores = .cores,
@@ -162,19 +165,30 @@ mod_mammal <- brm(
   thin = .thin
 )
 
+message("Saving model...")
 #stash results into named list
-out_mammals <- list(
-  data = mammals,
-  model = mod_mammal
+out_sg <- list(
+  data = dat,
+  model = mod_sg
 )
 
 #write out results
-save(out, file = glue("{.outP}/mammal_size_trait_mod_{Sys.Date()}.rdata"))
+save(out_sg, file = glue("{.outP}/bird-v-mammal_sg_mod_{Sys.Date()}.rdata"))
+
+
+
+#-- Modification by Class --#
+
+form_ghm <-  bf(log_area ~ ghm_scale*class + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
+message("Fitting models with formula:")
+print(form)
+
+message("Starting model...")
 
 # fit model
-mod_birds <- brm(
-  form,
-  data = birds,
+mod_ghm <- brm(
+  form_ghm,
+  data = dat,
   # family = Gamma(link = "log"),
   inits = 0,
   cores = .cores,
@@ -182,14 +196,45 @@ mod_birds <- brm(
   thin = .thin
 )
 
+message("Saving model...")
 #stash results into named list
-out_birds <- list(
-  data = birds,
-  model = mod_birds
+out_ghm <- list(
+  data = dat,
+  model = mod_ghm
 )
 
 #write out results
-save(out, file = glue("{.outP}/bird_size_trait_mod_{Sys.Date()}.rdata"))
+save(out_ghm, file = glue("{.outP}/bird-v-mammal_ghm_mod_{Sys.Date()}.rdata"))
+
+
+#-- SG + GHM by Class --#
+
+form_sg_ghm <-  bf(log_area ~ (sg_scale + ghm_scale)*class + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
+message("Fitting models with formula:")
+print(form)
+
+message("Starting model...")
+
+# fit model
+mod_sg_ghm <- brm(
+  form,
+  data = dat,
+  # family = Gamma(link = "log"),
+  inits = 0,
+  cores = .cores,
+  iter = .iter,
+  thin = .thin
+)
+
+message("Saving model...")
+#stash results into named list
+out_sg_ghm <- list(
+  data = dat,
+  model = mod_sg_ghm
+)
+
+#write out results
+save(out, file = glue("{.outP}/bird-v-mammal_sg-ghm_mod_{Sys.Date()}.rdata"))
 
 # ==== Finalize script ====
 message(glue('Script complete in {diffmin(t0)} minutes'))
