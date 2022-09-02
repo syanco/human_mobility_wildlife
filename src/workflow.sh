@@ -394,6 +394,8 @@
       sbatch $src/hpc/run_fit_niche_breadth_ghm_models.sh
       sbatch $src/hpc/run_fit_niche_breadth_models.sh
       sbatch $src/hpc/run_fit_niche_breadth_additive_models.sh
+      sbatch $src/hpc/run_fit_niche_breadth_control_area_models.sh
+
     #
   
     #- Generate model results and diagnostic sheets-#
