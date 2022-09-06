@@ -125,10 +125,13 @@ for(i in 1:length(sg_modlist)){
   # SG ONLY
   load(sg_modlist[i]) # load model
   fe <- fixef(out$model) #get fixed effects
+  sg_re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
   sgdf <- tibble("species"=out$species, # grab estimates
                  "sg_norm"=as.numeric(fe["sg_norm", "Estimate"]),
                  "sg_norm_lci"=fe["sg_norm", "Q2.5"],
-                 "sg_norm_uci"=fe["sg_norm", "Q97.5"]) %>% 
+                 "sg_norm_uci"=fe["sg_norm", "Q97.5"],
+                 sg_resid = sg_re[2,1],
+                 sg_group = sg_re[1,1]) %>% 
     mutate(sg_sign = case_when(sg_norm < 0 ~ "n",
                                sg_norm >= 0 ~ "p"),
            sg_sig = case_when((sg_norm_lci < 0 & 0 < sg_norm_uci) ~ "N",
@@ -138,7 +141,9 @@ for(i in 1:length(sg_modlist)){
            code = factor(case_when(sg_sig == "Y" & sg_sign == "n" ~ "Neg",
                                    sg_sig == "Y" & sg_sign == "p" ~ "Pos",
                                    sg_sig == "N" ~ "Non Sig"), 
-                         levels=c("Neg", "Pos", "Non Sig")))
+                         levels=c("Neg", "Pos", "Non Sig")),
+           sg_ICC = sg_group/(sg_group + sg_resid),
+           sg_var_ratio = sg_resid/sg_group)
   
   # Get conditional effects
   ce_sg <- conditional_effects(x=out$model, 
@@ -180,10 +185,13 @@ for(i in 1:length(sg_modlist)){
   # GHM ONLY
   load(ghm_modlist[i]) # load model
   fe <- fixef(out$model) #get fixed effects
+  ghm_re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
   ghmdf <- tibble("species"=out$species, # grab estimates
                  "ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
                  "ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
-                 "ghm_scale_uci"=fe["ghm_scale", "Q97.5"]) %>% 
+                 "ghm_scale_uci"=fe["ghm_scale", "Q97.5"],
+                 ghm_resid = ghm_re[2,1],
+                 ghm_group = ghm_re[1,1]) %>% 
     mutate(ghm_sign = case_when(ghm_scale < 0 ~ "n",
                                ghm_scale >= 0 ~ "p"),
            ghm_sig = case_when((ghm_scale_lci < 0 & 0 < ghm_scale_uci) ~ "N",
@@ -193,7 +201,9 @@ for(i in 1:length(sg_modlist)){
            code = factor(case_when(ghm_sig == "Y" & ghm_sign == "n" ~ "Neg",
                                    ghm_sig == "Y" & ghm_sign == "p" ~ "Pos",
                                    ghm_sig == "N" ~ "Non Sig"), 
-                         levels=c("Neg", "Pos", "Non Sig")))
+                         levels=c("Neg", "Pos", "Non Sig")),
+           ghm_ICC = ghm_group/(ghm_group + ghm_resid),
+           ghm_var_ratio = ghm_resid/ghm_group)
   
   # Get conditional effects
   ce_ghm <- conditional_effects(x=out$model, 
@@ -235,10 +245,13 @@ for(i in 1:length(sg_modlist)){
   # INTERACTION MODEL
   load(int_modlist[i]) 
   fe <- fixef(out$model)
+  int_re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
   intdf <- tibble("species" = out$species, 
                   "inter" = fe["sg_norm:ghm_scale", "Estimate"],
                   "inter_lci" = fe["sg_norm:ghm_scale", "Q2.5"],
-                  "inter_uci" = fe["sg_norm:ghm_scale", "Q97.5"]) %>% 
+                  "inter_uci" = fe["sg_norm:ghm_scale", "Q97.5"],
+                  int_resid = int_re[2,1],
+                  int_group = int_re[1,1]) %>% 
     mutate(inter_sign = case_when(inter < 0 ~ "n",
                                   inter >= 0 ~ "p"),
            inter_sig = case_when((inter_lci < 0 & 0 < inter_uci) ~ "N",
@@ -248,7 +261,9 @@ for(i in 1:length(sg_modlist)){
            code = factor(case_when(inter_sig == "Y" & inter_sign == "n" ~ "Neg",
                                    inter_sig == "Y" & inter_sign == "p" ~ "Pos",
                                    inter_sig == "N" ~ "Non Sig"), 
-                         levels=c("Neg", "Pos", "Non Sig")))
+                         levels=c("Neg", "Pos", "Non Sig")),
+           int_ICC = int_group/(int_group + int_resid),
+           int_var_ratio = int_resid/int_group)
   # get observed quantiles of ghm to set "low" and "high" human mod
   ghmq <- quantile(out$data$ghm_scale, probs = c(0.10, 0.90), na.rm = T)
   
