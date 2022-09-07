@@ -181,7 +181,7 @@ sp_vec <- c("Puma concolor", "Canis lupus", "Canis latrans", "Lynx rufus",
             
             "Alces alces", "Antilocapra americana",
             "Cervus elaphus", 
-            # "Odocoileus hemionus", 
+            "Odocoileus hemionus",
             "Odocoileus virginianus",
             
             "Anas acuta", "Anas clypeata", "Anas cyanoptera", "Anas strepera",
@@ -206,7 +206,7 @@ dat <- res_out_df %>%
                            species == "Alces alces" ~ "B", 
                            species == "Antilocapra americana" ~ "B",
                            species == "Cervus elaphus" ~ "B", 
-                           # species == "Odocoileus hemionus" ~ "B", 
+                           species == "Odocoileus hemionus" ~ "B",
                            species == "Odocoileus virginianus" ~ "B",
                            
                            species == "Anas acuta" ~ "C", 

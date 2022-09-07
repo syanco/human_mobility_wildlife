@@ -157,7 +157,7 @@ birds <- dat %>%
 
 form_sg <-  bf(log_area ~ sg_scale*class + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
-print(form)
+print(form_sg)
 
 message("Starting model...")
 
@@ -188,7 +188,7 @@ save(out_sg, file = glue("{.outP}/bird-v-mammal_sg_mod_{Sys.Date()}.rdata"))
 
 form_ghm <-  bf(log_area ~ ghm_scale*class + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
-print(form)
+print(form_ghm)
 
 message("Starting model...")
 
@@ -218,13 +218,13 @@ save(out_ghm, file = glue("{.outP}/bird-v-mammal_ghm_mod_{Sys.Date()}.rdata"))
 
 form_sg_ghm <-  bf(log_area ~ (sg_scale + ghm_scale)*class + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
-print(form)
+print(form_sg_ghm)
 
 message("Starting model...")
 
 # fit model
 mod_sg_ghm <- brm(
-  form,
+  form_sg_ghm,
   data = dat,
   # family = Gamma(link = "log"),
   inits = 0,
