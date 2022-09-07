@@ -153,9 +153,9 @@ birds <- dat %>%
 
 
 
-#-- Mobility by Class --#
+#-- Variance Components Mod --#
 
-form_sg <-  bf(log_area ~ sg_scale*class + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
+form <-  bf(log_area ~ 1 + (1 |species/grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
@@ -163,7 +163,7 @@ message("Starting model...")
 
 # fit model
 mod_sg <- brm(
-  form_sg,
+  form,
   data = dat,
   # family = Gamma(link = "log"),
   inits = 0,
@@ -180,68 +180,8 @@ out_sg <- list(
 )
 
 #write out results
-save(out_sg, file = glue("{.outP}/bird-v-mammal_sg_mod_{Sys.Date()}.rdata"))
+save(out_sg, file = glue("{.outP}/area_variance_components_mod_{Sys.Date()}.rdata"))
 
-
-
-#-- Modification by Class --#
-
-form_ghm <-  bf(log_area ~ ghm_scale*class + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
-message("Fitting models with formula:")
-print(form)
-
-message("Starting model...")
-
-# fit model
-mod_ghm <- brm(
-  form_ghm,
-  data = dat,
-  # family = Gamma(link = "log"),
-  inits = 0,
-  cores = .cores,
-  iter = .iter,
-  thin = .thin
-)
-
-message("Saving model...")
-#stash results into named list
-out_ghm <- list(
-  data = dat,
-  model = mod_ghm
-)
-
-#write out results
-save(out_ghm, file = glue("{.outP}/bird-v-mammal_ghm_mod_{Sys.Date()}.rdata"))
-
-
-#-- SG + GHM by Class --#
-
-form_sg_ghm <-  bf(log_area ~ (sg_scale + ghm_scale)*class + ndvi_scale + lst_scale + (1 |species/grp) + ar(time = wk, gr = grp))
-message("Fitting models with formula:")
-print(form)
-
-message("Starting model...")
-
-# fit model
-mod_sg_ghm <- brm(
-  form,
-  data = dat,
-  # family = Gamma(link = "log"),
-  inits = 0,
-  cores = .cores,
-  iter = .iter,
-  thin = .thin
-)
-
-message("Saving model...")
-#stash results into named list
-out_sg_ghm <- list(
-  data = dat,
-  model = mod_sg_ghm
-)
-
-#write out results
-save(out, file = glue("{.outP}/bird-v-mammal_sg-ghm_mod_{Sys.Date()}.rdata"))
 
 # ==== Finalize script ====
 message(glue('Script complete in {diffmin(t0)} minutes'))

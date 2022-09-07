@@ -74,24 +74,25 @@ list.files('analysis/src/funs/auto',full.names=TRUE) %>%
 
 
 #---- Load data ----#
-message("Loading trait data...")
-traits <- read_csv(.traitPF)
-
-# Interaction Models
 message('Loading interaction models...')
-int_modlist <- list.files( path=file.path(.datP, "niche/"), full.names=TRUE ) 
+int_modlist <- list.files(path=file.path(.datP, "niche/"), full.names = F )
+int_modlist_full <- list.files( path=file.path(.datP, "niche/"), full.names = T)
+int_sp <- word(int_modlist, 1, sep = "_")
 
+# 
 
-# SG Models
-message('Loading safegraph models...')
+# #-- SG + GHM Models --#
+# 
+message('Loading additive models...')
+add_modlist <- list.files(path=file.path(.datP, "niche_additive/"), 
+                          full.names = F)
+add_modlist_full <- list.files(path=file.path(.datP, "niche_additive/"), 
+                               full.names = T)
+add_sp <- word(add_modlist, 1, sep = "_")
 
-sg_modlist <- list.files( path=file.path(.datP, "niche_sg/"), full.names=TRUE ) 
-
-
-# SG Models
-message('Loading safegraph models...')
-
-ghm_modlist <- list.files( path=file.path(.datP, "niche_ghm/"), full.names=TRUE ) 
+#check that lists are same
+# TODO: might want to build in checks for scenations when not true
+int_sp == add_sp
 
 #---- Make Plots ----#
 
@@ -104,30 +105,26 @@ palgray <- c("#808080", "#D3D3D3")
 
 #-- make combined plots --#
 
-# !!!!!!!!! #
-# TODO:  this just manually matches the species lists... 
-# Need to make a better way to ensure I'm calling the same species across all
-# model types - maybe use species list from DB and then call model files by 
-# regex?
-# !!!!!!!!! #
-
-# sg_modlist <- sg_modlist[-22]
-
-# !!!!!!!!! !
-
 res_out <- list()
 row <- list()
 pl <- c()
-for(i in 1:length(sg_modlist)){
+for(i in 1:length(add_modlist_full)){
   tmp <- list()
   
-  # SG ONLY
-  load(sg_modlist[i]) # load model
+  # ADDITIVE MODELS
+  load(add_modlist_full[i]) # load model
   fe <- fixef(out$model) #get fixed effects
-  sgdf <- tibble("species"=out$species, # grab estimates
+  adddf <- tibble("species"=out$species, # grab estimates
+                 
+                 # SG OUT
                  "sg_norm"=as.numeric(fe["sg_norm", "Estimate"]),
                  "sg_norm_lci"=fe["sg_norm", "Q2.5"],
-                 "sg_norm_uci"=fe["sg_norm", "Q97.5"]) %>% 
+                 "sg_norm_uci"=fe["sg_norm", "Q97.5"],
+                 
+                 # GHM OUT
+                 "ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
+                 "ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
+                 "ghm_scale_uci"=fe["ghm_scale", "Q97.5"]) %>% 
     mutate(sg_sign = case_when(sg_norm < 0 ~ "n",
                                sg_norm >= 0 ~ "p"),
            sg_sig = case_when((sg_norm_lci < 0 & 0 < sg_norm_uci) ~ "N",
@@ -137,103 +134,113 @@ for(i in 1:length(sg_modlist)){
            sg_code = factor(case_when(sg_sig == "Y" & sg_sign == "n" ~ "Neg",
                                    sg_sig == "Y" & sg_sign == "p" ~ "Pos",
                                    sg_sig == "N" ~ "Non Sig"), 
-                         levels=c("Neg", "Pos", "Non Sig")))
-  
-  # Get conditional effects
-  ce_sg <- conditional_effects(x=out$model, 
-                               effects = "sg_norm",
-                               re_formula = NA)
-  # if(sgdf$sg_sig == "N"){next}
-  if(sgdf$sg_sig == "Y"){ # If the effect is significant...
-    (sg_ce_plot <-  plot(ce_sg, plot = F,
-                         line_args = list("se" = F,
-                                          "color" = pal2[2]))[[1]] + 
-       # scale_color_manual(values = palnew[3])+         
-       theme_tufte() +
-       xlab("Human Mobility") +
-       ylab("Space Use")+
-       theme(axis.line = element_line(size = .5),
-             axis.text = element_blank(),
-             axis.ticks = element_blank(),
-             axis.title = element_blank(),
-             # aspect.ratio = 1
-             ))
-    plsg <- 1
-  }else{ # ...not significant:
-    (sg_ce_plot <-  plot(ce_sg, plot = F,
-                         line_args = list("se" = F,
-                                          "color" = "#808080"))[[1]] + 
-       # scale_color_manual(values = palnew[3])+         
-       theme_tufte() +
-       xlab("Human Mobility") +
-       ylab("Space Use")+
-       theme(axis.line = element_line(size = .5),
-             axis.text = element_blank(),
-             axis.ticks = element_blank(),
-             axis.title = element_blank(),
-             # aspect.ratio = 1
-             ))
-    plsg <- 0
-  }
-  
-  
-  # GHM ONLY
-  load(ghm_modlist[i]) # load model
-  fe <- fixef(out$model) #get fixed effects
-  ghmdf <- tibble("species"=out$species, # grab estimates
-                  "ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
-                  "ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
-                  "ghm_scale_uci"=fe["ghm_scale", "Q97.5"]) %>% 
-    mutate(ghm_sign = case_when(ghm_scale < 0 ~ "n",
+                         levels=c("Neg", "Pos", "Non Sig")),
+           ghm_sign = case_when(ghm_scale < 0 ~ "n",
                                 ghm_scale >= 0 ~ "p"),
            ghm_sig = case_when((ghm_scale_lci < 0 & 0 < ghm_scale_uci) ~ "N",
                                TRUE ~ "Y"),
            ghm_display = case_when(ghm_sig == "Y" ~ ghm_scale,
                                    T ~ NA_real_),
            ghm_code = factor(case_when(ghm_sig == "Y" & ghm_sign == "n" ~ "Neg",
-                                   ghm_sig == "Y" & ghm_sign == "p" ~ "Pos",
-                                   ghm_sig == "N" ~ "Non Sig"), 
-                         levels=c("Neg", "Pos", "Non Sig")))
+                                       ghm_sig == "Y" & ghm_sign == "p" ~ "Pos",
+                                       ghm_sig == "N" ~ "Non Sig"), 
+                             levels=c("Neg", "Pos", "Non Sig")))
   
-  # Get conditional effects
-  ce_ghm <- conditional_effects(x=out$model, 
-                                effects = "ghm_scale",
-                                re_formula = NA)
-  # if(sgdf$sg_sig == "N"){next}
-  if(ghmdf$ghm_sig == "Y"){ # If the effect is significant...
-    (ghm_ce_plot <-  plot(ce_ghm, plot = F,
-                          line_args = list("se" = F,
-                                           "color" = pal2[2]))[[1]] + 
-       # scale_color_manual(values = palnew[3])+         
-       theme_tufte() +
-       xlab("Human Modification") +
-       ylab("Space Use")+
-       theme(axis.line = element_line(size = .5),
-             axis.text = element_blank(),
-             axis.ticks = element_blank(),
-             axis.title = element_blank(),
-             # aspect.ratio = 1
-       ))
-    plghm <- 1
-  }else{ # ...not significant:
-    (ghm_ce_plot <-  plot(ce_ghm, plot = F,
-                          line_args = list("se" = F,
-                                           "color" = "#808080"))[[1]] + 
-       # scale_color_manual(values = palnew[3])+         
-       theme_tufte() +
-       xlab("Human Modification") +
-       ylab("Space Use")+
-       theme(axis.line = element_line(size = .5),
-             axis.text = element_blank(),
-             axis.ticks = element_blank(),
-             axis.title = element_blank(),
-             # aspect.ratio = 1
-       ))
-    plghm <- 0
-  }
+  # # Get conditional effects
+  # ce_sg <- conditional_effects(x=out$model, 
+  #                              effects = "sg_norm",
+  #                              re_formula = NA)
+  # # if(sgdf$sg_sig == "N"){next}
+  # if(sgdf$sg_sig == "Y"){ # If the effect is significant...
+  #   (sg_ce_plot <-  plot(ce_sg, plot = F,
+  #                        line_args = list("se" = F,
+  #                                         "color" = pal2[2]))[[1]] + 
+  #      # scale_color_manual(values = palnew[3])+         
+  #      theme_tufte() +
+  #      xlab("Human Mobility") +
+  #      ylab("Space Use")+
+  #      theme(axis.line = element_line(size = .5),
+  #            axis.text = element_blank(),
+  #            axis.ticks = element_blank(),
+  #            axis.title = element_blank(),
+  #            # aspect.ratio = 1
+  #            ))
+  #   plsg <- 1
+  # }else{ # ...not significant:
+  #   (sg_ce_plot <-  plot(ce_sg, plot = F,
+  #                        line_args = list("se" = F,
+  #                                         "color" = "#808080"))[[1]] + 
+  #      # scale_color_manual(values = palnew[3])+         
+  #      theme_tufte() +
+  #      xlab("Human Mobility") +
+  #      ylab("Space Use")+
+  #      theme(axis.line = element_line(size = .5),
+  #            axis.text = element_blank(),
+  #            axis.ticks = element_blank(),
+  #            axis.title = element_blank(),
+  #            # aspect.ratio = 1
+  #            ))
+  #   plsg <- 0
+  # }
+  
+  
+  # # GHM ONLY
+  # load(ghm_modlist[i]) # load model
+  # fe <- fixef(out$model) #get fixed effects
+  # ghmdf <- tibble("species"=out$species, # grab estimates
+  #                 "ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
+  #                 "ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
+  #                 "ghm_scale_uci"=fe["ghm_scale", "Q97.5"]) %>% 
+  #   mutate(ghm_sign = case_when(ghm_scale < 0 ~ "n",
+  #                               ghm_scale >= 0 ~ "p"),
+  #          ghm_sig = case_when((ghm_scale_lci < 0 & 0 < ghm_scale_uci) ~ "N",
+  #                              TRUE ~ "Y"),
+  #          ghm_display = case_when(ghm_sig == "Y" ~ ghm_scale,
+  #                                  T ~ NA_real_),
+  #          ghm_code = factor(case_when(ghm_sig == "Y" & ghm_sign == "n" ~ "Neg",
+  #                                  ghm_sig == "Y" & ghm_sign == "p" ~ "Pos",
+  #                                  ghm_sig == "N" ~ "Non Sig"), 
+  #                        levels=c("Neg", "Pos", "Non Sig")))
+  # 
+  # # Get conditional effects
+  # ce_ghm <- conditional_effects(x=out$model, 
+  #                               effects = "ghm_scale",
+  #                               re_formula = NA)
+  # # if(sgdf$sg_sig == "N"){next}
+  # if(ghmdf$ghm_sig == "Y"){ # If the effect is significant...
+  #   (ghm_ce_plot <-  plot(ce_ghm, plot = F,
+  #                         line_args = list("se" = F,
+  #                                          "color" = pal2[2]))[[1]] + 
+  #      # scale_color_manual(values = palnew[3])+         
+  #      theme_tufte() +
+  #      xlab("Human Modification") +
+  #      ylab("Space Use")+
+  #      theme(axis.line = element_line(size = .5),
+  #            axis.text = element_blank(),
+  #            axis.ticks = element_blank(),
+  #            axis.title = element_blank(),
+  #            # aspect.ratio = 1
+  #      ))
+  #   plghm <- 1
+  # }else{ # ...not significant:
+  #   (ghm_ce_plot <-  plot(ce_ghm, plot = F,
+  #                         line_args = list("se" = F,
+  #                                          "color" = "#808080"))[[1]] + 
+  #      # scale_color_manual(values = palnew[3])+         
+  #      theme_tufte() +
+  #      xlab("Human Modification") +
+  #      ylab("Space Use")+
+  #      theme(axis.line = element_line(size = .5),
+  #            axis.text = element_blank(),
+  #            axis.ticks = element_blank(),
+  #            axis.title = element_blank(),
+  #            # aspect.ratio = 1
+  #      ))
+  #   plghm <- 0
+  # }
   
   # INTERACTION MODEL
-  load(int_modlist[i])
+  load(int_modlist_full[i])
   fe <- fixef(out$model)
   intdf <- tibble("species" = out$species,
                   "inter" = fe["sg_norm:ghm_scale", "Estimate"],
@@ -298,20 +305,21 @@ for(i in 1:length(sg_modlist)){
   }
   
   # gather results tables
-  res_out[[i]] <- ghmdf %>% left_join(sgdf) %>% left_join(intdf)
+  res_out[[i]] <- adddf %>% 
+    left_join(intdf)
   
-  # gather plot objects
-  tmp[[1]] <- wrap_elements(textGrob(glue("{out$species}"),
-                                     gp = gpar(fontsize = 6)))
-  tmp[[2]] <- sg_ce_plot 
-  tmp[[3]] <- ghm_ce_plot
-  tmp[[4]] <- int_ce_plot
+  # # gather plot objects
+  # tmp[[1]] <- wrap_elements(textGrob(glue("{out$species}"),
+  #                                    gp = gpar(fontsize = 6)))
+  # tmp[[2]] <- sg_ce_plot 
+  # tmp[[3]] <- ghm_ce_plot
+  # tmp[[4]] <- int_ce_plot
   
   # +
   # plot_layout(widths=c(1,1,1), heights = c(1))
-  row[[i]] <- tmp 
-  # wrap_plots(tmp, widths=c(1,1,1), heights = c(1))
-  if(plsg == 1 | plghm == 1 | plint ==1){pl[i] <- 1}else(pl[i] <- 0)
+  # row[[i]] <- tmp 
+  # # wrap_plots(tmp, widths=c(1,1,1), heights = c(1))
+  # if(plsg == 1 | plghm == 1 | plint ==1){pl[i] <- 1}else(pl[i] <- 0)
   
 } # i
 
