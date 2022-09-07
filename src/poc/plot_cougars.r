@@ -115,7 +115,7 @@ area_ce_int <- conditional_effects(x=area_int$model,
     scale_fill_manual(values = pal, name = "Modification",
                       labels = c("High", "Low")) +
     xlab("Mobility") +
-    ylab("Niche Breadth")+
+    ylab("Space Use")+
     theme_cowplot()  +
     theme(legend.position = "none",
           legend.text = element_text(size = 10),
