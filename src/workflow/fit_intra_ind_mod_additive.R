@@ -190,7 +190,7 @@ mod <- brm(
   inits = 0,
   cores =.cores,
   iter = .iter,
-  thin = .thin
+  thin = 5
 )
 
 #stash results into named list
