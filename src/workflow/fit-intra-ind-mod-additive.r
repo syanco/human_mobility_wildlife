@@ -13,7 +13,7 @@
 
 '
 Usage:
-fit_intra_ind_mod_additive.r <dat> <out> <cores> [<minsp> <iter> <thin>]
+fit_intra_ind_mod_additive.r <dat> <out> <cores> [<iter> <thin>]
 fit_intra_ind_mod_additive.r (-h | --help)
 
 Parameters:
@@ -41,7 +41,7 @@ if(interactive()) {
   
 } else {
   library(docopt)
-  library(rprojroot)
+  # library(rprojroot)
   
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
@@ -50,9 +50,9 @@ if(interactive()) {
   
   .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
-  .nc <- ag$nc
+  # .nc <- ag$nc
   
-  ag <- docopt(doc, version = '0.1\n')
+  # ag <- docopt(doc, version = '0.1\n')
   
   .wd <- getwd()
   .cores <- ag$cores
@@ -90,6 +90,10 @@ conflict_prefer("accumulate", "purrr")
 conflict_prefer("ar", "brms")
 conflict_prefer("lag", "stats")
 conflict_prefer("when", "purrr")
+
+.cores <- ifelse(is.null(.cores), 10, as.numeric(.cores))
+.iter <- ifelse(is.null(.iter), 3000, as.numeric(.iter))
+.thin <- ifelse(is.null(.thin), 4, as.numeric(.thin))
 
 #Source all files in the auto load funs directory
 list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
@@ -191,7 +195,7 @@ mod <- brm(
   data = size_wide,
   # family = Gamma(link = "log"),
   inits = 0,
-  cores =.nc,
+  cores =.cores,
   iter = .iter,
   thin = .thin
 )
