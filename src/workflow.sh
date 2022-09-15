@@ -405,6 +405,12 @@
 
   ##
 
+  ##-- Intra-Individual Analysis --##
+
+  sbatch $src/hpc/run_fit_intra_ind_mod_additive.sh
+
+  ##
+
   ##-- Step Selection Function --##
 
     #- Generate background points
