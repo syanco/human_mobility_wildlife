@@ -13,7 +13,7 @@
 
 '
 Usage:
-fit_intra_ind_mod_additive.r <dat> <out> <cores> [<minsp> <iter> <thin>]
+fit_intra_ind_mod_additive.r <dat> <out> <cores> [<iter> <thin>]
 fit_intra_ind_mod_additive.r (-h | --help)
 
 Parameters:
