@@ -6,7 +6,7 @@
 #SBATCH --partition pi_jetz,day
 #SBATCH -c 4
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J fit-intra-ind-additive
+#SBATCH -J fit-intra-ind-int
 
 # Load conda env
 module load miniconda
