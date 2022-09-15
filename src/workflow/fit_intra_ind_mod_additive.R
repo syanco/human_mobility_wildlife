@@ -41,24 +41,17 @@ if(interactive()) {
   
 } else {
   library(docopt)
-  library(rprojroot)
+  # library(rprojroot)
   
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
   source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
   
-  .outPF <- makePath(ag$out)
-  .dbPF <- makePath(ag$db)
-
-  ag <- docopt(doc, version = '0.1\n')
-  
   .wd <- getwd()
   .cores <- ag$cores
   .iter  <- ag$iter
   .thin <- ag$thin
-  
-  source(file.path(.wd,'analysis/src/funs/input_parse.r'))
   
   .datPF <- makePath(ag$dat)
   .outP <- makePath(ag$out)
