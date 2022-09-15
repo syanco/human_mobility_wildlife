@@ -162,7 +162,7 @@ size_paired <- size %>%
 
 # create wide format and calculate deltas
 size_wide <- size_paired %>% 
-  pivot_wider(id_cols = c(ind_id, wk, species), 
+  pivot_wider(id_cols = c(ind_id, wk, species, diet), 
               values_from = c(log_area_scale, sg_norm, ghm_scale), 
               names_from = year_f) %>% 
   mutate(area_diff = log_area_scale_2020-log_area_scale_2019,
