@@ -408,6 +408,7 @@
   ##-- Intra-Individual Analysis --##
 
   sbatch $src/hpc/run_fit_intra_ind_mod_additive.sh
+  sbatch $src/hpc/run_fit_intra_ind_mod_int.sh
 
   ##
 
