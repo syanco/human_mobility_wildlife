@@ -155,7 +155,7 @@ birds <- dat %>%
 
 #-- Variance Components Mod --#
 
-form <-  bf(log_area ~ 1 + (1 |species/grp) + ar(time = wk, gr = grp))
+form <-  bf(log_area ~ 1 + (1 |species:grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
@@ -168,7 +168,7 @@ mod_sg <- brm(
   # family = Gamma(link = "log"),
   inits = 0,
   cores = .cores,
-  iter = .iter,
+  iter = 100,
   thin = .thin
 )
 
