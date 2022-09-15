@@ -19,7 +19,7 @@ fit_intra_ind_mod_additive.r (-h | --help)
 Parameters:
   db: path to movement databse. 
   out: path to output directory.
-  nc: number of cores for parallel processing
+  cores: number of cores for parallel processing
   
 Options:
 -h --help     Show this screen.
@@ -188,8 +188,8 @@ mod <- brm(
   data = size_wide,
   # family = Gamma(link = "log"),
   inits = 0,
-  cores =.cores,
-  iter = .iter,
+  cores =4,
+  iter = 10000,
   thin = 5
 )
 
