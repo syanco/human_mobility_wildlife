@@ -35,9 +35,9 @@ if(interactive()) {
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
   .outP <- file.path(.wd,'out/intra_ind_models')
   
-  .cores <- 20
-  .iter <- 5000
-  .thin <- 4
+  .cores <- 4
+  .iter <- 1000
+  .thin <- 1
   
 } else {
   library(docopt)
@@ -193,7 +193,7 @@ message("Starting model...")
 mod <- brm(
   form,
   data = size_wide,
-  # family = Gamma(link = "log"),
+  family = asym_laplace(),
   inits = 0,
   cores =.cores,
   iter = .iter,
@@ -207,4 +207,4 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/intra_ind_add_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/intra_ind_add_mod_laplace_{Sys.Date()}.rdata"))
