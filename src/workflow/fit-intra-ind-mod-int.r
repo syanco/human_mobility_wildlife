@@ -162,7 +162,7 @@ size_paired <- size %>%
 
 # create wide format and calculate deltas
 size_wide <- size_paired %>% 
-  pivot_wider(id_cols = c(ind_id, wk, species, diet), 
+  pivot_wider(id_cols = c(ind_id, species, diet), 
               values_from = c(log_area_scale, sg_norm, ghm_scale), 
               names_from = year_f) %>% 
   mutate(area_diff = log_area_scale_2020-log_area_scale_2019,
@@ -193,7 +193,7 @@ message("Starting model...")
 mod <- brm(
   form,
   data = size_wide,
-  # family = Gamma(link = "log"),
+  family = student(),
   inits = 0,
   cores =.cores,
   iter = .iter,

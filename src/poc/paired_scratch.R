@@ -163,7 +163,7 @@ size_mean <- size_paired %>%
   summarize(m_area = mean(area, na.rm = T))
 
 size_wide <- size_paired %>% 
-  pivot_wider(id_cols = c(ind_id, wk, species), 
+  pivot_wider(id_cols = c(ind_f, wk, species), 
               values_from = c(log_area_scale, sg_norm, ghm_scale), 
               names_from = year_f) %>% 
   mutate(area_diff = log_area_scale_2020-log_area_scale_2019,
@@ -230,10 +230,10 @@ ggplot(size_wide,aes(x=ghm_diff, y = area_diff)) +
 
 
 size_wide %>% 
-  filter(species == "Alces alces") %>% 
+  # filter(species == "Alces alces") %>% 
   ggplot(aes(x=sg_diff, y = area_diff)) +
-  # geom_point(alpha=0.1)+
-  geom_bin2d() +
+  geom_point(aes(color = as.factor(ind_id)))+
+  # geom_bin2d() +
   scale_fill_viridis_c() +
   geom_hline(aes(yintercept = 0), linetype = "dashed")+
   geom_vline(aes(xintercept = 0), linetype = "dashed")+
@@ -246,8 +246,14 @@ size_wide %>%
 
 
 
+# filter no diff approach
 
 
+size_wide[size_wide$sg_diff == min(size_wide$sg_diff),]
+
+x <- size_wide %>% 
+  mutate(sg_diff2 = round(sg_diff, 5)) %>% 
+  filter(sg_diff2 != 0)
 
 t.test(size_mean$`2019`, size_mean$`2020`, paired = T)
 
@@ -258,17 +264,19 @@ ggplot(data = size_paired) +
   geom_line(aes(y = log_area_scale, x = year_f, group = ind_wk)) +
   facet_wrap(~species)
 
-form <-  bf(area_diff ~ 1 + sg_diff + (1|species/ind_id) + ar(time = wk, gr = ind_id))
+form <-  bf(area_diff ~ 1 + sg_diff2 + (1|species/ind_f) + ar(time = wk, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
 message("Starting model...")
 
+
+
 # fit model
 mod <- brm(
   form,
-  data = size_wide,
-  # family = Gamma(link = "log"),
+  data = x,
+  family = student(),
   inits = 0,
   cores = 4,
   iter = 1000,
@@ -277,3 +285,15 @@ mod <- brm(
 
 mod
 conditional_effects(mod)
+
+
+ids <- unique(size_wide$ind_id)
+v <- c()
+for(i in 1:ids){
+  v[i] <- size_wide %>% 
+    filter(ind_id == ids[i]) %>% 
+    summarize(v=var(sg_norm_2019)) %>% 
+    pull(v)
+}
+
+(mv <- mean(v))

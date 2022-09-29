@@ -7,6 +7,11 @@ load("out/intra_ind_models/intra_ind_add_mod_2022-09-15.rdata")
 
 mod <- out$mod
 mod
+conditional_effects(mod)
+
+pp_check(mod)
+pp_check(mod, type='error_scatter_avg')
+loo(mod)
 
 fe <- fixef(mod) #get fixed effects
 # add_re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
@@ -62,7 +67,7 @@ palgray <- c("#808080", "#D3D3D3")
 
 
 ce_sg <- conditional_effects(x=mod,
-                             effects = "sg_diff",
+                             effects = "sg_diff2",
                              re_formula = NA)
 (sg_ce_plot <-  plot(ce_sg, 
                      plot = F,

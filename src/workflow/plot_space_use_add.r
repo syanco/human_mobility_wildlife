@@ -109,9 +109,8 @@ palnew <- c("#7552A3", "#CEBEDA")
 palgray <- c("#808080", "#D3D3D3")
 
 
+
 #-- make combined plots --#
-
-
 
 res_out <- list()
 row <- list()

@@ -93,14 +93,44 @@ source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
 message("Loading data...")
 
 dbbmms <- read_csv(.varPF) %>% 
-  distinct()
+  mutate(species = case_when( # correct species names
+    study_id == 1442516400 ~ "Anser caerulescens",
+    study_id == 1233029719 ~ "Odocoileus virginianus",
+    study_id == 1631574074 ~ "Ursus americanus",
+    study_id == 1418296656 ~ "Numenius americanus",
+    study_id == 474651680  ~ "Odocoileus virginianus",
+    study_id == 1044238185 ~ "Alces alces",
+    TRUE ~ species
+  ))%>% 
+  mutate(species = case_when(
+    species == "Chen caerulescens" ~ "Anser caerulescens",
+    TRUE ~ species
+  ))
 
 # load and process data
 breadth <- read_csv(.datPF) %>%
+  mutate(scientificname = case_when( # correct species names
+    studyid == 1442516400 ~ "Anser caerulescens",
+    studyid == 1233029719 ~ "Odocoileus virginianus",
+    studyid == 1631574074 ~ "Ursus americanus",
+    studyid == 1418296656 ~ "Numenius americanus",
+    studyid == 474651680  ~ "Odocoileus virginianus",
+    studyid == 1044238185 ~ "Alces alces",
+    TRUE ~ scientificname
+  ))%>% 
+  mutate(scientificname = case_when(
+    scientificname == "Chen caerulescens" ~ "Anser caerulescens",
+    TRUE ~ scientificname
+  )) %>% 
+  distinct() %>%
+  mutate(tmax_mvnh = tmax,
+         tmin_mvnh = tmin,
+         lst_mvnh = lst,
+         ndvi_mvnh = ndvi) %>%
+  select(!c(tmax, tmin, lst, ndvi)) %>%
   filter(studyid != 351564596) %>%
   filter(studyid != 1891587670) %>%
-  mutate(ind_f = as.factor(individual)) %>%
-  distinct()    %>% 
+  mutate(ind_f = as.factor(individual)) %>%  # create factor version of ind for REs)
   left_join(dbbmms, by = c("scientificname" = "species", 
                            "individual" = "ind_id", 
                            "year" = "year", 
