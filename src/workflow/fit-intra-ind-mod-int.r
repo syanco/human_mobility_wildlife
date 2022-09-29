@@ -109,7 +109,21 @@ traits <- read_csv("raw_data/anthropause_data_sheet.csv")
 # load size data
 size <- read_csv("out/dbbmm_size.csv") %>%
   filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) %>%
+  filter(study_id != 1891587670) %>% 
+  mutate(ind_f = as.factor(ind_id))%>%  # create factor version of ind for REs)
+  mutate(species = case_when( # correct species names
+    study_id == 1442516400 ~ "Anser caerulescens",
+    study_id == 1233029719 ~ "Odocoileus virginianus",
+    study_id == 1631574074 ~ "Ursus americanus",
+    study_id == 1418296656 ~ "Numenius americanus",
+    study_id == 474651680  ~ "Odocoileus virginianus",
+    study_id == 1044238185 ~ "Alces alces",
+    TRUE ~ species
+  ))%>% 
+  mutate(species = case_when(
+    species == "Chen caerulescens" ~ "Anser caerulescens",
+    TRUE ~ species
+  )) %>% 
   distinct()
 
 message("Processing the data to allow the magic to happen...")
