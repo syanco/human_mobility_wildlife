@@ -155,7 +155,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
     distinct() 
   
   # fit model
-  mod_c <- brm(
+  mod <- brm(
     form,
     data = dat,
     # family = Gamma(link = "log"),
