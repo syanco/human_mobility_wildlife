@@ -113,9 +113,24 @@ evt_paired <- evttb %>%
 
 traits <- read_csv("raw_data/anthropause_data_sheet.csv")
 
+# load size data
 size <- read_csv("out/dbbmm_size.csv") %>%
   filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) %>%
+  filter(study_id != 1891587670) %>% 
+  mutate(ind_f = as.factor(ind_id))%>%  # create factor version of ind for REs)
+  mutate(species = case_when( # correct species names
+    study_id == 1442516400 ~ "Anser caerulescens",
+    study_id == 1233029719 ~ "Odocoileus virginianus",
+    study_id == 1631574074 ~ "Ursus americanus",
+    study_id == 1418296656 ~ "Numenius americanus",
+    study_id == 474651680  ~ "Odocoileus virginianus",
+    study_id == 1044238185 ~ "Alces alces",
+    TRUE ~ species
+  ))%>% 
+  mutate(species = case_when(
+    species == "Chen caerulescens" ~ "Anser caerulescens",
+    TRUE ~ species
+  )) %>% 
   distinct()
 
 paired <- size %>% 
@@ -164,18 +179,20 @@ size_mean <- size_paired %>%
 
 size_wide <- size_paired %>% 
   pivot_wider(id_cols = c(ind_f, wk, species), 
-              values_from = c(log_area_scale, sg_norm, ghm_scale), 
+              values_from = c(log_area_scale, sg_norm, ghm_scale, ndvi_scale, lst_scale), 
               names_from = year_f) %>% 
   mutate(area_diff = log_area_scale_2020-log_area_scale_2019,
          sg_diff = sg_norm_2020-sg_norm_2019,
-         ghm_diff = ghm_scale_2020-ghm_scale_2019) %>% 
+         ghm_diff = ghm_scale_2020-ghm_scale_2019,
+         ndvi_diff = ndvi_scale_2020-ndvi_scale_2019,
+         lst_diff = lst_scale_2020-lst_scale_2019) %>% 
   filter(!is.nan(sg_diff)) %>% 
   filter(!is.na(sg_diff))
 
 # get sample size per sp
 size_wide %>% 
-  group_by(species) %>% 
-  summarize(nind = n_distinct(ind_id)) %>% 
+  # group_by(species) %>%
+  summarize(nind = n_distinct(ind_f)) %>% 
   arrange(-nind)
 
 #distributuion of delta sg
@@ -232,7 +249,7 @@ ggplot(size_wide,aes(x=ghm_diff, y = area_diff)) +
 size_wide %>% 
   # filter(species == "Alces alces") %>% 
   ggplot(aes(x=sg_diff, y = area_diff)) +
-  geom_point(aes(color = as.factor(ind_id)))+
+  geom_point(aes(color = as.factor(ind_f)))+
   # geom_bin2d() +
   scale_fill_viridis_c() +
   geom_hline(aes(yintercept = 0), linetype = "dashed")+
@@ -252,40 +269,66 @@ size_wide %>%
 size_wide[size_wide$sg_diff == min(size_wide$sg_diff),]
 
 x <- size_wide %>% 
-  mutate(sg_diff2 = round(sg_diff, 5)) %>% 
+  mutate(sg_diff2 = round(sg_diff, 6),
+         ghm_diff2 = round(ghm_diff, 5)) %>% 
+  filter(sg_diff2 != 0 | ghm_diff2 != 0)
+
+y <- size_wide %>% 
+  mutate(sg_diff2 = round(sg_diff, 6)) %>% 
   filter(sg_diff2 != 0)
 
-t.test(size_mean$`2019`, size_mean$`2020`, paired = T)
+# get sample size per sp
+y %>% 
+  # group_by(species) %>%
+  summarize(nind = n_distinct(ind_f)) %>% 
+  arrange(-nind)
 
-ggplot(data = size_paired, aes(y = log_area_scale, x = year_f))+
-  geom_boxplot()
 
-ggplot(data = size_paired) +
-  geom_line(aes(y = log_area_scale, x = year_f, group = ind_wk)) +
-  facet_wrap(~species)
+# ggplot(data = size_paired, aes(y = log_area_scale, x = year_f))+
+#   geom_boxplot()
+# 
+ggplot(data = x) +
+  geom_point(aes(y = sg_diff2, x = ghm_diff2, color = ind_f)) 
 
-form <-  bf(area_diff ~ 1 + sg_diff2 + (1|species/ind_f) + ar(time = wk, gr = ind_f))
+form <-  bf(area_diff ~ 1 + sg_diff2 + ghm_diff2 + ndvi_diff + lst_diff + (1|species/ind_f) + ar(time = wk, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
 message("Starting model...")
 
-
+x2 <- x[round(runif(2000, min = 1, max = nrow(x)), 0),] %>% 
+  distinct()
 
 # fit model
 mod <- brm(
   form,
-  data = x,
+  data = x2,
   family = student(),
   inits = 0,
   cores = 4,
-  iter = 1000,
+  iter = 2000,
   thin = 2
 )
 
 mod
+pp_check(mod)
+# plot(mod) 
 conditional_effects(mod)
 
+x %>% 
+  # filter(species == "Alces alces") %>% 
+  ggplot(aes(x=sg_diff, y = area_diff)) +
+  geom_point(aes(color = as.factor(ind_f)))+
+  # geom_bin2d() +
+  scale_fill_viridis_c() +
+  geom_hline(aes(yintercept = 0), linetype = "dashed")+
+  geom_vline(aes(xintercept = 0), linetype = "dashed")+
+  ylab("Change in Weekly Space Use \n (=2020-2019)")+
+  xlab("Change in Human Mobility \n (=2020-2019)") +
+  # facet_wrap(~species, scales = "free")+
+  theme_minimal()+
+  theme(legend.position = "none") +
+  NULL
 
 ids <- unique(size_wide$ind_id)
 v <- c()

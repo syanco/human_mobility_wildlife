@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 1-
+#SBATCH -t 12:00:00
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition pi_jetz,day
@@ -18,4 +18,4 @@ wd=/gpfs/loomis/pi/jetz/sy522/covid-19_movement
 cd $wd
 
 # Execute model script 
-Rscript $wd/analysis/src/workflow/fit-intra-ind-mod-additive.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 4 10000 5
+Rscript $wd/analysis/src/workflow/fit_intra_ind_mod_additive.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 4 10000 5

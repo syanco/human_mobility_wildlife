@@ -163,6 +163,7 @@ size_paired <- size %>%
          ghm_scale = scale(ghm),
          ndvi_scale = scale(ndvi),
          lst_scale = scale(lst),
+         tmax_scale = scale(tmax),
          ind_f = as.factor(ind_id), # create factor version of ind for REs
          grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
          # trt_new = gsub('_.*','',trt),
@@ -176,12 +177,14 @@ size_paired <- size %>%
 
 # create wide format and calculate deltas
 size_wide <- size_paired %>% 
-  pivot_wider(id_cols = c(ind_id, wk, species), 
-              values_from = c(log_area_scale, sg_norm, ghm_scale), 
+  pivot_wider(id_cols = c(ind_f, wk, species), 
+              values_from = c(log_area_scale, sg_norm, ghm_scale, ndvi_scale, tmax_scale), 
               names_from = year_f) %>% 
   mutate(area_diff = log_area_scale_2020-log_area_scale_2019,
          sg_diff = sg_norm_2020-sg_norm_2019,
-         ghm_diff = ghm_scale_2020-ghm_scale_2019) %>% 
+         ghm_diff = ghm_scale_2020-ghm_scale_2019,
+         ndvi_diff = ndvi_scale_2020-ndvi_scale_2019,
+         tmax_diff = tmax_scale_2020-tmax_scale_2019) %>% 
   filter(!is.nan(sg_diff)) %>% 
   filter(!is.na(sg_diff))
 
@@ -197,21 +200,22 @@ size_wide <- size_paired %>%
 
 message("Starting that modeling magic...")
 
-form <-  bf(area_diff ~ 1 + sg_diff + ghm_diff + (1|species/ind_id) + ar(time = wk, gr = ind_id))
+form <-  bf(area_diff ~ 1 + sg_diff2 * ghm_diff2 + ndvi_diff + tmax_diff + (1|species/ind_f) + ar(time = wk, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
 message("Starting model...")
 
+
 # fit model
 mod <- brm(
   form,
   data = size_wide,
-  family = asym_laplace(),
+  family = student(),
   inits = 0,
-  cores =.cores,
-  iter = .iter,
-  thin = .thin
+  cores = 4,
+  iter = 10000,
+  thin = 5
 )
 
 #stash results into named list
@@ -221,4 +225,9 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/intra_ind_add_mod_laplace_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/intra_ind_int_mod_{Sys.Date()}.rdata"))
+
+#---- Finalize script ----#
+
+
+message(glue('Script complete in {diffmin(t0)} minutes'))
