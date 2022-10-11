@@ -79,7 +79,7 @@ traits <- read_csv(.traitPF)
 
 
 message('Loading  models...')
-modlist <- list.files(path=file.path(.datP, "niche_controlled/"), full.names = T)
+cont_modlist <- list.files(path=file.path(.datP, "niche_controlled/"), full.names = T)
 
 #---- Make Plots ----#
 
@@ -99,8 +99,8 @@ pl <- c()
 for(i in 1:length(modlist)){
   tmp <- list()
   
-  # ADDITIVE MODEL
-  load(modlist[i]) # load model
+  # CONTROLLED MODEL
+  load(cont_modlist[i]) # load model
   fe <- fixef(out$model) #get fixed effects
   re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
   df <- tibble("species"=out$species, # grab estimates

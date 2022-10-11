@@ -291,13 +291,13 @@ for(i in 1:length(add_modlist_full)){
   
   if(intdf$inter_sig == "Y"){ # If the effect is significant...
     (int_ce_plot <-  plot(ce_int, plot = FALSE,
-                          line_args = list("se"=F, size = 4))[[1]] +
+                          line_args = list("se"=F, size = 8))[[1]] +
        theme_tufte() +
        scale_color_manual(values = palnew, name = "Human \n Modification",
                           labels = c("High", "Low")) +
        scale_fill_manual(values = palnew, name = "Human \n Modification",
                          labels = c("High", "Low")) +
-       theme(axis.line = element_line(size = 4),
+       theme(axis.line = element_line(size = 8),
              axis.text = element_blank(),
              axis.ticks = element_blank(),
              axis.title = element_blank(),

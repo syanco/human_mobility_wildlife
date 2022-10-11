@@ -3,17 +3,22 @@ library(brms)
 library(ggthemes)
 library(glue)
 
-load("out/intra_ind_models/intra_ind_add_mod_2022-09-15.rdata")
+load("out/intra_ind_models/intra_ind_add_mod_2022-10-05.rdata")
+add_mod <- out$mod
+add_mod
+load("out/intra_ind_models/intra_ind_int_mod_2022-10-05.rdata")
+int_mod <- out$mod
+int_mod
 
-mod <- out$mod
-mod
-conditional_effects(mod)
+loo(add_mod, int_mod)
+waic(add_mod, int_mod, compare = T)
 
-pp_check(mod)
-pp_check(mod, type='error_scatter_avg')
-loo(mod)
+conditional_effects(int_mod)
 
-fe <- fixef(mod) #get fixed effects
+pp_check(int_mod)
+pp_check(int_mod, type='error_scatter_avg')
+
+fe <- fixef(int_mod) #get fixed effects
 # add_re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
 adddf <- tibble("species"=out$species, # grab estimates
                 # SG EFFECTS
@@ -66,12 +71,12 @@ palgray <- c("#808080", "#D3D3D3")
 
 
 
-ce_sg <- conditional_effects(x=mod,
-                             effects = "sg_diff2",
+ce_sg <- conditional_effects(x=int_mod,
+                             effects = "sg_diff",
                              re_formula = NA)
 (sg_ce_plot <-  plot(ce_sg, 
                      plot = F,
-                     points = T,
+                     rug = F,
                      line_args = list("se" = T,
                                       "color" = pal2[1],
                                       "fill" = pal2[1]))[[1]] + 
@@ -81,9 +86,39 @@ ce_sg <- conditional_effects(x=mod,
     xlab(bquote(~Delta~"Human Mobility")) +
     ylab(bquote(~Delta~"Space Use"))+
     geom_vline(aes(xintercept = 0), linetype = "dashed") +
+    geom_hline(aes(yintercept = 0), linetype = "dashed") +
     theme(axis.line = element_line(size = .5),
           # axis.text = element_blank(),
           axis.ticks = element_blank(),
           # axis.title = element_blank(),
           # aspect.ratio = 1
     ))
+ggsave(filename = glue("out/intra_ind_sg.png"), sg_ce_plot)
+
+# get observed quantiles of ghm to set "low" and "high" human mod
+ghmq <- quantile(out$data$ghm_diff, probs = c(0.10, 0.90), na.rm = T)
+ce_int <- conditional_effects(x=int_mod,
+                              effects = "sg_diff:ghm_diff",
+                              int_conditions = list(ghm_diff = ghmq),
+                              re_formula = NA)
+(int_ce_plot <-  plot(ce_int, 
+                     plot = F,
+                     rug = F,
+                     line_args = list("se" = T))[[1]] + 
+    scale_color_manual(values = palnew, name = "Human \n Modification",
+                       labels = c("High", "Low")) +
+    scale_fill_manual(values = palnew, name = "Human \n Modification",
+                      labels = c("High", "Low")) +
+    theme_tufte() +
+    # xlab(glue("{expression(delta)} Human Mobility")) +
+    xlab(bquote(~Delta~"Human Mobility")) +
+    ylab(bquote(~Delta~"Space Use"))+
+    geom_vline(aes(xintercept = 0), linetype = "dashed") +
+    geom_hline(aes(yintercept = 0), linetype = "dashed") +
+    theme(axis.line = element_line(size = .5),
+          # axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          # axis.title = element_blank(),
+          # aspect.ratio = 1
+    ))
+ggsave(filename = glue("out/intra_ind_int.png"), int_ce_plot)

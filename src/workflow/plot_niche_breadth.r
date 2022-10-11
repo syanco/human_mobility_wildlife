@@ -90,9 +90,19 @@ add_modlist_full <- list.files(path=file.path(.datP, "niche_additive/"),
                                full.names = T)
 add_sp <- word(add_modlist, 1, sep = "_")
 
+
+message("Loading area controlled models...")
+cont_modlist <- list.files(path=file.path(.datP, "niche_controlled/"), 
+                           full.names = F)
+cont_modlist_full <- list.files(path=file.path(.datP, "niche_controlled/"), 
+                                full.names = T)
+cont_sp <- word(cont_modlist, 1, sep = "_")
 #check that lists are same
 # TODO: might want to build in checks for scenations when not true
 int_sp == add_sp
+int_sp == cont_sp
+
+
 
 #---- Make Plots ----#
 
@@ -115,129 +125,97 @@ for(i in 1:length(add_modlist_full)){
   load(add_modlist_full[i]) # load model
   fe <- fixef(out$model) #get fixed effects
   adddf <- tibble("species"=out$species, # grab estimates
-                 
-                 # SG OUT
-                 "sg_norm"=as.numeric(fe["sg_norm", "Estimate"]),
-                 "sg_norm_lci"=fe["sg_norm", "Q2.5"],
-                 "sg_norm_uci"=fe["sg_norm", "Q97.5"],
-                 
-                 # GHM OUT
-                 "ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
-                 "ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
-                 "ghm_scale_uci"=fe["ghm_scale", "Q97.5"]) %>% 
-    mutate(sg_sign = case_when(sg_norm < 0 ~ "n",
-                               sg_norm >= 0 ~ "p"),
-           sg_sig = case_when((sg_norm_lci < 0 & 0 < sg_norm_uci) ~ "N",
-                              TRUE ~ "Y"),
-           sg_display = case_when(sg_sig == "Y" ~ sg_norm,
+                  
+                  # SG OUT
+                  "add_sg_norm"=as.numeric(fe["sg_norm", "Estimate"]),
+                  "add_sg_norm_lci"=fe["sg_norm", "Q2.5"],
+                  "add_sg_norm_uci"=fe["sg_norm", "Q97.5"],
+                  
+                  # GHM OUT
+                  "add_ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
+                  "add_ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
+                  "add_ghm_scale_uci"=fe["ghm_scale", "Q97.5"]) %>% 
+    mutate(add_sg_sign = case_when(
+      add_sg_norm < 0 ~ "n",
+      add_sg_norm >= 0 ~ "p"),
+      add_sg_sig = case_when(
+        (add_sg_norm_lci < 0 & 0 < add_sg_norm_uci) ~ "N",
+        TRUE ~ "Y"),
+      add_sg_display = case_when(add_sg_sig == "Y" ~ add_sg_norm,
+                                 T ~ NA_real_),
+      add_sg_code = factor(case_when(
+        add_sg_sig == "Y" & add_sg_sign == "n" ~ "Neg",
+        add_sg_sig == "Y" & add_sg_sign == "p" ~ "Pos",
+        add_sg_sig == "N" ~ "Non Sig"), 
+        levels=c("Neg", "Pos", "Non Sig")),
+      add_ghm_sign = case_when(add_ghm_scale < 0 ~ "n",
+                               add_ghm_scale >= 0 ~ "p"),
+      add_ghm_sig = case_when(
+        (add_ghm_scale_lci < 0 & 0 < add_ghm_scale_uci) ~ "N",
+        TRUE ~ "Y"),
+      add_ghm_display = case_when(add_ghm_sig == "Y" ~ add_ghm_scale,
                                   T ~ NA_real_),
-           sg_code = factor(case_when(sg_sig == "Y" & sg_sign == "n" ~ "Neg",
-                                   sg_sig == "Y" & sg_sign == "p" ~ "Pos",
-                                   sg_sig == "N" ~ "Non Sig"), 
-                         levels=c("Neg", "Pos", "Non Sig")),
-           ghm_sign = case_when(ghm_scale < 0 ~ "n",
-                                ghm_scale >= 0 ~ "p"),
-           ghm_sig = case_when((ghm_scale_lci < 0 & 0 < ghm_scale_uci) ~ "N",
-                               TRUE ~ "Y"),
-           ghm_display = case_when(ghm_sig == "Y" ~ ghm_scale,
-                                   T ~ NA_real_),
-           ghm_code = factor(case_when(ghm_sig == "Y" & ghm_sign == "n" ~ "Neg",
-                                       ghm_sig == "Y" & ghm_sign == "p" ~ "Pos",
-                                       ghm_sig == "N" ~ "Non Sig"), 
-                             levels=c("Neg", "Pos", "Non Sig")))
+      add_ghm_code = factor(case_when(
+        add_ghm_sig == "Y" & add_ghm_sign == "n" ~ "Neg",
+        add_ghm_sig == "Y" & add_ghm_sign == "p" ~ "Pos",
+        add_ghm_sig == "N" ~ "Non Sig"), 
+        levels=c("Neg", "Pos", "Non Sig")))
   
-  # # Get conditional effects
-  # ce_sg <- conditional_effects(x=out$model, 
-  #                              effects = "sg_norm",
-  #                              re_formula = NA)
-  # # if(sgdf$sg_sig == "N"){next}
-  # if(sgdf$sg_sig == "Y"){ # If the effect is significant...
-  #   (sg_ce_plot <-  plot(ce_sg, plot = F,
-  #                        line_args = list("se" = F,
-  #                                         "color" = pal2[2]))[[1]] + 
-  #      # scale_color_manual(values = palnew[3])+         
-  #      theme_tufte() +
-  #      xlab("Human Mobility") +
-  #      ylab("Space Use")+
-  #      theme(axis.line = element_line(size = .5),
-  #            axis.text = element_blank(),
-  #            axis.ticks = element_blank(),
-  #            axis.title = element_blank(),
-  #            # aspect.ratio = 1
-  #            ))
-  #   plsg <- 1
-  # }else{ # ...not significant:
-  #   (sg_ce_plot <-  plot(ce_sg, plot = F,
-  #                        line_args = list("se" = F,
-  #                                         "color" = "#808080"))[[1]] + 
-  #      # scale_color_manual(values = palnew[3])+         
-  #      theme_tufte() +
-  #      xlab("Human Mobility") +
-  #      ylab("Space Use")+
-  #      theme(axis.line = element_line(size = .5),
-  #            axis.text = element_blank(),
-  #            axis.ticks = element_blank(),
-  #            axis.title = element_blank(),
-  #            # aspect.ratio = 1
-  #            ))
-  #   plsg <- 0
-  # }
+  # CONTROLLED MODEL
+  load(cont_modlist_full[i]) # load model
+  fe <- fixef(out$model) #get fixed effects
+  # re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
+  contdf <- tibble("species"=out$species, # grab estimates
+                   
+                   # AREA EFFECTS
+                   "cont_area"=as.numeric(fe["log_area_scale", "Estimate"]),
+                   "cont_area_lci"=fe["log_area_scale", "Q2.5"],
+                   "cont_area_uci"=fe["log_area_scale", "Q97.5"],
+                   
+                   # SG EFFECTS
+                   "cont_sg_norm"=as.numeric(fe["sg_norm", "Estimate"]),
+                   "cont_sg_norm_lci"=fe["sg_norm", "Q2.5"],
+                   "cont_sg_norm_uci"=fe["sg_norm", "Q97.5"],
+                   
+                   # GHM EFFECTS
+                   "cont_ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
+                   "cont_ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
+                   "cont_ghm_scale_uci"=fe["ghm_scale", "Q97.5"]) %>% 
+    mutate(cont_area_sign = case_when(cont_area < 0 ~ "n",
+                                      cont_area >= 0 ~ "p"),
+           cont_area_sig = case_when((cont_area_lci < 0 & 0 < cont_area_uci) ~ "N",
+                                     TRUE ~ "Y"),
+           cont_area_display = case_when(cont_area_sig == "Y" ~ cont_area,
+                                         T ~ NA_real_),
+           cont_area_code = factor(case_when(
+             cont_area_sig == "Y" & cont_area_sign == "n" ~ "Neg",
+             cont_area_sig == "Y" & cont_area_sign == "p" ~ "Pos",
+             cont_area_sig == "N" ~ "Non Sig"), 
+             levels=c("Neg", "Pos", "Non Sig")),
+           
+           cont_sg_sign = case_when(cont_sg_norm < 0 ~ "n",
+                                    cont_sg_norm >= 0 ~ "p"),
+           cont_sg_sig = case_when((cont_sg_norm_lci < 0 & 0 < cont_sg_norm_uci) ~ "N",
+                                   TRUE ~ "Y"),
+           cont_sg_display = case_when(cont_sg_sig == "Y" ~ cont_sg_norm,
+                                       T ~ NA_real_),
+           cont_sg_code = factor(case_when(
+             cont_sg_sig == "Y" & cont_sg_sign == "n" ~ "Neg",
+             cont_sg_sig == "Y" & cont_sg_sign == "p" ~ "Pos",
+             cont_sg_sig == "N" ~ "Non Sig"), 
+             levels=c("Neg", "Pos", "Non Sig")),
+           
+           cont_ghm_sign = case_when(cont_ghm_scale < 0 ~ "n",
+                                     cont_ghm_scale >= 0 ~ "p"),
+           cont_ghm_sig = case_when((cont_ghm_scale_lci < 0 & 0 < cont_ghm_scale_uci) ~ "N",
+                                    TRUE ~ "Y"),
+           cont_ghm_display = case_when(cont_ghm_sig == "Y" ~ cont_ghm_scale,
+                                        T ~ NA_real_),
+           cont_ghm_code = factor(case_when(cont_ghm_sig == "Y" & cont_ghm_sign == "n" ~ "Neg",
+                                            cont_ghm_sig == "Y" & cont_ghm_sign == "p" ~ "Pos",
+                                            cont_ghm_sig == "N" ~ "Non Sig"), 
+                                  levels=c("Neg", "Pos", "Non Sig")))
   
-  
-  # # GHM ONLY
-  # load(ghm_modlist[i]) # load model
-  # fe <- fixef(out$model) #get fixed effects
-  # ghmdf <- tibble("species"=out$species, # grab estimates
-  #                 "ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
-  #                 "ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
-  #                 "ghm_scale_uci"=fe["ghm_scale", "Q97.5"]) %>% 
-  #   mutate(ghm_sign = case_when(ghm_scale < 0 ~ "n",
-  #                               ghm_scale >= 0 ~ "p"),
-  #          ghm_sig = case_when((ghm_scale_lci < 0 & 0 < ghm_scale_uci) ~ "N",
-  #                              TRUE ~ "Y"),
-  #          ghm_display = case_when(ghm_sig == "Y" ~ ghm_scale,
-  #                                  T ~ NA_real_),
-  #          ghm_code = factor(case_when(ghm_sig == "Y" & ghm_sign == "n" ~ "Neg",
-  #                                  ghm_sig == "Y" & ghm_sign == "p" ~ "Pos",
-  #                                  ghm_sig == "N" ~ "Non Sig"), 
-  #                        levels=c("Neg", "Pos", "Non Sig")))
-  # 
-  # # Get conditional effects
-  # ce_ghm <- conditional_effects(x=out$model, 
-  #                               effects = "ghm_scale",
-  #                               re_formula = NA)
-  # # if(sgdf$sg_sig == "N"){next}
-  # if(ghmdf$ghm_sig == "Y"){ # If the effect is significant...
-  #   (ghm_ce_plot <-  plot(ce_ghm, plot = F,
-  #                         line_args = list("se" = F,
-  #                                          "color" = pal2[2]))[[1]] + 
-  #      # scale_color_manual(values = palnew[3])+         
-  #      theme_tufte() +
-  #      xlab("Human Modification") +
-  #      ylab("Space Use")+
-  #      theme(axis.line = element_line(size = .5),
-  #            axis.text = element_blank(),
-  #            axis.ticks = element_blank(),
-  #            axis.title = element_blank(),
-  #            # aspect.ratio = 1
-  #      ))
-  #   plghm <- 1
-  # }else{ # ...not significant:
-  #   (ghm_ce_plot <-  plot(ce_ghm, plot = F,
-  #                         line_args = list("se" = F,
-  #                                          "color" = "#808080"))[[1]] + 
-  #      # scale_color_manual(values = palnew[3])+         
-  #      theme_tufte() +
-  #      xlab("Human Modification") +
-  #      ylab("Space Use")+
-  #      theme(axis.line = element_line(size = .5),
-  #            axis.text = element_blank(),
-  #            axis.ticks = element_blank(),
-  #            axis.title = element_blank(),
-  #            # aspect.ratio = 1
-  #      ))
-  #   plghm <- 0
-  # }
   
   # INTERACTION MODEL
   load(int_modlist_full[i])
@@ -253,40 +231,40 @@ for(i in 1:length(add_modlist_full)){
            inter_display = case_when(inter_sig == "Y" ~ inter,
                                      T ~ NA_real_),
            int_code = factor(case_when(inter_sig == "Y" & inter_sign == "n" ~ "Neg",
-                                   inter_sig == "Y" & inter_sign == "p" ~ "Pos",
-                                   inter_sig == "N" ~ "Non Sig"),
-                         levels=c("Neg", "Pos", "Non Sig")))
+                                       inter_sig == "Y" & inter_sign == "p" ~ "Pos",
+                                       inter_sig == "N" ~ "Non Sig"),
+                             levels=c("Neg", "Pos", "Non Sig")))
   # get observed quantiles of ghm to set "low" and "high" human mod
   ghmq <- quantile(out$data$ghm_scale, probs = c(0.10, 0.90), na.rm = T)
-
+  
   # Conditional Effects Plot for interaction
   ce_int <- conditional_effects(x=out$model,
                                 effects = "sg_norm:ghm_scale",
                                 int_conditions = list(ghm_scale = ghmq),
                                 re_formula = NA)
-
+  
   if(intdf$inter_sig == "Y"){ # If the effect is significant...
     (int_ce_plot <-  plot(ce_int, plot = FALSE,
                           line_args = list("se"=F,
-                                           "size" = 4))[[1]] +
+                                           "size" = 8))[[1]] +
        theme_tufte() +
        scale_color_manual(values = palnew, name = "Human \n Modification",
                           labels = c("High", "Low")) +
        scale_fill_manual(values = palnew, name = "Human \n Modification",
                          labels = c("High", "Low")) +
-       theme(axis.line = element_line(size = 4),
+       theme(axis.line = element_line(size = 8),
              axis.text = element_blank(),
              axis.ticks = element_blank(),
              axis.title = element_blank(),
              aspect.ratio = 1,
              legend.position = "none"
              
-             ))
+       ))
     ggsave(filename = glue("out/niche_plots/{out$species}_niche_int.png"), int_ce_plot)
     plint <- 1
   }else{ # ...if the effect is not significant
     (int_ce_plot <-  plot(ce_int, plot = FALSE,
-                          line_args = list("se"=F, "size" = 4))[[1]] +
+                          line_args = list("se"=F, "size" = 8))[[1]] +
        theme_tufte() +
        # xlab("Human Mobility") +
        # ylab("")+
@@ -294,32 +272,21 @@ for(i in 1:length(add_modlist_full)){
                         labels = c("High", "Low"))+
        scale_fill_grey(name = "Human \n Modification",
                        labels = c("High", "Low"))+
-       theme(axis.line = element_line(size = 4),
+       theme(axis.line = element_line(size = 8),
              axis.text = element_blank(),
              axis.ticks = element_blank(),
              axis.title = element_blank(),
              aspect.ratio = 1,
              legend.position = "none"))
-
+    
     plint <- 0
   }
   
   # gather results tables
   res_out[[i]] <- adddf %>% 
-    left_join(intdf)
+    left_join(intdf) %>% 
+    left_join(contdf)
   
-  # # gather plot objects
-  # tmp[[1]] <- wrap_elements(textGrob(glue("{out$species}"),
-  #                                    gp = gpar(fontsize = 6)))
-  # tmp[[2]] <- sg_ce_plot 
-  # tmp[[3]] <- ghm_ce_plot
-  # tmp[[4]] <- int_ce_plot
-  
-  # +
-  # plot_layout(widths=c(1,1,1), heights = c(1))
-  # row[[i]] <- tmp 
-  # # wrap_plots(tmp, widths=c(1,1,1), heights = c(1))
-  # if(plsg == 1 | plghm == 1 | plint ==1){pl[i] <- 1}else(pl[i] <- 0)
   
 } # i
 
@@ -350,12 +317,12 @@ ghmq_trait <- quantile(out$data$ghm_scale, probs = c(0.05, 0.95), na.rm = T)
 sgq_trait <- quantile(out$data$sg_norm, probs = c(0.10, 0.90), na.rm = T)
 
 ce_trait <- conditional_effects(x=out$model, 
-                             effects = "sg_scale:ghm_scale",
-                             int_conditions = list(ghm_scale = ghmq_trait
-                                                   # sg_norm = c(-.2225,-0.2138)
-                                                   ),
-                             conditions = conds,
-                             re_formula = NA)
+                                effects = "sg_scale:ghm_scale",
+                                int_conditions = list(ghm_scale = ghmq_trait
+                                                      # sg_norm = c(-.2225,-0.2138)
+                                ),
+                                conditions = conds,
+                                re_formula = NA)
 
 plot(ce_trait,
      facet_args = list("scales" = "free_y"))[[1]]+
