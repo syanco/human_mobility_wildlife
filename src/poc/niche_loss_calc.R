@@ -5,7 +5,7 @@
 
 '
 Plot Space Use.  Generate table-like coefficient plots for the effects of human 
-modification and human mobility on animal space use.
+modification and human mobility on animal niche breadth.
 
 Usage:
 area_loss_calc.r <dat> <out> <trait>
@@ -82,8 +82,8 @@ traits <- read_csv(.traitPF)
 # #-- Interaction Models --#
 # 
 message('Loading interaction models...')
-int_modlist <- list.files(path=file.path(.datP, "area/"), full.names = F )
-int_modlist_full <- list.files( path=file.path(.datP, "area/"), full.names = T)
+int_modlist <- list.files(path=file.path(.datP, "niche/"), full.names = F )
+int_modlist_full <- list.files( path=file.path(.datP, "niche/"), full.names = T)
 int_sp <- word(int_modlist, 1, sep = "_")
 
 # 
@@ -91,9 +91,9 @@ int_sp <- word(int_modlist, 1, sep = "_")
 # #-- SG + GHM Models --#
 # 
 message('Loading additive models...')
-add_modlist <- list.files(path=file.path(.datP, "area_additive/"), 
+add_modlist <- list.files(path=file.path(.datP, "niche_additive/"), 
                           full.names = F)
-add_modlist_full <- list.files(path=file.path(.datP, "area_additive/"), 
+add_modlist_full <- list.files(path=file.path(.datP, "niche_additive/"), 
                                full.names = T)
 add_sp <- word(add_modlist, 1, sep = "_")
 
@@ -190,8 +190,11 @@ for(i in 1:length(add_modlist_full)){
     
     # posterior_summary(out$model)
     # get observed quantiles of ghm to set "low" and "high" human mod
-    ghmq <- c(ghm_0, quantile(out_int$data$ghm_scale, probs = c(0.50), na.rm = T))
-    sgq <- c(sg_0, quantile(out_int$data$sg_norm, probs = c(0.50), na.rm = T))
+    ghmq <- c(ghm_0, quantile(out_add$data$ghm_scale, probs = c(0.50), na.rm = T))
+    sgq <- c(sg_0, quantile(out_add$data$sg_norm, probs = c(0.50), na.rm = T))
+    
+    # ghmq <- quantile(out_int$data$ghm_scale, probs = c(0.05, 0.50), na.rm = T)
+    # sgq <- quantile(out_int$data$sg_norm, probs = c(0.05, 0.50), na.rm = T)
     # ndviq <- quantile(out$data$ndvi_scale, probs = c(0.95), na.rm = T)
     # lstq <- quantile(out$data$lst_scale, probs = c(0.95), na.rm = T)
     
@@ -208,23 +211,22 @@ for(i in 1:length(add_modlist_full)){
     h_sg_only <- ce_int$`sg_norm:ghm_scale`[2, "estimate__"]
     
     # get scaling params...
-    m <- mean(out_int$data$log_area, na.rm = T)
-    sd <- sd(out_int$data$log_area, na.rm = T)
+    m <- mean(out_int$data$total, na.rm = T)
+    sd <- sd(out_int$data$total, na.rm = T)
+    # 
+    unscaled_nh <- (nh * sd) + m
+    unscaled_h <- (h * sd) + m
+    unscaled_h_ghm <- (h_ghm_only * sd) + m
+    unscaled_h_sg <- (h_sg_only * sd) + m
     
-    unscaled_nh <- exp((nh * sd) + m) 
-    unscaled_h <- exp((h * sd) + m) 
-    unscaled_h_ghm <- exp((h_ghm_only * sd) + m) 
-    unscaled_h_sg <- exp((h_sg_only * sd) + m) 
     
     out_df <- data.frame(model = "interaction",
                          species = out_int$species,
-                         human_size = unscaled_h,
-                         nonhuman_size = unscaled_nh,
-                         change_prop = unscaled_h/unscaled_nh,
-                         ghm_only_prop = unscaled_h_ghm/unscaled_nh,
-                         sg_only_prop = unscaled_h_sg/unscaled_nh,
-                         diff = unscaled_h - unscaled_nh) %>% 
-      mutate(diff_sq_km = diff/1000000) %>% 
+                         human_size = exp(unscaled_h),
+                         nonhuman_size = exp(unscaled_nh),
+                         change_prop = exp(unscaled_h-unscaled_nh),
+                         ghm_only_prop = exp(unscaled_h_ghm-unscaled_nh),
+                         sg_only_prop = exp(unscaled_h_sg-unscaled_nh)) %>% 
       left_join(adddf)
     
     res_out[[i]] <- out_df
@@ -244,6 +246,11 @@ for(i in 1:length(add_modlist_full)){
       # get observed quantiles of ghm to set "low" and "high" human mod
       ghmq <- c(ghm_0, quantile(out_add$data$ghm_scale, probs = c(0.50), na.rm = T))
       sgq <- c(sg_0, quantile(out_add$data$sg_norm, probs = c(0.50), na.rm = T))
+      # 
+      # ghmq <- quantile(out_add$data$ghm_scale, probs = c(0.05, 0.50), na.rm = T)
+      # sgq <- quantile(out_add$data$sg_norm, probs = c(0.05, 0.50), na.rm = T)
+      
+      
       # ndviq <- quantile(out$data$ndvi_scale, probs = c(0.95), na.rm = T)
       # lstq <- quantile(out$data$lst_scale, probs = c(0.95), na.rm = T)
       
@@ -261,23 +268,21 @@ for(i in 1:length(add_modlist_full)){
       h_sg_only <- ce_int$`sg_norm:ghm_scale`[2, "estimate__"]
       
       # get scaling params...
-      m <- mean(out_add$data$log_area, na.rm = T)
-      sd <- sd(out_add$data$log_area, na.rm = T)
+      m <- mean(out_add$data$total, na.rm = T)
+      sd <- sd(out_add$data$total, na.rm = T)
       
-      unscaled_nh <- exp((nh * sd) + m) 
-      unscaled_h <- exp((h * sd) + m)
-      unscaled_h_ghm <- exp((h_ghm_only * sd) + m) 
-      unscaled_h_sg <- exp((h_sg_only * sd) + m) 
+      unscaled_nh <- (nh * sd) + m 
+      unscaled_h <- (h * sd) + m
+      unscaled_h_ghm <- (h_ghm_only * sd) + m 
+      unscaled_h_sg <- (h_sg_only * sd) + m
       
       out_df <- data.frame(model = "additive",
                            species = out_add$species,
                            human_size = unscaled_h,
                            nonhuman_size = unscaled_nh,
-                           change_prop = unscaled_h/unscaled_nh,
-                           ghm_only_prop = unscaled_h_ghm/unscaled_nh,
-                           sg_only_prop = unscaled_h_sg/unscaled_nh,
-                           diff = unscaled_h - unscaled_nh) %>% 
-        mutate(diff_sq_km = diff/1000000) %>% 
+                           change_prop = exp(unscaled_h-unscaled_nh),
+                           ghm_only_prop = exp(unscaled_h_ghm-unscaled_nh),
+                           sg_only_prop = exp(unscaled_h_sg-unscaled_nh)) %>% 
         left_join(adddf)
       
       res_out[[i]] <- out_df
@@ -286,10 +291,8 @@ for(i in 1:length(add_modlist_full)){
 }
 
 (out <- do.call("rbind", res_out) %>% 
-    arrange(change_prop) %>% 
-    mutate(perc_change = (diff/nonhuman_size)*100)
-)
-write_csv(out, glue("out/prop_change_table_area_{Sys.Date()}.csv"))
+    arrange(change_prop))
+write_csv(out, glue("out/prop_change_table_niche_{Sys.Date()}.csv"))
 
 
 

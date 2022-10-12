@@ -186,7 +186,12 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
       dplyr::filter(yr == i) %>%
       mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T"),
              week = week(timestamp),
-             n_indiv_week_year = paste0(individual_id, '_' , week, '_' , yr)) %>% 
+             n_indiv_week_year = paste0(individual_id, '_' , week, '_' , yr),
+             tmax_scale = scale(tmax),
+             tmin_scale = scale(tmin),
+             ndvi_scale = scale(ndvi),
+             elev_scale = scale(elev),
+             dist2road_scale = scale(dist2road)) %>% 
       arrange(timestamp)
     
     
@@ -225,7 +230,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
       # print(w)
       
       evt_tmp <- evt_mod %>% filter(week == w) %>%
-        select(tmax, tmin, ndvi, elev, dist2road, week, event_id, individual_id, 
+        select(tmax_scale, tmin_scale, ndvi_scale, elev_scale, dist2road_scale, week, event_id, individual_id, 
                n_indiv_week_year) %>%
         drop_na(tmax, tmin, ndvi, elev, dist2road)
       
@@ -235,7 +240,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
       tryCatch({
         
         if(nrow(evt_tmp) > 0){      
-          determinant <- MVNH_det(evt_tmp[,c('tmax', 'tmin', 'ndvi', 'elev', 'dist2road')], log = TRUE)
+          determinant <- MVNH_det(evt_tmp[,c('tmax_scale', 'tmin_scale', 'ndvi_scale', 'elev_scale', 'dist2road_scale')], log = F)
 
           determinant_df <- data.frame(as.list(determinant))
           determinant_df$week <- unique(w)
@@ -244,7 +249,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
           determinant_df$studyid <- studyid
           determinant_df$year <- i
           
-          write.table(determinant_df, glue("{.outPF}/niche_determinant_anthropause_test.csv"), append = T, row.names = F, 
+          write.table(determinant_df, glue("{.outPF}/niche_determinant_anthropause_test_{Sys.Date}.csv"), append = T, row.names = F, 
                       col.names = F, sep = ",")
           
           
