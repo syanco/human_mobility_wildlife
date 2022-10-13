@@ -242,7 +242,7 @@ message("Starting model...")
 # fit model
 mod <- brm(
   form,
-  data = size_wide,
+  data = breadth_wide,
   family = student(),
   inits = 0,
   cores = 4,
