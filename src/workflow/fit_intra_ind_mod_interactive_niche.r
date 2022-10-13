@@ -229,7 +229,7 @@ breadth_wide <- breadth_paired %>%
 
 message("Starting that modeling magic...")
 
-form <-  bf(breadth_diff ~ 1 + sg_diff * ghm_diff + ndvi_diff + tmax_diff + (1|species/ind_f) + ar(time = wk, gr = ind_f))
+form <-  bf(breadth_diff ~ 1 + sg_diff * ghm_diff + ndvi_diff + tmax_diff + (1|scientificname/ind_f) + ar(time = week, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
@@ -249,7 +249,7 @@ mod <- brm(
 
 #stash results into named list
 out <- list(
-  data = size_wide,
+  data = breadth_wide,
   model = mod
 )
 
