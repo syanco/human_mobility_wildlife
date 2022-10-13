@@ -410,7 +410,10 @@
     #Area
     sbatch $src/hpc/run_fit_intra_ind_mod_additive.sh
     sbatch $src/hpc/run_fit_intra_ind_mod_int.sh
-
+    
+    #Niche
+    sbatch $src/hpc/run_fit_intra_ind_mod_additive_niche.sh
+    sbatch $src/hpc/run_fit_intra_ind_mod_int_niche.sh
   ##
 
   ##-- Step Selection Function --##
