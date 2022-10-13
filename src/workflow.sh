@@ -378,7 +378,7 @@
     #- Calculate MVNH Breadth -#
       
       # Create csv to store results
-      echo "total, tmax, tmin, ndvi, elev, dist2road, cor, week, individual, scientificname, studyid, year" > ./out/niche_determinant_anthropause.csv
+      echo "total, tmax, tmin, ndvi, elev, cor, week, individual, scientificname, studyid, year" > ./out/niche_determinant_anthropause.csv
 
       # Make log file to track successful outputs
       echo "studyid, individual, scientificname, year, status, week" > out/niche_log.csv
