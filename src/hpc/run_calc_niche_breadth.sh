@@ -3,8 +3,8 @@
 #SBATCH -t 12:00:00
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
-#SBATCH --partition day
-#SBATCH -c 10
+#SBATCH --partition day,pi_jetz
+#SBATCH -c 24
 #SBATCH --mem-per-cpu 10G
 #SBATCH -J calc_niches_with_TMAX
 
@@ -24,5 +24,5 @@ cp $wd/processed_data/mosey_mod.db /tmp/
 
 
 # Execute calc size script/
-Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db calc-niche-breadth 24
+Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause.csv 24
 
