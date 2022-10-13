@@ -122,9 +122,9 @@ breadth <- read_csv(.datPF) %>%
   distinct() %>%
   mutate(tmax_mvnh = tmax,
          tmin_mvnh = tmin,
-         lst_mvnh = lst,
+         elev_mvnh = elev,
          ndvi_mvnh = ndvi) %>%
-  select(!c(tmax, tmin, lst, ndvi)) %>%
+  select(!c(tmax, tmin, elev, ndvi)) %>%
   filter(studyid != 351564596) %>%
   filter(studyid != 1891587670) %>%
   mutate(ind_f = as.factor(individual)) %>%  # create factor version of ind for REs)
