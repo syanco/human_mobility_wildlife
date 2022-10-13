@@ -30,7 +30,7 @@ if(interactive()) {
   
   .wd <- getwd()
   
-  .outPF <- file.path(.wd,'out/single_species_models/niche')
+  .outPF <- file.path(.wd,'out/niche_determinant_anthropause.csv')
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   
   .nc <- 2
@@ -89,13 +89,10 @@ evt0 <- tbl(db, "event_clean")%>%
 message("Disconnecting from databse...")
 dbDisconnect(db)
 
-
 ind <- indtb %>% 
   pull(individual_id)
 
-
 ind <- ind[ind  %in% unique(evt0$individual_id)]
-
 
 yearvec <- c("2019", "2020")
 
@@ -135,8 +132,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
              tmax_scale = scale(tmax),
              tmin_scale = scale(tmin),
              ndvi_scale = scale(ndvi),
-             elev_scale = scale(elev),
-             dist2road_scale = scale(dist2road)) %>% 
+             elev_scale = scale(elev)) %>% 
       arrange(timestamp)
     
     
@@ -167,19 +163,18 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
       for(w in min(wk):max(wk)){
         # w <- 26
         
-        evt_tmp <- evt_mod %>% filter(week == w) %>%
-          select(tmax_scale, tmin_scale, ndvi_scale, elev_scale, 
-                 dist2road_scale, week, event_id, individual_id, 
-                 n_indiv_week_year) %>%
-          drop_na(tmax, tmin, ndvi, elev, dist2road)
+        evt_tmp <- evt_mod %>% 
+          filter(week == w) %>%
+          select(tmax_scale, tmin_scale, ndvi_scale, elev_scale, week, event_id,
+                 individual_id, n_indiv_week_year) %>%
+          drop_na(tmax_scale, tmin_scale, ndvi_scale, elev_scale)
         
         
         tryCatch({
           
           if(nrow(evt_tmp) > 0){      
             determinant <- MVNH_det(evt_tmp[,c('tmax_scale', 'tmin_scale', 
-                                               'ndvi_scale', 'elev_scale', 
-                                               'dist2road_scale')], 
+                                               'ndvi_scale', 'elev_scale')], 
                                     log = F)
             
             determinant_df <- data.frame(as.list(determinant))
@@ -204,9 +199,9 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
             write.table(tmp_dummy_success, glue("./out/niche_log.csv"), 
                         append = T, row.names = F, 
                         col.names = F, sep = ",")
-          } else {# if there's data
+          } else {# if there's no data
             
-            tmp_dummy_success = data.frame(
+            tmp_dummy_fail = data.frame(
               studyid = studyid, 
               individual  = ind[j],
               scientificname = scientificname,
@@ -215,7 +210,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
               week = w)
             
             # logfile_template$studyid <- studyid
-            write.table(tmp_dummy_success, glue("./out/niche_log.csv"), 
+            write.table(tmp_dummy_fail, glue("./out/niche_log.csv"), 
                         append = T, row.names = F, 
                         col.names = F, sep = ",")
             
