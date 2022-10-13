@@ -78,8 +78,8 @@ ce_sg <- conditional_effects(x=int_mod,
                      plot = F,
                      rug = F,
                      line_args = list("se" = T,
-                                      "color" = pal2[1],
-                                      "fill" = pal2[1]))[[1]] + 
+                                      "color" = "black",
+                                      "fill" = "gray"))[[1]] + 
     # scale_color_manual(values = palnew[3])+         
     theme_tufte() +
     # xlab(glue("{expression(delta)} Human Mobility")) +
@@ -89,11 +89,42 @@ ce_sg <- conditional_effects(x=int_mod,
     geom_hline(aes(yintercept = 0), linetype = "dashed") +
     theme(axis.line = element_line(size = .5),
           # axis.text = element_blank(),
-          axis.ticks = element_blank(),
+          # axis.ticks = element_blank(),
           # axis.title = element_blank(),
-          # aspect.ratio = 1
+          aspect.ratio = 1,
+          text = element_text(family = "Roboto")
     ))
-ggsave(filename = glue("out/intra_ind_sg.png"), sg_ce_plot)
+ggsave(filename = glue("out/area_intra_ind_sg.png"), sg_ce_plot,
+       width = 6, height = 6)
+
+
+ce_ghm <- conditional_effects(x=int_mod,
+                             effects = "ghm_diff",
+                             re_formula = NA)
+(ghm_ce_plot <-  plot(ce_ghm, 
+                     plot = F,
+                     rug = F,
+                     line_args = list("se" = T,
+                                      "color" = "black",
+                                      "fill" = "gray"))[[1]] + 
+    # scale_color_manual(values = palnew[3])+         
+    theme_tufte() +
+    # xlab(glue("{expression(delta)} Human Mobility")) +
+    xlab(bquote(~Delta~"Human Modification")) +
+    ylab(bquote(~Delta~"Space Use"))+
+    geom_vline(aes(xintercept = 0), linetype = "dashed") +
+    geom_hline(aes(yintercept = 0), linetype = "dashed") +
+    theme(axis.line = element_line(size = .5),
+          # axis.text = element_blank(),
+          # axis.ticks = element_blank(),
+          # axis.title = element_blank(),
+          aspect.ratio = 1,
+          text = element_text(family = "Roboto")
+    ))
+ggsave(filename = glue("out/area_intra_ind_ghm.png"), ghm_ce_plot,
+       width = 6, height = 6)
+
+
 
 # get observed quantiles of ghm to set "low" and "high" human mod
 ghmq <- quantile(out$data$ghm_diff, probs = c(0.10, 0.90), na.rm = T)
@@ -121,4 +152,4 @@ ce_int <- conditional_effects(x=int_mod,
           # axis.title = element_blank(),
           # aspect.ratio = 1
     ))
-ggsave(filename = glue("out/intra_ind_int.png"), int_ce_plot)
+ggsave(filename = glue("out/area_intra_ind_int.png"), int_ce_plot)

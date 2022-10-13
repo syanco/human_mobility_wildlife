@@ -2,8 +2,6 @@
 #
 #CONDA: covid
 #
-# This script generates individual dynamic brownian bridge models and associated 
-# UDs for migratory  periods.
 
 # TODO:  The dBBMM paramaters (e.g., window size, margin, error, etc.) are 
 # currently hardcoded.  Could be passed in as options to the script.
@@ -126,12 +124,42 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   )) %>% 
   distinct()
 
+breadth <- read_csv("out/niche_determinant_anthropause.csv") %>%
+  mutate(scientificname = case_when( # correct species names
+    studyid == 1442516400 ~ "Anser caerulescens",
+    studyid == 1233029719 ~ "Odocoileus virginianus",
+    studyid == 1631574074 ~ "Ursus americanus",
+    studyid == 1418296656 ~ "Numenius americanus",
+    studyid == 474651680  ~ "Odocoileus virginianus",
+    studyid == 1044238185 ~ "Alces alces",
+    TRUE ~ scientificname
+  ))%>% 
+  mutate(scientificname = case_when(
+    scientificname == "Chen caerulescens" ~ "Anser caerulescens",
+    TRUE ~ scientificname
+  )) %>% 
+  distinct() %>%
+  mutate(tmax_mvnh = tmax,
+         tmin_mvnh = tmin,
+         elev_mvnh = elev,
+         ndvi_mvnh = ndvi) %>%
+  select(!c(tmax, tmin, elev, ndvi)) %>%
+  filter(studyid != 351564596) %>%
+  filter(studyid != 1891587670) %>%
+  mutate(ind_f = as.factor(individual)) %>%  # create factor version of ind for REs)
+  left_join(size, by = c("scientificname" = "species", 
+                         "individual" = "ind_id", 
+                         "year" = "year", 
+                         "studyid" = "study_id", 
+                         "week" = "wk"))
+
+
 message("Processing the data to allow the magic to happen...")
 
 # identify paired observations only
-paired <- size %>% 
+paired <- breadth %>% 
   # mutate(yrnum = as.numeric(yr)) %>% 
-  group_by(ind_id) %>% 
+  group_by(individual) %>% 
   summarize(minyr = min(year),
             maxyr = max(year),
             paired = minyr != maxyr) %>% 
@@ -139,13 +167,13 @@ paired <- size %>%
 
 # create vector of paired individual ids
 paired_vec <- paired %>% 
-  pull(ind_id)
+  pull(individual)
 
 # filter size dataset to only inlcude paired individuals
-size_paired <- size %>% 
-  filter(ind_id %in% paired_vec) %>% 
+breadth_paired <- breadth %>% 
+  filter(individual %in% paired_vec) %>% 
   #filter to mammals only
-  left_join(traits, by = c("species" = "Species")) %>% 
+  left_join(traits, by = c("scientificname" = "Species")) %>% 
   filter(Family == "Cervidae" | Family == "Canidae" | Family == "Ursidae" |
            Family == "Felidae" | Family == "Antilocapridae" | Family == "Bovidae") %>% 
   mutate(diet = case_when(Diet.PlantO >= 50 ~ "Herbivore",
@@ -154,6 +182,7 @@ size_paired <- size %>%
                           Diet.Inv >= 50 ~ "Insectivore",
                           (Diet.Vend+Diet.Vect+Diet.Vfish) >= 50 ~ "Carnivore",
                           TRUE ~ "Omnivore"),
+         breadth_scale = scale(total),
          log_area = log(area), #get log of weekly area use
          log_area_scale = scale(log_area), # standardize it
          sg_norm = sg / cbg_area, # normalize safegraph data by size of the CBG
@@ -164,23 +193,23 @@ size_paired <- size %>%
          ndvi_scale = scale(ndvi),
          lst_scale = scale(lst),
          tmax_scale = scale(tmax),
-         ind_f = as.factor(ind_id), # create factor version of ind for REs
+         ind_f = as.factor(individual), # create factor version of ind for REs
          grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
          # trt_new = gsub('_.*','',trt),
          year_f = factor(year), # create year factor
          # trt_new = fct_relevel(trt_new, "pre.ld", "ld", "post.ld")
          # sp2 = gsub(" ", "_", species),
-         wk_n = as.numeric(substring(wk, 2)), # extract week number
-         ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
-         study_f = as.factor(study_id),
-         ind_wk = paste0(ind_id,wk))  # make study id factor) %>% 
+         wk_n = as.numeric(substring(week, 2)), # extract week number
+         ts = parse_date_time(paste(year, week, 01, sep = "-"), "%Y-%U-%u"), # make better date format
+         study_f = as.factor(studyid),
+         ind_wk = paste0(individual,week))  # make study id factor) %>% 
 
 # create wide format and calculate deltas
-size_wide <- size_paired %>% 
-  pivot_wider(id_cols = c(ind_f, wk, species), 
-              values_from = c(log_area_scale, sg_norm, ghm_scale, ndvi_scale, tmax_scale), 
+breadth_wide <- breadth_paired %>% 
+  pivot_wider(id_cols = c(ind_f, week, scientificname), 
+              values_from = c(breadth_scale, sg_norm, ghm_scale, ndvi_scale, tmax_scale), 
               names_from = year_f) %>% 
-  mutate(area_diff = log_area_scale_2020-log_area_scale_2019,
+  mutate(breadth_diff = breadth_scale_2020-breadth_scale_2019,
          sg_diff = sg_norm_2020-sg_norm_2019,
          ghm_diff = ghm_scale_2020-ghm_scale_2019,
          ndvi_diff = ndvi_scale_2020-ndvi_scale_2019,
@@ -200,7 +229,7 @@ size_wide <- size_paired %>%
 
 message("Starting that modeling magic...")
 
-form <-  bf(area_diff ~ 1 + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1|species/ind_f) + ar(time = wk, gr = ind_f))
+form <-  bf(breadth_diff ~ 1 + sg_diff * ghm_diff + ndvi_diff + tmax_diff + (1|species/ind_f) + ar(time = wk, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
@@ -225,7 +254,7 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/intra_ind_add_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/niche_intra_ind_int_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 
