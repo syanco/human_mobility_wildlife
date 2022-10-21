@@ -3,10 +3,10 @@ library(brms)
 library(ggthemes)
 library(glue)
 
-load("out/intra_ind_models/intra_ind_add_mod_2022-10-05.rdata")
-add_mod <- out$mod
-add_mod
-load("out/intra_ind_models/intra_ind_int_mod_2022-10-05.rdata")
+# load("out/intra_ind_models/niche_intra_ind_int_mod_2022-a")
+# add_mod <- out$mod
+# add_mod
+load("out/intra_ind_models/niche_intra_ind_int_mod_2022-10-14.rdata")
 int_mod <- out$mod
 int_mod
 
@@ -94,7 +94,7 @@ ce_sg <- conditional_effects(x=int_mod,
           aspect.ratio = 1,
           text = element_text(family = "Roboto")
     ))
-ggsave(filename = glue("out/area_intra_ind_sg.png"), sg_ce_plot,
+ggsave(filename = glue("out/niche_intra_ind_sg.png"), sg_ce_plot,
        width = 6, height = 6)
 
 
@@ -121,7 +121,7 @@ ce_ghm <- conditional_effects(x=int_mod,
           aspect.ratio = 1,
           text = element_text(family = "Roboto")
     ))
-ggsave(filename = glue("out/area_intra_ind_ghm.png"), ghm_ce_plot,
+ggsave(filename = glue("out/niche_intra_ind_ghm.png"), ghm_ce_plot,
        width = 6, height = 6)
 
 
@@ -152,4 +152,4 @@ ce_int <- conditional_effects(x=int_mod,
           # axis.title = element_blank(),
           # aspect.ratio = 1
     ))
-ggsave(filename = glue("out/area_intra_ind_int.png"), int_ce_plot)
+ggsave(filename = glue("out/niche_intra_ind_int.png"), int_ce_plot)

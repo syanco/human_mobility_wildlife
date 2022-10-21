@@ -75,8 +75,11 @@ list.files('analysis/src/funs/auto',full.names=TRUE) %>%
 
 #---- Load data ----#
 message('Loading interaction models...')
-int_modlist <- list.files(path=file.path(.datP, "niche/"), full.names = F )
-int_modlist_full <- list.files( path=file.path(.datP, "niche/"), full.names = T)
+int_modlist <- list.files(path=file.path(.datP, "niche/"), 
+                          pattern = "*10-14.rdata|*10-15.rdata", full.names = F)
+int_modlist_full <- list.files(path=file.path(.datP, "niche/"), 
+                               pattern = "*10-14.rdata|*10-15.rdata", 
+                               full.names = T)
 int_sp <- word(int_modlist, 1, sep = "_")
 
 # 
@@ -85,16 +88,19 @@ int_sp <- word(int_modlist, 1, sep = "_")
 # 
 message('Loading additive models...')
 add_modlist <- list.files(path=file.path(.datP, "niche_additive/"), 
-                          full.names = F)
+                          pattern = "*10-14.rdata|*10-15.rdata", full.names = F)
 add_modlist_full <- list.files(path=file.path(.datP, "niche_additive/"), 
+                               pattern = "*10-14.rdata|*10-15.rdata", 
                                full.names = T)
 add_sp <- word(add_modlist, 1, sep = "_")
 
 
 message("Loading area controlled models...")
 cont_modlist <- list.files(path=file.path(.datP, "niche_controlled/"), 
+                           pattern = "*10-14.rdata|*10-15.rdata", 
                            full.names = F)
 cont_modlist_full <- list.files(path=file.path(.datP, "niche_controlled/"), 
+                                pattern = "*10-14.rdata|*10-15.rdata",
                                 full.names = T)
 cont_sp <- word(cont_modlist, 1, sep = "_")
 #check that lists are same
@@ -292,7 +298,7 @@ for(i in 1:length(add_modlist_full)){
 
 # combine dfs
 res_out_df <- do.call("rbind", res_out)
-write_csv(x=res_out_df, file = glue("out/niche_mod_summary_{Sys.Date()}.csv"))
+write_csv(x=res_out_df, file = glue("out/niche_mod_summary_{Sys.Date()}-noenv.csv"))
 
 # combine plots and save out
 row_reduced <- row[which(pl==1)]

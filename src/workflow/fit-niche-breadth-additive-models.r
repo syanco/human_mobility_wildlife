@@ -146,8 +146,8 @@ registerDoMC(.cores)
 # ==== Perform analysis ====
 
 #declare model form
-# form <-  bf(breadth_scale ~ sg_norm + ghm_scale + ndvi_scale + tmax_scale + (1 |grp) + ar(time = week, gr = grp))
-form <-  bf(breadth_scale ~ sg_norm + ghm_scale + (1 |grp) + ar(time = week, gr = grp))
+form <-  bf(breadth_scale ~ sg_norm + ghm_scale + ndvi_scale + tmax_scale + (1 |grp) + ar(time = week, gr = grp))
+# form <-  bf(breadth_scale ~ sg_norm + ghm_scale + (1 |grp) + ar(time = week, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
@@ -165,7 +165,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
            !is.infinite(total)) %>% 
     mutate(
       # sqrt_breadth = sqrt(total), #get sqrt weekly niche breadth
-      breadth_scale = scale(total), # standardize it
+      breadth_scale = scale(log(total)), # standardize it
       sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
       # log_sg_norm = log(sg_norm),
       ghm_scale = scale(ghm),
