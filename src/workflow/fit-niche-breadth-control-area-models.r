@@ -158,7 +158,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   sp <- sp_sum$scientificname[i]
   
   
-  message(glue("Strating model for {sp}..."))
+  message(glue("Starting model for {sp}..."))
   
   dat <- breadth %>%
     filter(scientificname == sp,
@@ -167,7 +167,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       log_area = log(area), #get log of weekly area use
       log_area_scale = scale(log_area), # standardize it
       # sqrt_breadth = sqrt(total), #get sqrt weekly niche breadth
-      breadth_scale = scale(log(total)), # standardize it
+      breadth_scale = scale(log(total+0.000000000000000000001)), # standardize it
       sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
       # log_sg_norm = log(sg_norm),
       ghm_scale = scale(ghm),

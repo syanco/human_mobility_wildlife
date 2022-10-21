@@ -185,7 +185,7 @@ breadth_paired <- breadth %>%
                           Diet.Inv >= 50 ~ "Insectivore",
                           (Diet.Vend+Diet.Vect+Diet.Vfish) >= 50 ~ "Carnivore",
                           TRUE ~ "Omnivore"),
-         breadth_scale = scale(log(total)),
+         breadth_scale = scale(log(total+0.000000000000000000001)),
          log_area = log(area), #get log of weekly area use
          log_area_scale = scale(log_area), # standardize it
          sg_norm = sg / cbg_area, # normalize safegraph data by size of the CBG
