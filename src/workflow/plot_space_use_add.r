@@ -380,7 +380,8 @@ ce_trait <- conditional_effects(x=out_birds$model,
 plot(ce_trait,
      facet_args = list("scales" = "free_y"),
      line_args = list(alpha=0.3))[[1]]+
-  # xlim(c(-.2225,1))+
+  # xlim(c(-.2225,1))+  # ce_ghm <- conditional_effects(x=out$model, 
+  #                              effects = "ghm_scale",
   theme_tufte()+
   theme(axis.line = element_line(size = .5),
         # axis.text = element_blank(),

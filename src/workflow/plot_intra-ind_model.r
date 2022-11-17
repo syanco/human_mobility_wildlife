@@ -92,21 +92,21 @@ ce_sg <- conditional_effects(x=int_mod,
           # axis.ticks = element_blank(),
           # axis.title = element_blank(),
           aspect.ratio = 1,
-          text = element_text(family = "Roboto")
+          text = element_text(family = "Roboto", size=20)
     ))
 ggsave(filename = glue("out/area_intra_ind_sg.png"), sg_ce_plot,
        width = 6, height = 6)
 
 
 ce_ghm <- conditional_effects(x=int_mod,
-                             effects = "ghm_diff",
-                             re_formula = NA)
+                              effects = "ghm_diff",
+                              re_formula = NA)
 (ghm_ce_plot <-  plot(ce_ghm, 
-                     plot = F,
-                     rug = F,
-                     line_args = list("se" = T,
-                                      "color" = "black",
-                                      "fill" = "gray"))[[1]] + 
+                      plot = F,
+                      rug = F,
+                      line_args = list("se" = T,
+                                       "color" = "black",
+                                       "fill" = "gray"))[[1]] + 
     # scale_color_manual(values = palnew[3])+         
     theme_tufte() +
     # xlab(glue("{expression(delta)} Human Mobility")) +
@@ -119,7 +119,7 @@ ce_ghm <- conditional_effects(x=int_mod,
           # axis.ticks = element_blank(),
           # axis.title = element_blank(),
           aspect.ratio = 1,
-          text = element_text(family = "Roboto")
+          text = element_text(family = "Roboto", size=20)
     ))
 ggsave(filename = glue("out/area_intra_ind_ghm.png"), ghm_ce_plot,
        width = 6, height = 6)
@@ -133,9 +133,9 @@ ce_int <- conditional_effects(x=int_mod,
                               int_conditions = list(ghm_diff = ghmq),
                               re_formula = NA)
 (int_ce_plot <-  plot(ce_int, 
-                     plot = F,
-                     rug = F,
-                     line_args = list("se" = T))[[1]] + 
+                      plot = F,
+                      rug = F,
+                      line_args = list("se" = T))[[1]] + 
     scale_color_manual(values = palnew, name = "Human \n Modification",
                        labels = c("High", "Low")) +
     scale_fill_manual(values = palnew, name = "Human \n Modification",
@@ -149,6 +149,7 @@ ce_int <- conditional_effects(x=int_mod,
     theme(axis.line = element_line(size = .5),
           # axis.text = element_blank(),
           axis.ticks = element_blank(),
+          text=element_text(size=12)
           # axis.title = element_blank(),
           # aspect.ratio = 1
     ))

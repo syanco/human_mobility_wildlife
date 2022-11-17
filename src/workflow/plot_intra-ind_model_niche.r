@@ -3,10 +3,10 @@ library(brms)
 library(ggthemes)
 library(glue)
 
-# load("out/intra_ind_models/niche_intra_ind_int_mod_2022-a")
-# add_mod <- out$mod
-# add_mod
-load("out/intra_ind_models/niche_intra_ind_int_mod_2022-10-14.rdata")
+load("out/intra_ind_models/niche_intra_ind_add_mod_2022-10-21.rdata")
+add_mod <- out$mod
+add_mod
+load("out/intra_ind_models/niche_intra_ind_int_mod_2022-10-21.rdata")
 int_mod <- out$mod
 int_mod
 
@@ -15,10 +15,10 @@ waic(add_mod, int_mod, compare = T)
 
 conditional_effects(int_mod)
 
-pp_check(int_mod)
-pp_check(int_mod, type='error_scatter_avg')
+pp_check(add_mod)
+pp_check(add_mod, type='error_scatter_avg')
 
-fe <- fixef(int_mod) #get fixed effects
+fe <- fixef(add_mod) #get fixed effects
 # add_re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
 adddf <- tibble("species"=out$species, # grab estimates
                 # SG EFFECTS
@@ -71,7 +71,7 @@ palgray <- c("#808080", "#D3D3D3")
 
 
 
-ce_sg <- conditional_effects(x=int_mod,
+ce_sg <- conditional_effects(x=add_mod,
                              effects = "sg_diff",
                              re_formula = NA)
 (sg_ce_plot <-  plot(ce_sg, 
@@ -84,7 +84,7 @@ ce_sg <- conditional_effects(x=int_mod,
     theme_tufte() +
     # xlab(glue("{expression(delta)} Human Mobility")) +
     xlab(bquote(~Delta~"Human Mobility")) +
-    ylab(bquote(~Delta~"Space Use"))+
+    ylab(bquote(~Delta~"Niche Breadth"))+
     geom_vline(aes(xintercept = 0), linetype = "dashed") +
     geom_hline(aes(yintercept = 0), linetype = "dashed") +
     theme(axis.line = element_line(size = .5),
@@ -92,13 +92,13 @@ ce_sg <- conditional_effects(x=int_mod,
           # axis.ticks = element_blank(),
           # axis.title = element_blank(),
           aspect.ratio = 1,
-          text = element_text(family = "Roboto")
+          text = element_text(family = "Roboto", size = 20)
     ))
 ggsave(filename = glue("out/niche_intra_ind_sg.png"), sg_ce_plot,
        width = 6, height = 6)
 
 
-ce_ghm <- conditional_effects(x=int_mod,
+ce_ghm <- conditional_effects(x=add_mod,
                              effects = "ghm_diff",
                              re_formula = NA)
 (ghm_ce_plot <-  plot(ce_ghm, 
@@ -111,7 +111,7 @@ ce_ghm <- conditional_effects(x=int_mod,
     theme_tufte() +
     # xlab(glue("{expression(delta)} Human Mobility")) +
     xlab(bquote(~Delta~"Human Modification")) +
-    ylab(bquote(~Delta~"Space Use"))+
+    ylab(bquote(~Delta~"Niche Breadth"))+
     geom_vline(aes(xintercept = 0), linetype = "dashed") +
     geom_hline(aes(yintercept = 0), linetype = "dashed") +
     theme(axis.line = element_line(size = .5),
@@ -119,7 +119,7 @@ ce_ghm <- conditional_effects(x=int_mod,
           # axis.ticks = element_blank(),
           # axis.title = element_blank(),
           aspect.ratio = 1,
-          text = element_text(family = "Roboto")
+          text = element_text(family = "Roboto", size = 20)
     ))
 ggsave(filename = glue("out/niche_intra_ind_ghm.png"), ghm_ce_plot,
        width = 6, height = 6)
