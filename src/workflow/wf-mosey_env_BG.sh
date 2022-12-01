@@ -58,8 +58,7 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 # need to use tail to remove first line, which is the header
 # study ids have \r suffix. Need to remove these
 # 
-# !!!!!!! TODO:  currently everythi9ng but moose are set to 0 - MODIFY!!!!!
-# 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 indIds=($(mlr --csv --opprint filter '$run == 1' then cut -f ind out/ssf-background-pts/bg-log.csv | tail -n +2))
 indIds=(${indIds[@]%$'\r'} ) # remove \r suffix
 

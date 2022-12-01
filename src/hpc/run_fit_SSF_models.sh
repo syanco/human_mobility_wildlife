@@ -22,4 +22,4 @@ cd $wd
 cp $wd/processed_data/mosey_mod.db /tmp/
 
 # Execute cleaning script (non parallel)
-Rscript $wd/analysis/src/workflow/fit-SSF-models.r /tmp/mosey_mod.db $wd/out/ssf-background-pts/annotated $wd/out/ssf-mods 24 10 10000 4
+Rscript $wd/analysis/src/workflow/fit-SSF-models.r /tmp/mosey_mod.db $wd/out/ssf-background-pts $wd/out/ssf-mods 24 10 10000 4

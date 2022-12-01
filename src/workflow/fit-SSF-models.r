@@ -25,7 +25,7 @@ if(interactive()) {
   .wd <- getwd()
   
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
-  .bgP <- file.path(.wd, "out/ssf-background-pts/annotated")
+  .bgP <- file.path(.wd, "out/ssf-background-pts")
   # .bgM <- file.path(.wd, "out/ssf-background-pts/moose")
   .outP <- file.path(.wd,'out/ssf-mods')
   
@@ -178,7 +178,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   sp <- sp_sum$taxon_canonical_name[i]
   
   # get list of ind for ssf
-  fl <- tibble(files = list.files(glue("{.bgP}"))) %>% 
+  fl <- tibble(files = list.files(glue("{.bgP}/bg_annotated"))) %>% 
     mutate(indid = str_extract(files, pattern = "^[:digit:]+")) %>% 
     distinct(indid) %>% 
     pull(indid)
@@ -200,16 +200,16 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
     ind <- fl[j]
     
     o <- tryCatch({
-      ndvi <- read_csv(glue("{.bgP}/{ind}_ndvi_1.csv")) %>% 
+      ndvi <- read.csv(glue("{.bgP}/bg_annotated/{ind}_ndvi_1.csv"), colClasses = c("case_" = "logical")) %>% 
         mutate(lat = round(lat, 4),
                lng = round(lng, 4))      
-      tmax <- read_csv(glue("{.bgP}/{ind}_tmax_1.csv")) %>% 
+      tmax <- read.csv(glue("{.bgP}/bg_annotated/{ind}_tmax_1.csv"), colClasses = c("case_" = "logical")) %>% 
         mutate(lat = round(lat, 4),
                lng = round(lng, 4))
-      ghm_sg <- read_csv(glue("{.bgP}/sindividual-{ind}-sg-ghm.csv"))%>% 
+      ghm_sg <- read.csv(glue("{.bgP}/sg-ghm-anno/sindividual-{ind}-sg-ghm.csv"), colClasses = c("case_" = "logical"))%>% 
         mutate(x2_ = round(x2_, 4),
                y2_ = round(y2_, 4))
-      dat0 <- read_csv(glue("{.bgP}/{ind}.csv")) %>% 
+      dat0 <- read.csv(glue("{.bgP}/individual-files/{ind}.csv"), colClasses = c("case_" = "logical")) %>% 
         mutate(x2_ = round(x2_, 4),
                y2_ = round(y2_, 4))
       
