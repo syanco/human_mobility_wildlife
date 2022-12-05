@@ -177,17 +177,20 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   # get focal species
   sp <- sp_sum$taxon_canonical_name[i]
   
-  # get list of ind for ssf
-  fl <- tibble(files = list.files(glue("{.bgP}/bg_annotated"))) %>% 
-    mutate(indid = str_extract(files, pattern = "^[:digit:]+")) %>% 
-    distinct(indid) %>% 
-    pull(indid)
+  # # get list of ind for ssf
+  # fl <- tibble(files = list.files(glue("{.bgP}/bg_annotated"))) %>% 
+  #   # filter(taxon_canonical_name == sp) %>% 
+  #   mutate(indid = str_extract(files, pattern = "^[:digit:]+")) %>% 
+  #   distinct(indid) %>% 
+  #   pull(indid)
   
   
   # list of individuals within species
-  # indls <- indtb %>% 
-  #   filter(taxon_canonical_name == sp) %>% 
-  #   pull(individual_id)
+  indls <- indtb %>%
+    filter(taxon_canonical_name == sp) %>%
+    pull(individual_id) %>% 
+    as.character()
+  
   
   # init empty list to stor annos
   sp_out <- list()
@@ -195,9 +198,9 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   # loop through individuals
   # j <- 2
   # 
-  for(j in 1:length(fl)){
+  for(j in 1:length(indls)){
     #get ind id
-    ind <- fl[j]
+    ind <- indls[j]
     
     o <- tryCatch({
       ndvi <- read.csv(glue("{.bgP}/bg_annotated/{ind}_ndvi_1.csv"), colClasses = c("case_" = "logical")) %>% 
