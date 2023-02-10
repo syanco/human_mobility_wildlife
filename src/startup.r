@@ -12,7 +12,7 @@ suppressPackageStartupMessages({
   library(glue)
   library(here)
   library(tictoc)
-  # library(tidyverse)
+  library(tidyverse)
   # library(uuid)
 }))
 
