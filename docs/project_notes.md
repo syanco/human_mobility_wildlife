@@ -66,3 +66,28 @@ For now I'm just scp'ing the processed db to the HPC to run the dbbmms
 
 ###Annotations
 Pick up by running import and annotation steps in wf-mosey_env_BG.sh (after generate bg is complete on HPC)
+
+
+
+
+
+
+
+
+
+## Workflow Log
+
+Log describes Feb 2023 re-run of the workflow after update to the mosey.db.
+
+### 2023 February 10
+
+Need to export new dataset to Ben and Fede.
+
+Started workflow:  
+- moved raw db to processed dir.  
+- Ran cleaning script
+
+
+
+
+

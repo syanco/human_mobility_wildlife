@@ -70,14 +70,15 @@ source(file.path(.wd,'analysis/src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
-    library(iterators)
-    library(tidyverse)
-    library(lubridate)
+    # library(iterators)
+    library(dplyr)
+    library(brms)
+    # library(lubridate)
     library(glue)
-    library(foreach)
-    library(doMC)
-    # library(amt)
-    library(glmmTMB)
+    # # library(foreach)
+    # # library(doMC)
+    # # library(amt)
+    # library(glmmTMB)
     library(RSQLite)
     library(broom)
     library(broom.mixed)
@@ -249,12 +250,12 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       cbg_km = cbg_area_m2/1000000,
       sg_norm = safegraph_daily_count/cbg_km,
       ghm_norm = scale(ghm),
-      ind_f = as.numeric(as.factor(ind_id)),
+      ind_f = as.integer(as.factor(ind_id)),
       an_ID = as.numeric(ind_f),
       burst_f = as.factor(burst_),
-      strt_n = as.numeric(as.factor(strt)),
-      case = as.numeric(case_),
-      yr = as.factor(year(t2_))
+      strt_n = as.integer(as.factor(strt)),
+      case = as.integer(case_),
+      yr = as.factor(substr(t2_,1, 4))
       
     ) %>%
     distinct()    
