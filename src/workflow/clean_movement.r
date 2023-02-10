@@ -129,6 +129,8 @@ mod <- evt %>%
 rminds <- indtb %>% 
   filter(study_id == 1891172051 | study_id == 1891403240) %>% 
   pull(individual_id)
+rminds <- c(rminds, 2548934748)
+
 
 mod <- mod %>% 
   filter(individual_id %notin% rminds)
