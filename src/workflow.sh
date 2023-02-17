@@ -75,6 +75,8 @@
 
     # Make a copy of db to be modified
     cp $wd/raw_data/mosey.db $wd/processed_data/mosey_mod.db
+    cp $wd/raw_data/mosey_swap.db $wd/processed_data/mosey_swap_mod.db
+  
   ##
 
   ##-- Run Cleaning --##
