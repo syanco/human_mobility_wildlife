@@ -7,7 +7,9 @@
 #SBATCH -c 1
 #SBATCH --mem-per-cpu 100G
 
-module load R/4.1.0-foss-2020b
+# module load R/4.1.0-foss-2020b
+module load miniconda
+conda activate covid
 
 # Declare WD
 wd=~/project/covid-19_movement
