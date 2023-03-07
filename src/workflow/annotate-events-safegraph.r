@@ -37,7 +37,8 @@ if(interactive()) {
   .test <- TRUE
   # rd <- here::here
   
-  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'out/')
   .pdPF  <- file.path(.wd,'processed_data')
   .outPF <- file.path(.wd,'out/')
@@ -51,7 +52,8 @@ if(interactive()) {
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   # UPDATE VERSION!!!
-  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'out/')
   .pdPF  <- file.path(.wd,'processed_data/')
   .outPF <- file.path(.wd,'out/')
