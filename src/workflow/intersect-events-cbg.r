@@ -43,7 +43,8 @@ if(interactive()) {
   .test <- TRUE
   rd <- here::here
   
-  .dbPF <- '~/projects/covid-19_movement/processed_data/mosey_mod.db'
+  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,'analysis/event-cbg-intersection/')
   
@@ -55,7 +56,8 @@ if(interactive()) {
   .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
-  .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
+  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,'out/event-cbg-intersection/')
 }
