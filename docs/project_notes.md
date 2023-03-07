@@ -111,3 +111,5 @@ About to walk away for the day and not sure the loop is going to re-start, so th
 
 
 Was able to finally complete the mosey re-annos on the swap db yesterday.  Starting the SG annotation steps today - so far seems to work fin, just need to update the filepaths to db (call the swap db and also move off of Loomis filesystem)
+
+Workflow run through the annotate-events-safegraph step.
