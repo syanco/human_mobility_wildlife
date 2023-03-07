@@ -3,7 +3,7 @@
 #SBATCH -t 16:00:00
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
-#SBATCH --partition pi_jetz
+#SBATCH --partition day
 #SBATCH -c 10
 #SBATCH --mem-per-cpu 20G
 #SBATCH -J calc_size_with_TMAX-TMIN
