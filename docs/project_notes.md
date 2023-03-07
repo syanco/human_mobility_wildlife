@@ -87,7 +87,22 @@ Started workflow:
 - moved raw db to processed dir.  
 - Ran cleaning script
 
+### 2023 March 1
+
+Got the import tweaked and completed for annotating the mosey swap.
 
 
+### 2023 March 2
 
+Got the next step done (ran annos for tmax and ndvi)
+(had to make soem tweaks to make mosey work - basically was able to template from my dynamic niches repo - primar issue was that the current build of mosey tries to loop over entities in both the outer .sh script and the inner r script.  I killed the loop in the r script b/c it makes nice print statements basically)
 
+### 2023 March 3
+
+Fixing up import script just like the last two steps - gotta copy changes to dynamic niches.  I forgot thought to fix the thing where the anno is saving each csv to int's own filter.  better to have fixed at that step but it takes a day to annotate so I don't want to re-run.
+
+OK - got it running. Next step is to grab the SG annotations and then do the merge.
+
+About to walk away for the day and not sure the loop is going to re-start, so the last ind I see printed is....
+2561430505
+2561486584

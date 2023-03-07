@@ -10,7 +10,8 @@
 # /opt/cisco/anyconnect/bin/vpn connect access.yale.edu
 # 
 wd=~/projects/covid-19_movement/out/anno
-dbr=/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db
+dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db
+dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db
 
 cd $wd
 
@@ -18,7 +19,7 @@ cd $wd
 ssh grace "ls -lh $dbr" #8.3GB
 
 #download the file
-scp grace:$dbr mosey_mod.db
+scp grace:$dbr mosey_swap_mod.db
 # 
 # #disconnect from vpn
 # /opt/cisco/anyconnect/bin/vpn disconnect
@@ -27,13 +28,14 @@ scp grace:$dbr mosey_mod.db
 #---- mosey_env
 #----
 
-mamba activate annotate
+# mamba activate annotate
 
 wd=~/projects/covid-19_movement/
 src=$wd/analysis/src
-db=$wd/processed_data/mosey_mod.db
+# db=$wd/processed_data/mosey_mod.db
+db=$wd/processed_data/mosey_swap_mod.db
 
-export MOSEYENV_SRC=~/projects/mosey_env/main #for mosey_anno_gee.sh
+export MOSEYENV_SRC=~/projects/covid-19_movement/analysis/src/mosey #for mosey_anno_gee.sh
 
 cd $wd
 
@@ -43,12 +45,12 @@ cd $wd
 
 mkdir ctfs
 
-sql="select study_id, study_name, 1 as run
-from study
-where study_id in (select distinct study_id from event_clean)
-order by study_id"
+sql="select individual_id, 1 as run
+from individual
+where individual_id in (select distinct individual_id from event_clean)
+order by individual_id"
 
-sqlite3 -header -csv $db "$sql;" > ctfs/study.csv
+sqlite3 -header -csv $db "$sql;" > ctfs/individual.csv
 
 #--
 #-- Set up variables
@@ -95,7 +97,7 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 #TODO: db should be optional
 #TODO: this harcodes to a ctfs/ dir in the main dir but I want that to sit in
 ## analysis/ - let ths be passed by arg
-$MOSEYENV_SRC/gee_event_import.sh $geePtsP $gcsInURL $db $csvP #$sesid
+$MOSEYENV_SRC/gee_ingest.sh swap_anno $geePtsP $gcsInURL $csvP #$sesid
 
 #----
 #---- Annotate 
@@ -112,11 +114,11 @@ $MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP $envP #"${envs[*]}"
 
 # add columns to db to receive annos
 sqlite3 $db "alter table event_clean add column tmax REAL;"
-sqlite3 $db "alter table event_clean add column tmin REAL;"
-sqlite3 $db "alter table event_clean add column lst REAL;"
+# sqlite3 $db "alter table event_clean add column tmin REAL;"
+# sqlite3 $db "alter table event_clean add column lst REAL;"
 sqlite3 $db "alter table event_clean add column ndvi REAL;"
-sqlite3 $db "alter table event_clean add column elev REAL;"
-sqlite3 $db "alter table event_clean add column dist2road REAL;"
+# sqlite3 $db "alter table event_clean add column elev REAL;"
+# sqlite3 $db "alter table event_clean add column dist2road REAL;"
 
 #points and annotations are stored in event_clean
 #for testing, see db/anno_test.sql for ddl to create event_test

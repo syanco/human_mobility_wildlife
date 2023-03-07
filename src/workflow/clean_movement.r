@@ -42,7 +42,7 @@ if(interactive()) {
   library(here)
   
   .wd <- '~/projects/covid-19_movement'
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_swap_mod.db')
 
 } else {
   library(docopt)
