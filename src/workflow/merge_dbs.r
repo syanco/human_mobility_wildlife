@@ -41,8 +41,8 @@ if(interactive()) {
   
   source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
   
-  .dbmain <- '~/projects/covid-19_movement/processed_data/mosey_mod.db'
-  .dbswap <- '~/projects/covid-19_movement/processed_data/mosey_swap_mod.db'
+  .dbmain <- '~/project/covid-19_movement/processed_data/mosey_mod.db'
+  .dbswap <- '~/project/covid-19_movement/processed_data/mosey_swap_mod.db'
 
   
 }
