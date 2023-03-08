@@ -62,10 +62,10 @@ suppressWarnings(
   }))
 
 # Load Control Files
-# ctfnew <- read_csv('~/project/covid-19_movement/ctfs/new_studies.csv')
-# ctfswap <- read_csv('~/project/covid-19_movement/ctfs/swaps.csv')
-ctfnew <- read_csv('~/projects/covid-19_movement/ctfs/new_studies.csv')
-ctfswap <- read_csv('~/projects/covid-19_movement/ctfs/swaps.csv')
+ctfnew <- read_csv('~/project/covid-19_movement/ctfs/new_studies.csv')
+ctfswap <- read_csv('~/project/covid-19_movement/ctfs/swaps.csv')
+# ctfnew <- read_csv('~/projects/covid-19_movement/ctfs/new_studies.csv')
+# ctfswap <- read_csv('~/projects/covid-19_movement/ctfs/swaps.csv')
 
 swapstudies <- ctfswap$Old_study_name # vec of studies to swap out (not including the new ones)
 
