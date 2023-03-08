@@ -109,7 +109,13 @@ About to walk away for the day and not sure the loop is going to re-start, so th
 
 ### 2023 March 7
 
-
 Was able to finally complete the mosey re-annos on the swap db yesterday.  Starting the SG annotation steps today - so far seems to work fin, just need to update the filepaths to db (call the swap db and also move off of Loomis filesystem)
 
-Workflow run through the annotate-events-safegraph step.
+Workflow run through the annotate-events-ghm step.
+
+
+### 2023 March 8
+
+Working on merge script.
+
+Since I'm going to overwrite tables in the main mosey - I made a copy in processed data (mosey_mod_copy.db)
