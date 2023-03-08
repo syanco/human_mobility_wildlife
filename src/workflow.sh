@@ -303,6 +303,7 @@
 
   ##---  Merge Swap DB  ---##
 
+    Rscript $src/workflow/merge_dbs.r
 
   ##
 
