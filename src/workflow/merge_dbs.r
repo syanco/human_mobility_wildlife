@@ -9,7 +9,7 @@
 Merge mosey_swap_mod.db with mosey_mod.db
 
 Usage:
-merge_dbs.r <db_swap> <db_main>
+merge_dbs.r 
 merge_dbs.r (-h | --help)
 
 Parameters:
@@ -41,9 +41,9 @@ if(interactive()) {
   
   source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
   
-  .dbmain <- makePath(ag$db_main)
-  .dbswap <- makePath(ag$db_swap)
-  .nc <- ag$nc
+  .dbmain <- '~/projects/covid-19_movement/processed_data/mosey_mod.db'
+  .dbswap <- '~/projects/covid-19_movement/processed_data/mosey_swap_mod.db'
+
   
 }
 
