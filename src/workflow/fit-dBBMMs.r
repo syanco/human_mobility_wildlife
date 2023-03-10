@@ -155,7 +155,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         message(glue("Insufficient records for individual {ind[j]}, year {yearvec[i]}, movin on..."))
         
         # Make entry in log file
-        outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
+        outlog <- matrix(c(scientificname, as.integer(ind[j]), as.integer(studyid), yearvec[i], "dbbm", 
                            glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
                            0, as.character(Sys.Date())), 
                          nrow = 1)

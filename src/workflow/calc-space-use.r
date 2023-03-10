@@ -130,7 +130,7 @@ evt_sg <- read.csv("out/event-annotation/event_sg.csv",
 evt_ghm <- read.csv("out/event-annotation/event_ghm.csv", 
                     colClasses = c(event_id = "integer64"))
 
-ctf <- read_csv(.ctf)
+ctf <- read.csv(.ctf)
 #TODO: rm below after a real run with log
 ctf <- ctf[!duplicated(ctf),] %>% 
   filter(produced == 1)
