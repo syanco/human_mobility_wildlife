@@ -360,12 +360,12 @@
       # Outputs: model rdata objects 
        
       # SLURM
-      sbatch $src/hpc/run_fit_space_use_models.sh
-      sbatch $src/hpc/run_fit_space_use_sg_models.sh
-      sbatch $src/hpc/run_fit_space_use_ghm_models.sh
+      sbatch $src/hpc/run_fit_space_use_models.sh # interactive
+      # sbatch $src/hpc/run_fit_space_use_sg_models.sh
+      # sbatch $src/hpc/run_fit_space_use_ghm_models.sh
       sbatch $src/hpc/run_fit_space_use_additive_models.sh
       # sbatch $src/hpc/run_fit_space_use_trait_model.sh
-      sbatch $src/hpc/run_fit_space_use_VarCom_model.sh
+      # sbatch $src/hpc/run_fit_space_use_VarCom_model.sh
       
       # ON DEMAND:
       # conda activate brms
