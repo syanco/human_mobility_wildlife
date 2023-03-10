@@ -28,7 +28,8 @@ if(interactive()) {
   .wd <- '~/projects/covid-19_movement'
   rd <- here::here
   
-  .dbmain <- '~/projects/covid-19_movement/processed_data/mosey_mod.db'
+  # .dbmain <- '~/project/covid-19_movement/processed_data/mosey_mod.db'
+  .dbmain <- '~/projects/covid-19_movement/processed_data/mosey_mod_20220303.db'
   .dbswap <- '~/projects/covid-19_movement/processed_data/mosey_swap_mod.db'
   
   
@@ -41,8 +42,8 @@ if(interactive()) {
   
   source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
   
-  .dbmain <- '~/project/covid-19_movement/processed_data/mosey_mod.db'
-  # .dbmain <- '~/projects/covid-19_movement/processed_data/mosey_mod_20220303.db'
+  # .dbmain <- '~/project/covid-19_movement/processed_data/mosey_mod.db'
+  .dbmain <- '~/project/covid-19_movement/processed_data/mosey_mod_20220303.db'
   .dbswap <- '~/project/covid-19_movement/processed_data/mosey_swap_mod.db'
 
   
@@ -62,10 +63,10 @@ suppressWarnings(
   }))
 
 # Load Control Files
-ctfnew <- read_csv('~/project/covid-19_movement/ctfs/new_studies.csv')
-ctfswap <- read_csv('~/project/covid-19_movement/ctfs/swaps.csv')
-# ctfnew <- read_csv('~/projects/covid-19_movement/ctfs/new_studies.csv')
-# ctfswap <- read_csv('~/projects/covid-19_movement/ctfs/swaps.csv')
+# ctfnew <- read_csv('~/project/covid-19_movement/ctfs/new_studies.csv')
+# ctfswap <- read_csv('~/project/covid-19_movement/ctfs/swaps.csv')
+ctfnew <- read_csv('~/projects/covid-19_movement/ctfs/new_studies.csv')
+ctfswap <- read_csv('~/projects/covid-19_movement/ctfs/swaps.csv')
 
 swapstudies <- ctfswap$Old_study_name # vec of studies to swap out (not including the new ones)
 

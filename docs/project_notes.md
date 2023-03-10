@@ -121,3 +121,8 @@ Working on merge script.
 Since I'm going to overwrite tables in the main mosey - I made a copy in processed data (mosey_mod_copy.db)
 
 Merge ran successfully on the HPC - back to re-running analyses which **should** run out of the box....
+
+### 2023 March 10
+
+Re-running analysis, completed today:
+- fit dBBMMs
