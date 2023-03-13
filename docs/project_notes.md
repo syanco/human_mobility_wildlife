@@ -136,4 +136,5 @@ Calc space use is still coming up empty - not sure what's going on - need to deb
 
 Start trying to debug why calc space use is coming up empty...
 
-Fit dbbmm was not upated correctly - added `as.integer()` wrapper to all the outlogs (was only doing it for those with too few events.)
+Fit dbbmm was not upated correctly - added `as.integer()` wrapper to all the outlogs (was only doing it for those with too few events.)  
+Relaunched fit_dbbmm.r at 10am 

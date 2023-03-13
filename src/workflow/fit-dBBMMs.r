@@ -86,7 +86,9 @@ invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
 indtb <- tbl(db,'individual') %>% 
-  collect()
+  collect() 
+
+indtb <- indtb[!duplicated(indtb),]
 
 message("Disconnecting from databse...")
 dbDisconnect(db)
@@ -94,6 +96,8 @@ dbDisconnect(db)
 ind <- indtb %>% 
   pull(individual_id)
 
+#remove duplicated created due to merging of dbs
+ind <- ind[!duplicated(ind)] 
 
 yearvec <- c("2019", "2020")
 
@@ -145,6 +149,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         filter(yr == !!yearvec[i]) %>%
         collect() %>% 
         mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T")) %>% 
+        distinct() %>% 
         # sort by timestamp
         arrange(timestamp)
       
@@ -155,10 +160,14 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         message(glue("Insufficient records for individual {ind[j]}, year {yearvec[i]}, movin on..."))
         
         # Make entry in log file
-        outlog <- matrix(c(scientificname, as.integer(ind[j]), as.integer(studyid), yearvec[i], "dbbm", 
-                           glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                           0, as.character(Sys.Date())), 
-                         nrow = 1)
+        outlog <- data.frame("species" = scientificname, 
+                             "ind_id" = ind[j], 
+                             "study_id" = studyid, 
+                             "year" = yearvec[i], 
+                             "out_type" = "dbbm", 
+                             "filename" = glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"), 
+                             "produced" = 0, 
+                             "out_date" = as.character(Sys.Date()))
         write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
                     col.names = F, sep = ",")
         
@@ -167,10 +176,18 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         # TODO:  I think this upper size check is unecessary - maybe remove someday, but for now I just set the threshold very high
         if(nrow(evt_mod) > 50000){
           # Just make anentry in the big mem log file - save dbbmm for later
-          outlog <- matrix(c(scientificname, as.integer(ind[j]), as.integer(studyid), yearvec[i], "dbbm", 
-                             glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                             0, as.character(Sys.Date())), 
-                           nrow = 1)
+          # outlog <- matrix(c(scientificname, as.integer(ind[j]), as.integer(studyid), yearvec[i], "dbbm", 
+          #                    glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
+          #                    0, as.character(Sys.Date())), 
+          #                  nrow = 1)
+          outlog <- data.frame("species" = scientificname, 
+                               "ind_id" = ind[j], 
+                               "study_id" = studyid, 
+                               "year" = yearvec[i], 
+                               "out_type" = "dbbm", 
+                               "filename" = glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"), 
+                               "produced" = 0, 
+                               "out_date" = as.character(Sys.Date()))
           write.table(outlog, glue("{.outPF}/dbbmm_bigmem_log.csv"), append = T, row.names = F, 
                       col.names = F, sep = ",")
         } else {
@@ -259,10 +276,14 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
               )
               
               # Make entry in log file
-              outlog <- matrix(c(scientificname, as.integer(ind[j]), as.integer(studyid), yearvec[i], "dbbm", 
-                                 glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                                 1, as.character(Sys.Date())), 
-                               nrow = 1)
+              outlog <- data.frame("species" = scientificname, 
+                                   "ind_id" = ind[j], 
+                                   "study_id" = studyid, 
+                                   "year" = yearvec[i], 
+                                   "out_type" = "dbbm", 
+                                   "filename" = glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"), 
+                                   "produced" = 1, 
+                                   "out_date" = as.character(Sys.Date()))
               write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
                           col.names = F, sep = ",")
             }else {
