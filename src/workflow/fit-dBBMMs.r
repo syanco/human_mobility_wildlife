@@ -167,7 +167,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         # TODO:  I think this upper size check is unecessary - maybe remove someday, but for now I just set the threshold very high
         if(nrow(evt_mod) > 50000){
           # Just make anentry in the big mem log file - save dbbmm for later
-          outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
+          outlog <- matrix(c(scientificname, as.integer(ind[j]), as.integer(studyid), yearvec[i], "dbbm", 
                              glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
                              0, as.character(Sys.Date())), 
                            nrow = 1)
@@ -259,7 +259,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
               )
               
               # Make entry in log file
-              outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
+              outlog <- matrix(c(scientificname, as.integer(ind[j]), as.integer(studyid), yearvec[i], "dbbm", 
                                  glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
                                  1, as.character(Sys.Date())), 
                                nrow = 1)

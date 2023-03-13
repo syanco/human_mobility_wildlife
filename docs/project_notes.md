@@ -125,4 +125,15 @@ Merge ran successfully on the HPC - back to re-running analyses which **should**
 ### 2023 March 10
 
 Re-running analysis, completed today:
-- fit dBBMMs
+- fit dBBMMs  
+- calc space use  
+
+Had to restart the fit dbmms b/c the log was saving out the ind_id as scientific notation and it was breaking all the ctf lookups downstream (e.g. in calc space use)
+
+Calc space use is still coming up empty - not sure what's going on - need to debug next week...
+
+### 2023 March 13
+
+Start trying to debug why calc space use is coming up empty...
+
+Fit dbbmm was not upated correctly - added `as.integer()` wrapper to all the outlogs (was only doing it for those with too few events.)
