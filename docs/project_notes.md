@@ -138,3 +138,5 @@ Start trying to debug why calc space use is coming up empty...
 
 Fit dbbmm was not upated correctly - added `as.integer()` wrapper to all the outlogs (was only doing it for those with too few events.)  
 Relaunched fit_dbbmm.r at 10am 
+
+That run didn't work - but did some more debugging - i think the db merge was creating duplicates in some of the tables?  Either way I was getting duplicated results, so I added some checks for duoplicates in the fitdbbmm script and modified how I write out to the log.  Launcehd a new run at 1500. 
