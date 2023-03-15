@@ -3,7 +3,9 @@ library(dplyr)
 library(survival)
 library(INLA)
 
-
+invLog <- function(x){
+  exp(x)/(1+exp(x))
+}
 # sim code from:  https://github.com/glmmTMB/glmmTMB/issues/535
 group_effects <- rnorm(10,sd=2)
 dat0 <- data.frame(group=rep(1:10,each=20*21),

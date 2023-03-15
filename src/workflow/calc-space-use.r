@@ -145,7 +145,7 @@ message("Gathering movement data...")
 
 # Load existing file in cases where you want to pick upn after eg a timeout
 existing_out <- read_csv(glue("{.outPF}/dbbmm_size.csv"))
-#existing_out <- existing_out[0,]
+# existing_out <- existing_out[0,]
 #+++++++++++++++++++++#
 message(glue("Starting {.nc} cores"))
 registerDoMC(.nc)
