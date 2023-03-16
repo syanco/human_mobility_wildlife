@@ -19,4 +19,4 @@ cd $wd
 
 # Execute cleaning script (non parallel)
 # Rscript $src/clean_movement.r --db $wd/processed_data/mosey_mod.db
-Rscript $src/clean_movement.r --db $wd/processed_data/mosey_swap_mod.db
+Rscript $src/clean_movement.r --db $wd/processed_data/mosey_mod.db

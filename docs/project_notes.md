@@ -96,7 +96,7 @@ Here's what I'm doing:\
 
 **raw_data/**
 mosey.db - the pre-swap mosey (from April 2022)
-mosey_swap.db - the db with replacement studies that Deigo made.
+mosey_swap.db - the db with replacement studies that Diego made.
 mosey_merge.db - the merged, complete raw db.
 
 **processed_data/**
