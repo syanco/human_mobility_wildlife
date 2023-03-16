@@ -42,8 +42,8 @@ if(interactive()) {
   library(here)
   
   .wd <- '~/projects/covid-19_movement'
-  .dbPF <- file.path(.wd,'processed_data/mosey_swap_mod.db')
-
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  
 } else {
   library(docopt)
   library(rprojroot)
@@ -54,7 +54,7 @@ if(interactive()) {
   source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
   
   .dbPF <- makePath(ag$db)
-
+  
 }
 
 #---- Initialize Environment ----#
@@ -192,11 +192,13 @@ evt_sf <- evt1 %>%
   arrange(timestamp) %>% 
   mutate(rn = row_number(),
          # lead_d = geometry[row_number()+1],
-         lag_lon = dplyr::lag(lon, 1),
-         lag_lat = dplyr::lag(lat, 1),
-         sl = distGeo(cbind(lon,lat), cbind(lag_lon, lag_lat)),
-         bearing = bearing(cbind(lon,lat), cbind(lag_lon, lag_lat)),
-         ta = 180-abs(180 - abs(bearing - dplyr::lag(bearing, 1)) %% 360),
+         lag_lon = dplyr::lag(lon, 1), #get pvs lon
+         lag_lat = dplyr::lag(lat, 1), # get pvs lat
+         sl = distGeo(cbind(lon,lat), cbind(lag_lon, lag_lat)), # step length (m)
+         dt = as.numeric(difftime(timestamp, dplyr::lag(timestamp, 1)), units='secs'), # time diff (secs)
+         v = sl/dt, # velocity (m/s)
+         bearing = bearing(cbind(lon,lat), cbind(lag_lon, lag_lat)), # bearing since last point
+         ta = 180-abs(180 - abs(bearing - dplyr::lag(bearing, 1)) %% 360), # tunr angle from current bearing and last bearing
          wk = lubridate::week(timestamp))
 
 # calculate qunatile-based cutoffs
@@ -205,19 +207,43 @@ cuts <- evt_sf %>%
   group_by(individual_id) %>% 
   summarize(
     qta = quantile(ta, probs = 0.95, na.rm = T, names = F),
-    qsl = quantile(sl, probs = 0.95, na.rm = T, names = F)
+    qsl = quantile(sl, probs = 0.95, na.rm = T, names = F),
+    qv  = quantile(v,  probs = 0.95, na.rm = T, names = F)
   ) 
 
 # filter outliers
-out <- evt_sf %>% 
+evt_out <- evt_sf %>% 
   # just join the cutpoints back to the dataset
   left_join(cuts) %>% 
   # conservative outlier thresh, must be past 95% quant for either sl and TA
-  filter(sl < qsl & ta < qta) %>% 
+  filter(
+    v < qv & ta < qta,
+    v < 25) %>% # remove observations faster than 25 m/s
   ungroup()
 
 # write table back to db
-dbWriteTable(conn = db, name = "event_clean", value = out, append = FALSE, overwrite = T)
+dbWriteTable(conn = db, name = "event_clean", value = evt_out, append = FALSE, overwrite = T)
+
+
+#-- Update Individual and Event Tables
+
+# Individual Table
+ind <- tbl(db, "individual")
+
+ind_out <- ind %>% 
+  semi_join(evt_out, by = "individual_id") # only retain inds contained in cleaned event table
+
+# write table back to db
+dbWriteTable(conn = db, name = "individual_clean", value = ind_out, append = FALSE, overwrite = T)
+
+# Study Table
+std <- tbl(db, "study")
+
+std_out <- std %>% 
+  semi_join(ind_out, by = "study_id") # only retain studies contained in cleaned individual table
+
+# write table back to db
+dbWriteTable(conn = db, name = "study_clean", value = std_out, append = FALSE, overwrite = T)
 
 
 #---- Finalize script ----#
