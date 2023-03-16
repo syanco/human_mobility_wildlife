@@ -229,18 +229,20 @@ dbWriteTable(conn = db, name = "event_clean", value = evt_out, append = FALSE, o
 
 # Individual Table
 ind <- tbl(db, "individual")
+evt_clean <- tbl(db, 'event_clean')
 
 ind_out <- ind %>% 
-  semi_join(evt_out, by = "individual_id") # only retain inds contained in cleaned event table
+  semi_join(evt_clean, by = "individual_id") # only retain inds contained in cleaned event table
 
 # write table back to db
 dbWriteTable(conn = db, name = "individual_clean", value = ind_out, append = FALSE, overwrite = T)
 
 # Study Table
 std <- tbl(db, "study")
+ind_clean <- tbl(db, 'individual_clean')
 
 std_out <- std %>% 
-  semi_join(ind_out, by = "study_id") # only retain studies contained in cleaned individual table
+  semi_join(ind_clean, by = "study_id") # only retain studies contained in cleaned individual table
 
 # write table back to db
 dbWriteTable(conn = db, name = "study_clean", value = std_out, append = FALSE, overwrite = T)
