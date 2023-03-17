@@ -86,7 +86,7 @@
     # Depends:  clone of mosey_env (https://github.com/benscarlson/mosey_env)
   
     # SLURM:
-    
+    sbatch $src/hpc/run_clean_movement.sh
 
     # ON DEMAND:
     # conda activate spatial
