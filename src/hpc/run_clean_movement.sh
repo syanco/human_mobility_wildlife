@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 03:00:00
+#SBATCH -t 05:00:00
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH -c 1
