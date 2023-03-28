@@ -219,19 +219,19 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
             summarize(ndvi = mean(ndvi, na.rm = T))
           
           # Get lst
-          lst <- evt_anno %>% 
-            filter(event_id %in% evtids) %>% 
-            summarize(lst = mean(lst, na.rm = T))
+          # lst <- evt_anno %>% 
+          #   filter(event_id %in% evtids) %>% 
+          #   summarize(lst = mean(lst, na.rm = T))
           
           # Get tmax
           tmax <- evt_anno %>% 
             filter(event_id %in% evtids) %>% 
             summarize(tmax = mean(tmax, na.rm = T))
           
-          # Get tmin
-          tmin <- evt_anno %>% 
-            filter(event_id %in% evtids) %>% 
-            summarize(tmin = mean(tmin, na.rm = T))
+          # # Get tmin
+          # tmin <- evt_anno %>% 
+          #   filter(event_id %in% evtids) %>% 
+          #   summarize(tmin = mean(tmin, na.rm = T))
           
           #unpack underlying data
           evt_tmp <- tmp_out$events 
@@ -264,9 +264,9 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                           cbg_area, 
                           # pop, 
                           ndvi, 
-                          lst,
+                          # lst,
                           tmax,
-                          tmin,
+                          # tmin,
                           n, 
                           a_bb, 
                           fixmed, 

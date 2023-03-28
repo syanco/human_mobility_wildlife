@@ -45,13 +45,13 @@ gcsURL=${argv[2]} # The gcs url to the folder that will hold csvs for import to 
 outP=${argv[3]} # The path to the folder that will hold csvs for import to gcs
 
 #Set defaults for optional paramters
-[[ -z "$db" ]] && db=processed_data/mosey_swap_mod.db
+[[ -z "$db" ]] && db=processed_data/mosey_mod.db
 # [[ -z "$db" ]] && db=processed_data/mosey_mod.db
 
 # Local parameters
 groupSize=500000 #Pass in as optional argument
 #table="forage_event" #TODO: probably need to pass in an sql statement or point to sql file? 
-entity=individual #Pass in as optional argument
+entity=study #Pass in as optional argument
 
 #Get the session id
 # sesid=$(sqlite3 $db "select ses_id from session where ses_name = '$sesnm' and table_name = 'study'")
@@ -59,8 +59,8 @@ entity=individual #Pass in as optional argument
 mkdir -p $outP
 # earthengine create folder -p $geePtsP
 
-entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
-# names=($(mlr --csv --opprint filter '$run == 1' then cut -f name ctfs/$entity.csv | tail -n +2))
+# entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
+entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/$entity.csv | tail -n +2))
 
 n=${#entIds[@]}
 
@@ -98,7 +98,7 @@ do
     from event_clean f 
         inner join event e
     on f.event_id = e.event_id
-    where f.individual_id = ${entId}"
+    where f.study_id = ${entId}"
 #     inner join event e on f.event_id = e.event_id
 # 	  inner join study study_id on seg.pop_id = pop.pop_id
 #     where pop.pop_id = $entId and pop.ses_id = $sesid

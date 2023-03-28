@@ -35,8 +35,8 @@ gcsOutP=${argv[1]}
 #----Load variables from control files
 
 #study.csv
-# studyIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/study.csv | tail -n +2))
-indIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/individual.csv | tail -n +2))
+studyIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/study.csv | tail -n +2))
+# indIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/individual.csv | tail -n +2))
 
 #envs.csv
 envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id ctfs/env.csv | tail -n +2))
@@ -44,26 +44,27 @@ bands=($(mlr --csv --opprint filter '$run == 1' then cut -f band ctfs/env.csv | 
 colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name ctfs/env.csv | tail -n +2))
 
 # Remove \r suffix
-# studyIds=( ${studyIds[@]%$'\r'} )
-indIds=( ${indIds[@]%$'\r'} )
+studyIds=( ${studyIds[@]%$'\r'} )
+# indIds=( ${indIds[@]%$'\r'} )
 envs=( ${envs[@]%$'\r'} )
 bands=( ${bands[@]%$'\r'} )
 colnames=( ${colnames[@]%$'\r'} )
 
 # echo Annotating ${#studyIds[@]} studies.
-echo Annotating ${#indIds[@]} studies.
+echo Annotating ${#studyIds[@]} studies.
 
-# for studyId in "${studyIds[@]}"
-for indId in "${indIds[@]}"
+for studyId in "${studyIds[@]}"
+# for indId in "${indIds[@]}"
 do 
   echo "*******"
-  echo "Start processing study ${indId}"
+  echo "Start processing study ${studyId}"
   echo "*******"
   
   #studyId=10763606 #LifeTrack White Stork Poland (419 rows)
   #studyId=8863543 #HUJ MPIAB White Stork E-Obs (3 million rows)
   #studyId=${studyIds[0]}
-  points=$geePtsP/$indId
+  # points=$geePtsP/$indId
+  points=$geePtsP/$studyId
   
   # get length of an array
   n=${#envs[@]}
@@ -86,11 +87,11 @@ do
     # if column is not present don't pass parameters
 
     #echo "index: $i, env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
-    out=$gcsOutP/${indId}_${colnames[$i]} #do not include url, bucket, or file extension
+    out=$gcsOutP/${studyId}_${colnames[$i]} #do not include url, bucket, or file extension
     
     echo Annotating "env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
     # $MOSEYENV_SRC/gee_anno.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}
-        $MOSEYENV_SRC/gee_anno.r $points $out $indId ${envs[$i]} ${colnames[$i]} ${bands[$i]}
+        $MOSEYENV_SRC/gee_anno.r $points $out $studyId ${envs[$i]} ${colnames[$i]} ${bands[$i]}
   done
 
 done

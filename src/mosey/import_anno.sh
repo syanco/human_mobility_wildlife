@@ -56,12 +56,12 @@ mkdir -p $annoP
 
 #---- Load variables from control files
 
-entity=individual
+entity=study
 
 #study.csv
-#studyIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/$entity.csv | tail -n +2))
+names=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/$entity.csv | tail -n +2))
 # names=($(mlr --csv --opprint filter '$run == 1' then cut -f name ctfs/$entity.csv | tail -n +2))
-names=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
+# names=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
 echo ${names[@]}
 
 #envs.csv

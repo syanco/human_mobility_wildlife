@@ -102,3 +102,15 @@ mosey_merge.db - the merged, complete raw db.
 **processed_data/**
 mosey_mod.db - the working version of the complete db, by tomorrow, everything should run form this, typically using the 'event_clean' table
 mosey_swap.db - copy of above, used as working version
+
+
+### 2023 March 17
+
+Successfully re-ran clean script
+
+
+### 2023 March 20
+
+Starting annotation again - Ts & Ps for me.
+
+Very minor edits needed to get the ingest step working (switched to using study_id as entity rather than individual)

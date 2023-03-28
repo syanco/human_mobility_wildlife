@@ -139,7 +139,7 @@
       # Thus, after running the previous line, thje file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2023-03-07.sh
+      sbatch dsq-joblist-2023-03-27.sh
       
       # TODO: 
       #   * Rewrite for non-DSQ (for reproducibility)?
@@ -301,11 +301,11 @@
   ##
 
 
-  ##---  Merge Swap DB  ---##
-
-    Rscript $src/workflow/merge_dbs.r
-
-  ##
+  # ##---  Merge Swap DB  ---##
+  # 
+  #   # Rscript $src/workflow/merge_dbs.r
+  # 
+  # ##
 
 
 ####----  Analysis ----####
@@ -343,7 +343,7 @@
       # Outputs: csv 
       
       # Create csv to store results
-      echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, ndvi, lst, tmax, tmin, n, a_bb, fixmed, m_error" > ./out/dbbmm_size.csv
+      echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, ndvi, tmax, n, a_bb, fixmed, m_error" > ./out/dbbmm_size.csv
 
       # SLURM:
       sbatch $src/hpc/run_calc_space_use.sh

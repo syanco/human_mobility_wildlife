@@ -77,7 +77,7 @@ if(interactive()) {
   #.envPF <- ag$env
   .datP <- ag$dat
   .outP <- ag$out
-  .ind <- ag$ent
+  .std <- ag$ent
   .env_id <- ag$env_id
   .col_name <- ag$colname
   .band <- as.numeric(ag$band)
@@ -125,7 +125,7 @@ ee_Initialize(quiet=TRUE)
 #TODO: do a check to make sure rgee initialized correctly
 
 #---- Local parameters ----#
-.entity <- 'individual'
+.entity <- 'study'
 #TODO: I might not need some of these variables anymore
 #TODO: have a list called 'cols' instead of vars for each column name
 .colImageId <- 'image_id';
@@ -283,7 +283,7 @@ entities <- read_csv(file.path(.wd,'ctfs',glue('{.entity}.csv'))) %>% filter(run
       #View(anno$getInfo()); quit()
       #glue('{.outPF}_{group}') #OLD, remove
       
-      fileN <- glue('{.ind}_{.col_name}')
+      fileN <- glue('{.std}_{.col_name}')
       
       task <- ee$batch$Export$table$toCloudStorage(
         collection=anno,

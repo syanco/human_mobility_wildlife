@@ -91,7 +91,9 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
 invisible(assert_that(length(dbListTables(db))>0))
 
-evt <- tbl(db,'event')
+evt <- tbl(db,'event')  # %>%  collect()
+evt_cln <- tbl(db,'event_clean') %>%  collect()
+
 # dbBegin(db)
 
 #---- Perform analysis ----#
@@ -100,6 +102,7 @@ evt <- tbl(db,'event')
 
 # get list of inidviduals to remove from study base don bad coords
 indtb <- tbl(db, "individual") %>%  collect()
+# ind_cln <- tbl(db, "individual_clean") %>%  collect()
 
 # extract only relevnt time periods
 mod <- evt %>%
@@ -137,41 +140,6 @@ mod <- mod %>%
 
 # write results back to db
 dbWriteTable(conn = db, name = "event_mod", value = mod, append = F, overwrite = T)
-
-# # SQLite query to filter out events outside study periods, add a year variable,
-# # and a study period variable.  Uses ctf to assign cutpoints
-# q <- glue("
-#   CREATE TABLE event_mod AS
-#     SELECT *, strftime('%Y', `timestamp`) AS `yr`, 
-#       CASE
-#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_pre-ld_2019']}' 
-#           AND `timestamp` < '{periods$date[periods$cutpoint == 'start_ld_2019']}') 
-#             THEN ('pre-ld_2019')
-#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_ld_2019']}' 
-#           AND `timestamp` < '{periods$date[periods$cutpoint == 'start_post-ld_2019']}') 
-#             THEN ('ld_2019')
-#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_post-ld_2019']}' 
-#           AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2019']}') 
-#             THEN ('post-ld_2019')
-#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_pre-ld_2020']}' 
-#           AND `timestamp` < '{periods$date[periods$cutpoint == 'start_ld_2020']}') 
-#             THEN ('pre-ld_2020')
-#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_ld_2020']}' 
-#           AND `timestamp` < '{periods$date[periods$cutpoint == 'start_post-ld_2020']}') 
-#             THEN ('ld_2020')
-#         WHEN (`timestamp` >= '{periods$date[periods$cutpoint == 'start_post-ld_2020']}' 
-#           AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2020']}') 
-#             THEN ('post-ld_2020')
-#       END AS `trt`
-#     FROM `event`
-#       WHERE ((`timestamp` > '{periods$date[periods$cutpoint == 'start_pre-ld_2019']}' 
-#         AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2019']}') 
-#         OR (`timestamp` > '{periods$date[periods$cutpoint == 'start_pre-ld_2020']}' 
-#         AND `timestamp` < '{periods$date[periods$cutpoint == 'stop_2020']}'))"
-# )
-
-# # Execute the query
-# dbExecute(db, q)
 
 
 #-- Clean Outliers
@@ -219,7 +187,7 @@ evt_out <- evt_sf %>%
   filter(
     v < qv & ta < qta,
     v < 25) %>% # remove observations faster than 25 m/s
-  ungroup()
+  ungroup() 
 
 # write table back to db
 dbWriteTable(conn = db, name = "event_clean", value = evt_out, append = FALSE, overwrite = T)
@@ -229,6 +197,7 @@ dbWriteTable(conn = db, name = "event_clean", value = evt_out, append = FALSE, o
 
 # Individual Table
 ind <- tbl(db, "individual") %>% 
+  # mutate(individual_id = as.character(individual_id)) %>% 
   collect()
 
 ind_out <- ind %>% 

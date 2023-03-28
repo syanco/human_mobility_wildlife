@@ -10,7 +10,7 @@
 # /opt/cisco/anyconnect/bin/vpn connect access.yale.edu
 # 
 wd=~/projects/covid-19_movement/out/anno
-dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db
+# dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db
 dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db
 
 cd $wd
@@ -19,7 +19,7 @@ cd $wd
 ssh grace "ls -lh $dbr" #8.3GB
 
 #download the file
-scp grace:$dbr mosey_swap_mod.db
+scp grace:$dbr mosey__mod.db
 # 
 # #disconnect from vpn
 # /opt/cisco/anyconnect/bin/vpn disconnect
@@ -33,7 +33,7 @@ scp grace:$dbr mosey_swap_mod.db
 wd=~/projects/covid-19_movement/
 src=$wd/analysis/src
 # db=$wd/processed_data/mosey_mod.db
-db=$wd/processed_data/mosey_swap_mod.db
+db=$wd/processed_data/mosey_mod.db
 
 export MOSEYENV_SRC=~/projects/covid-19_movement/analysis/src/mosey #for mosey_anno_gee.sh
 
@@ -43,14 +43,13 @@ cd $wd
 #-- Create study.csv file since I don't have one
 #--
 
-mkdir ctfs
+# mkdir ctfs
 
-sql="select individual_id, 1 as run
-from individual
-where individual_id in (select distinct individual_id from event_clean)
-order by individual_id"
+sql="select study_id, 1 as run
+from study_clean
+order by study_id"
 
-sqlite3 -header -csv $db "$sql;" > ctfs/individual.csv
+sqlite3 -header -csv $db "$sql;" > ctfs/study.csv
 
 #--
 #-- Set up variables
@@ -62,7 +61,6 @@ gcsInP=ingest_gee #This holds the csvs that will be imported to gee
 gcsOutP=annotated #This is the output folder for annotated csvs (excluding bucket)
 csvP=out/anno/individual-files #local folder that holds the csv files to be ingested into gee
 annoP=data/anno/annotated #local folder that holds the annotated csv files
-annoP=out/anno/annotated #local folder that holds the annotated csv files
 envP=analysis/ctfs/env.csv
 
 #TODO: don't require sesid
@@ -97,7 +95,7 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 #TODO: db should be optional
 #TODO: this harcodes to a ctfs/ dir in the main dir but I want that to sit in
 ## analysis/ - let ths be passed by arg
-$MOSEYENV_SRC/gee_ingest.sh swap_anno $geePtsP $gcsInURL $csvP #$sesid
+$MOSEYENV_SRC/gee_ingest.sh re_anno $geePtsP $gcsInURL $csvP #$sesid
 
 #----
 #---- Annotate 

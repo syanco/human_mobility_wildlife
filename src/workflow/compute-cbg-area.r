@@ -39,8 +39,8 @@ if(interactive()) {
   rm(list=ls())
   library(here)
   
-  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
-  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
+  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
+  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .test <- TRUE
   # rd <- here::here
   
