@@ -2,11 +2,11 @@ if(interactive()) {
   rm(list=ls())
   library(here)
   
-  .wd <- '/home/sy522/project/covid-19_movement'
+  .wd <- '~/projects/covid-19_movement'
   .test <- TRUE
   # rd <- here::here
   
-  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '~/projects/covid-19_movement/processed_data/mosey_mod.db'
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'analysis/src/workflow/')
   .outPF <- file.path(.wd,"analysis/src/workflow/")
