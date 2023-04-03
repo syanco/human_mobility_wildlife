@@ -128,7 +128,7 @@
 
       # DSQ: (Yale-specific)
       # module load R/4.1.0-foss-2020b
-      mamba activate covid
+      conda activate covid
       module load dSQ
       
       Rscript $src/workflow/create_intersection_joblist.r
@@ -139,7 +139,7 @@
       # Thus, after running the previous line, thje file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2023-03-28.sh
+      sbatch dsq-joblist-2023-04-03.sh
       
       # TODO: 
       #   * Rewrite for non-DSQ (for reproducibility)?
@@ -147,6 +147,9 @@
     
     #
 
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>          <<<<<<<<<<<<<<<<<<<#
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BOOKMARK          <<<<<#
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>          <<<<<<<<<<<<<<<<<<<#
 
     #- Compute cbg area -#
 
@@ -338,9 +341,7 @@
       #   * big mem log likely unneccesary, deprecate/delete
   
     #
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> BOOKMARK
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
     #- Calculate dBBMM areas and collate environment -#
 

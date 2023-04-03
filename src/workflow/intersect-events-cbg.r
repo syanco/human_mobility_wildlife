@@ -52,7 +52,7 @@ if(interactive()) {
   library(docopt)
   library(rprojroot)
   
-  .wd <- getwd()
+  .wd <- '/home/sy522/project/covid-19_movement'
   .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
