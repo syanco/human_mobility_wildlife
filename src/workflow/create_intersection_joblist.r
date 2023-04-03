@@ -51,7 +51,9 @@ start_ix <- seq(from = 1, to = n*n_events, by = n_events)
 end_ix <- seq(from = n_events, to = n_total$num, by = n_events)
 
 
-joblist <- data.frame("string" = rep(paste0(" module load R/4.1.0-foss-2020b; Rscript ",.datPF,"intersect-events-cbg.r "), times = n),
+# joblist <- data.frame("string" = rep(paste0(" module load R/4.1.0-foss-2020b; Rscript ",.datPF,"intersect-events-cbg.r "), times = n),
+joblist <- data.frame("string" = rep(paste0(" module load R/4.1.0-foss-2020b; 
+                                            conda activate covid; Rscript ",.datPF,"intersect-events-cbg.r "), times = n),
                       "arg1" = start_ix,
                       "arg2" = end_ix,
                       "arg3" = seq(from = 1, to = n, by = 1))
