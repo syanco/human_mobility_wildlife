@@ -53,7 +53,7 @@ if(interactive()) {
   library(rprojroot)
   
   .wd <- '/home/sy522/project/covid-19_movement'
-  .script <-  thisfile()
+  # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
