@@ -43,8 +43,8 @@ if(interactive()) {
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .test <- TRUE
   # rd <- here::here
-  
-  .datPF <- file.path(.wd,'data/')
+  .wd <- getwd()
+  .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,'out/event-annotation/')
   
 } else {
