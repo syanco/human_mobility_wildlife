@@ -8,7 +8,7 @@ options(tidyverse.quiet = TRUE) #https://rstats-tips.net/2020/07/31/get-rid-of-i
 suppressWarnings(
 suppressPackageStartupMessages({
   library(assertthat)
-  library(conflicted)
+  # library(conflicted)
   library(glue)
   library(here)
   library(tictoc)
@@ -19,7 +19,7 @@ suppressPackageStartupMessages({
 
 
 # Several common packages have conflicts with dplyr filter() and select()
-conflict_prefer('filter','dplyr',quiet=TRUE)
-conflict_prefer('select','dplyr',quiet=TRUE)
+# conflict_prefer('filter','dplyr',quiet=TRUE)
+# conflict_prefer('select','dplyr',quiet=TRUE)
 
 `%notin%` <- Negate(`%in%`)
