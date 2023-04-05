@@ -73,6 +73,10 @@ conflict_prefer("accumulate", "foreach")
 conflict_prefer("ar", "brms")
 conflict_prefer("lag", "stats")
 conflict_prefer("when", "foreach")
+conflicts_prefer(tidyr::expand)
+conflicts_prefer(tibble::has_name)
+conflicts_prefer(tidyr::pack)
+conflicts_prefer(tidyr::unpack)
 
 # load breezy functions
 source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
@@ -117,7 +121,7 @@ registerDoMC(.cores)
 # ==== Perform analysis ====
 
 #declare model form
-form <-  bf(log_area_scale ~ 1 + ndvi_scale + tmin_scale + (1 |grp) + ar(time = wk, gr = grp))
+form <-  bf(log_area_scale ~ 1 + ndvi_scale + tmax_scale + (1 |grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
