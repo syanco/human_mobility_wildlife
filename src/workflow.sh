@@ -365,13 +365,11 @@
       # Outputs: model rdata objects 
        
       # SLURM
-      sbatch $src/hpc/run_fit_space_use_models.sh # interactive
-      # sbatch $src/hpc/run_fit_space_use_sg_models.sh
-      # sbatch $src/hpc/run_fit_space_use_ghm_models.sh
+
+      sbatch $src/hpc/run_fit_space_use_dot_models.sh # dot
+      sbatch $src/hpc/run_fit_space_use_interactive_models.sh # interactive
       sbatch $src/hpc/run_fit_space_use_additive_models.sh
-      # sbatch $src/hpc/run_fit_space_use_trait_model.sh
-      # sbatch $src/hpc/run_fit_space_use_VarCom_model.sh
-      
+
       # ON DEMAND:
       # conda activate brms
       # Rscript $wd/analysis/src/workflow/fit-space-use-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area 24 10 10000 5

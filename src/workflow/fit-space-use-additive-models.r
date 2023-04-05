@@ -140,9 +140,9 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       # log_sg_norm = log(sg_norm),
       ghm_scale = scale(ghm),
       ndvi_scale = scale(ndvi),
-      lst_scale = scale(lst),
+      # lst_scale = scale(lst),
       tmax_scale = scale(tmax),
-      tmin_scale = scale(tmin),
+      # tmin_scale = scale(tmin),
       grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
       # trt_new = gsub('_.*','',trt),
       year_f = factor(year), # create year factor
