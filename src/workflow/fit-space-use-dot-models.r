@@ -23,7 +23,7 @@ if(interactive()) {
   .wd <- getwd()
   
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
-  .outP <- file.path(.wd,'out/single_species_models/area')
+  .outP <- file.path(.wd,'out/single_species_models/area_dot')
 
   .cores <- 20
   .minsp <- 10
@@ -117,7 +117,7 @@ registerDoMC(.cores)
 # ==== Perform analysis ====
 
 #declare model form
-form <-  bf(log_area_scale ~ sg_norm*ghm_scale + ndvi_scale + tmin_scale + (1 |grp) + ar(time = wk, gr = grp))
+form <-  bf(log_area_scale ~ 1 + ndvi_scale + tmin_scale + (1 |grp) + ar(time = wk, gr = grp))
 message("Fitting models with formula:")
 print(form)
 
