@@ -13,7 +13,7 @@ module load miniconda
 conda activate covid
 
 # Declare WD
-wd=/gpfs/loomis/pi/jetz/sy522/covid-19_movement
+wd=~/project/covid-19_movement
 src=$wd/analysis/src/workflow
 
 # Move to WD
