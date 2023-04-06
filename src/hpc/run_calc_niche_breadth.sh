@@ -3,10 +3,10 @@
 #SBATCH -t 2:00:00
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
-#SBATCH --partition day,pi_jetz
+#SBATCH --partition day
 #SBATCH -c 24
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J calc_niches_with_TMAX
+#SBATCH -J calc_niches
 
 # Load conda env
 module load miniconda

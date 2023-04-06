@@ -130,9 +130,10 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
              week = week(timestamp),
              n_indiv_week_year = paste0(individual_id, '_' , week, '_' , yr),
              tmax_scale = scale(tmax),
-             tmin_scale = scale(tmin),
+             # tmin_scale = scale(tmin),
              ndvi_scale = scale(ndvi),
-             elev_scale = scale(elev)) %>% 
+             elev_scale = scale(elev)
+             ) %>% 
       arrange(timestamp)
     
     
@@ -165,16 +166,15 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
         
         evt_tmp <- evt_mod %>% 
           filter(week == w) %>%
-          select(tmax_scale, tmin_scale, ndvi_scale, elev_scale, week, event_id,
+          select(tmax_scale, ndvi_scale, elev_scale, week, event_id,
                  individual_id, n_indiv_week_year) %>%
-          drop_na(tmax_scale, tmin_scale, ndvi_scale, elev_scale)
+          drop_na(tmax_scale, ndvi_scale, elev_scale)
         
         
         tryCatch({
           
           if(nrow(evt_tmp) > 0){      
-            determinant <- MVNH_det(evt_tmp[,c('tmax_scale', 'tmin_scale', 
-                                               'ndvi_scale', 'elev_scale')], 
+            determinant <- MVNH_det(evt_tmp[,c('tmax_scale', 'ndvi_scale', 'elev_scale')], 
                                     log = F)
             
             determinant_df <- data.frame(as.list(determinant))

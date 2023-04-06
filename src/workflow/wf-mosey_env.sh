@@ -115,7 +115,7 @@ sqlite3 $db "alter table event_clean add column tmax REAL;"
 # sqlite3 $db "alter table event_clean add column tmin REAL;"
 # sqlite3 $db "alter table event_clean add column lst REAL;"
 sqlite3 $db "alter table event_clean add column ndvi REAL;"
-# sqlite3 $db "alter table event_clean add column elev REAL;"
+sqlite3 $db "alter table event_clean add column elev REAL;"
 # sqlite3 $db "alter table event_clean add column dist2road REAL;"
 
 #points and annotations are stored in event_clean
