@@ -168,6 +168,8 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
     filter(scientificname == sp,
            !is.infinite(total)) %>% 
     mutate(
+      log_area = log(area), #get log of weekly area use
+      log_area_scale = scale(log_area), # standardize it
       # sqrt_breadth = sqrt(total), #get sqrt weekly niche breadth
       breadth_scale = scale(log(total+0.000000000000000000001)), # standardize it
       sg_norm = scale(sg / cbg_area), # normalize safegraph data by size of the CBG
