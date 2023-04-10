@@ -77,6 +77,10 @@ conflict_prefer("accumulate", "foreach")
 conflict_prefer("ar", "brms")
 conflict_prefer("lag", "stats")
 conflict_prefer("when", "foreach")
+conflict_prefer("expand", "tidyr")
+conflict_prefer("has_name", "tibble")
+conflict_prefer("pack", "tidyr")
+conflict_prefer("unpack", "tidyr")
 
 # load breezy functions
 source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
@@ -124,7 +128,7 @@ breadth <- read_csv(.datPF) %>%
          # tmin_mvnh = tmin,
          elev_mvnh = elev,
          ndvi_mvnh = ndvi) %>%
-  select(!c(tmax, tmin, elev, ndvi)) %>%
+  select(!c(tmax, elev, ndvi)) %>%
   filter(studyid != 351564596) %>%
   filter(studyid != 1891587670) %>%
   mutate(ind_f = as.factor(individual)) %>%  # create factor version of ind for REs)
