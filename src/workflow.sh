@@ -404,6 +404,8 @@
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>          <<<<<<<<<<<<<<<<<<<#
 #>
     #- Fit niche breadth models -#
+      
+      sbatch $src/hpc/run_fit_niche_breadth_dot_models.sh
       sbatch $src/hpc/run_fit_niche_breadth_additive_models.sh
       sbatch $src/hpc/run_fit_niche_breadth_interactive_models.sh #interaction model
 
