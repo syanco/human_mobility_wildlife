@@ -161,7 +161,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   mod <- brm(
     form,
     data = dat,
-    # family = Gamma(link = "log"),
+    family = student(),
     inits = 0,
     cores = 1,
     iter = .iter,

@@ -63,6 +63,8 @@ suppressWarnings(
     library(grid)
   }))
 
+
+
 #Source all files in the auto load funs directory
 list.files('analysis/src/funs/auto',full.names=TRUE) %>%
   walk(source)
