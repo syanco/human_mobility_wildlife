@@ -155,7 +155,8 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
       ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
       study_f = as.factor(study_id) # make study id factor
     ) %>%
-    distinct() 
+    distinct() %>% 
+    filter(!is.na(sg_norm) & !is.na(ghm_scale))
   
   # fit model
   mod <- brm(
