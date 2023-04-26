@@ -420,8 +420,8 @@
   ##-- Intra-Individual Analysis --##
   
     #Area
-    sbatch $src/hpc/run_fit_intra_ind_mod_additive.sh
-    sbatch $src/hpc/run_fit_intra_ind_mod_int.sh
+    sbatch $src/hpc/run_fit_intra_ind_mod_additive_area.sh
+    sbatch $src/hpc/run_fit_intra_ind_mod_int_area.sh
     
     #Niche
     sbatch $src/hpc/run_fit_intra_ind_mod_additive_niche.sh
