@@ -200,7 +200,7 @@ size_wide <- size_paired %>%
 
 message("Starting that modeling magic...")
 
-form <-  bf(size_diff ~ 1 + sg_dif + ghm_diff + ndvi_diff + tmax_diff + (1|species/ind_f) + ar(time = wk, gr = ind_f))
+form <-  bf(size_diff ~ 1 + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1|species/ind_f) + ar(time = wk, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
