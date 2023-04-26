@@ -18,4 +18,4 @@ wd=~/project/covid-19_movement
 cd $wd
 
 # Execute model script 
-Rscript $wd/analysis/src/workflow/fit_intra_ind_mod_interactive_area.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 4 10000 5
+Rscript $wd/analysis/src/workflow/fit_intra_ind_mod_interactive_space.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 4 10000 5

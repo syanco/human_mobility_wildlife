@@ -2,6 +2,8 @@
 #
 #CONDA: covid
 #
+# This script generates individual dynamic brownian bridge models and associated 
+# UDs for migratory  periods.
 
 # TODO:  The dBBMM paramaters (e.g., window size, margin, error, etc.) are 
 # currently hardcoded.  Could be passed in as options to the script.
@@ -88,6 +90,7 @@ conflict_prefer("accumulate", "purrr")
 conflict_prefer("ar", "brms")
 conflict_prefer("lag", "stats")
 conflict_prefer("when", "purrr")
+conflicts_prefer(tibble::has_name)
 
 .cores <- ifelse(is.null(.cores), 10, as.numeric(.cores))
 .iter <- ifelse(is.null(.iter), 3000, as.numeric(.iter))
@@ -124,6 +127,7 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   )) %>% 
   distinct()
 
+# load and process data
 breadth <- read_csv("out/niche_determinant_anthropause.csv") %>%
   mutate(scientificname = case_when( # correct species names
     studyid == 1442516400 ~ "Anser caerulescens",
@@ -140,18 +144,18 @@ breadth <- read_csv("out/niche_determinant_anthropause.csv") %>%
   )) %>% 
   distinct() %>%
   mutate(tmax_mvnh = tmax,
-         tmin_mvnh = tmin,
-         elev_mvnh = elev,
+         # tmin_mvnh = tmin,
+         # elev_mvnh = elev,
          ndvi_mvnh = ndvi) %>%
-  select(!c(tmax, tmin, elev, ndvi)) %>%
+  select(!c(tmax, ndvi)) %>%
   filter(studyid != 351564596) %>%
   filter(studyid != 1891587670) %>%
   mutate(ind_f = as.factor(individual)) %>%  # create factor version of ind for REs)
   left_join(size, by = c("scientificname" = "species", 
-                         "individual" = "ind_id", 
-                         "year" = "year", 
-                         "studyid" = "study_id", 
-                         "week" = "wk"))
+                           "individual" = "ind_id", 
+                           "year" = "year", 
+                           "studyid" = "study_id", 
+                           "week" = "wk"))
 
 
 message("Processing the data to allow the magic to happen...")
@@ -191,7 +195,7 @@ breadth_paired <- breadth %>%
          # log_sg_norm = log(sg_norm),
          ghm_scale = scale(ghm),
          ndvi_scale = scale(ndvi),
-         lst_scale = scale(lst),
+         # lst_scale = scale(lst),
          tmax_scale = scale(tmax),
          ind_f = as.factor(individual), # create factor version of ind for REs
          grp = paste(ind_f, year, sep = "_"), # create indXyr grouping factor
@@ -207,9 +211,10 @@ breadth_paired <- breadth %>%
 # create wide format and calculate deltas
 breadth_wide <- breadth_paired %>% 
   pivot_wider(id_cols = c(ind_f, week, scientificname), 
-              values_from = c(breadth_scale, sg_norm, ghm_scale, ndvi_scale, tmax_scale), 
+              values_from = c(breadth_scale, log_area_scale, sg_norm, ghm_scale, ndvi_scale, tmax_scale), 
               names_from = year_f) %>% 
   mutate(breadth_diff = breadth_scale_2020-breadth_scale_2019,
+         area_diff = log_area_scale_2020-log_area_scale_2019,
          sg_diff = sg_norm_2020-sg_norm_2019,
          ghm_diff = ghm_scale_2020-ghm_scale_2019,
          ndvi_diff = ndvi_scale_2020-ndvi_scale_2019,
@@ -229,7 +234,7 @@ breadth_wide <- breadth_paired %>%
 
 message("Starting that modeling magic...")
 
-form <-  bf(breadth_diff ~ 1 + sg_diff * ghm_diff + ndvi_diff + tmax_diff + (1|scientificname/ind_f) + ar(time = week, gr = ind_f))
+form <-  bf(breadth_diff ~ area_diff + sg_diff*ghm_diff + ndvi_diff + tmax_diff + (1|scientificname/ind_f) + ar(time = week, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
