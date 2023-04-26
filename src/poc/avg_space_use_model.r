@@ -138,12 +138,12 @@ for(i in 1:length(add_modlist_full)){
   
   modls <- list()
   # dot model
-  # if(dot_modlist_full[i] != "NULL"){
-  # load(dot_modlist_full[i]) # load model
-  # dotmod <- out$model
-  # sp <- out$species #TODO: if this model fails, I won't get a sp object which is bad, but for now this is fine...
-  # modls[["dot"]] <- dotmod
-  # }
+  if(dot_modlist_full[i] != "NULL"){
+  load(dot_modlist_full[i]) # load model
+  dotmod <- out$model
+  sp <- out$species #TODO: if this model fails, I won't get a sp object which is bad, but for now this is fine...
+  modls[["dot"]] <- dotmod
+  }
   
   
   # additive model
@@ -151,7 +151,6 @@ for(i in 1:length(add_modlist_full)){
   load(add_modlist_full[i]) # load model
   addmod <- out$model
   modls[["add"]] <- addmod
-  sp <- out$species
   }
   
   # interactive model
@@ -159,23 +158,14 @@ for(i in 1:length(add_modlist_full)){
   load(int_modlist_full[i]) # load model
   intmod <- out$model
   modls[["int"]] <- intmod
-  sp <- out$species
   }
   
-  if(length(modls) > 1) {
   # execute model compare
-  comp <- call_fun(loo, modls, compare=TRUE, model_names=names(modls)) 
- # call_fun(waic, modls, compare=TRUE, model_names=names(modls)) 
- # call_fun(model_weights, modls, compare=TRUE, model_names=names(modls)) 
-  # comp <- loo(dotmod, addmod, intmod)
+  focal <- call_fun(posterior_average, modls, compare=TRUE, model_names=names(modls)) 
+
+  #TODO: make sumamry table manually from the df of posteriors
+  sum_df <- data,frame()
   
-  winner <- names(which(comp$diffs[,"elpd_diff"] == 0))
-  # focal <- get(winner)
-  focal <- modls[[winner]]
-  } else {
-    winner <- names(modls)
-    focal <- modls[[winner]]
-  }
   
   fe <- fixef(focal) #get fixed effects
   re <- posterior_summary(focal, variable = c("sd_grp__Intercept", "sigma"))
