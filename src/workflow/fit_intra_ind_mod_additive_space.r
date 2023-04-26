@@ -220,12 +220,12 @@ mod <- brm(
 
 #stash results into named list
 out <- list(
-  data = breadth_wide,
+  data = size_wide,
   model = mod
 )
 
 #write out results
-save(out, file = glue("{.outP}/size_intra_ind_int_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/size_intra_ind_add_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 

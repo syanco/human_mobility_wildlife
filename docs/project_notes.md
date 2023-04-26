@@ -114,3 +114,20 @@ Successfully re-ran clean script
 Starting annotation again - Ts & Ps for me.
 
 Very minor edits needed to get the ingest step working (switched to using study_id as entity rather than individual)
+
+### 2023 April 26
+
+Finished several key re-runs over the last few days:
+
+1). *Main model selection scripts*
+
+Using the following approach:
+
+We a priori expected an interaction effect - so we fit an interaction model for every species.  In cases where the interaction effect was absent (credible intervals overlapping zero) we re-fit the model considering additive effects of SG and GHM only and present the results of only that model.
+
+Successful re-fit models with the new build of the db, and collated results - passed on for viz.
+
+2). *Intra individual models*
+
+Added sapce use as control var in the niche models. cleanded up HPC scripts and relaunched on HPC (currenlty running)
+

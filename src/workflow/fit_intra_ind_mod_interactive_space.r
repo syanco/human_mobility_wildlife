@@ -220,7 +220,7 @@ mod <- brm(
 
 #stash results into named list
 out <- list(
-  data = breadth_wide,
+  data = size_wide,
   model = mod
 )
 
