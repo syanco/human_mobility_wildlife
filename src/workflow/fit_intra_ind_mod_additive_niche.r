@@ -90,7 +90,7 @@ conflict_prefer("accumulate", "purrr")
 conflict_prefer("ar", "brms")
 conflict_prefer("lag", "stats")
 conflict_prefer("when", "purrr")
-conflicts_prefer(tibble::has_name)
+conflict_prefer("has_name", "tibble")
 
 .cores <- ifelse(is.null(.cores), 10, as.numeric(.cores))
 .iter <- ifelse(is.null(.iter), 3000, as.numeric(.iter))
