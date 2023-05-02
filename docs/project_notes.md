@@ -129,5 +129,5 @@ Successful re-fit models with the new build of the db, and collated results - pa
 
 2). *Intra individual models*
 
-Added sapce use as control var in the niche models. cleanded up HPC scripts and relaunched on HPC (currenlty running)
+Added sapce use as control var in the niche models. cleanded up HPC scripts and relaunched on HPC (successful)
 
