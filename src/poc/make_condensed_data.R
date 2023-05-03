@@ -66,11 +66,14 @@ sg <- read_csv("out/event-annotation/event_sg.csv")
 #----  Make complete annotated dataset ----#
 
 evt_full <- evttb %>% 
+  head(n = 25) %>% 
   left_join(inddb) %>% 
   collect() %>% 
+  mutate(event_id = as.numeric(event_id),
+         timestamp = ymd_hms(timestamp)) %>% 
   mutate(ID = as.factor(individual_id)) %>% 
-  left_join(ghm, by = "event_id") %>% 
-  left_join(sg, by = "event_id")
+  left_join(ghm, by = c("event_id")) %>% 
+  left_join(sg, by = c("event_id", "timestamp"))
 
 saveRDS(evt_full, file = glue("{.outP}/anno_full_{Sys.Date()}.rds"))
 
@@ -81,7 +84,9 @@ evt_day <- evt_full %>%
   mutate(doy = yday(timestamp)) %>% 
   group_by(ID, doy) %>% 
   summarize(ghm = mean(ghm, na.rm = T),
-            sg = mean(sg, na.rm = T),
+            sg = mean(safegraph_daily_count, na.rm = T),
+            cbg = mean(cbg_area_m2, na.rm = T),
+            sg_norm = sg/cbg_area,
             tmax = mean(tmax, na.rm = T),
             ndvi = mean(ndvi, na.rm = T),
             elev = mean(elev, na.rm = T),
@@ -101,7 +106,9 @@ saveRDS(evt_day, file = glue("{.outP}/anno_day_{Sys.Date()}.rds"))
 evt_wk <- evt_full %>% 
   group_by(ID, wk) %>% 
   summarize(ghm = mean(ghm, na.rm = T),
-            sg = mean(sg, na.rm = T),
+            sg = mean(safegraph_daily_count, na.rm = T),
+            cbg = mean(cbg_area_m2, na.rm = T),
+            sg_norm = sg/cbg_area,
             tmax = mean(tmax, na.rm = T),
             ndvi = mean(ndvi, na.rm = T),
             elev = mean(elev, na.rm = T),
@@ -119,10 +126,12 @@ saveRDS(evt_wk, file = glue("{.outP}/anno_week_{Sys.Date()}.rds"))
 #---- Make weekly data ----#
 
 evt_mo <- evt_full %>% 
-  mutate(month = month(timestamp())) %>% 
+  mutate(month = month(timestamp)) %>% 
   group_by(ID, month) %>% 
   summarize(ghm = mean(ghm, na.rm = T),
-            sg = mean(sg, na.rm = T),
+            sg = mean(safegraph_daily_count, na.rm = T),
+            cbg = mean(cbg_area_m2, na.rm = T),
+            sg_norm = sg/cbg_area,
             tmax = mean(tmax, na.rm = T),
             ndvi = mean(ndvi, na.rm = T),
             elev = mean(elev, na.rm = T),

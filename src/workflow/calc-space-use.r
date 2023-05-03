@@ -201,7 +201,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
           # Get area of CBG to normalize safegraph data
           cbg_area <- evt_sg %>% 
             filter(event_id %in% evtids) %>% 
-            summarize(sg = mean(cbg_area_m2, na.rm = T))
+            summarize(cbg = mean(cbg_area_m2, na.rm = T))
           
           # Get GHM data
           ghm <- evt_ghm %>% 
