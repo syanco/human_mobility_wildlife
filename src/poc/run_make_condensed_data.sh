@@ -18,4 +18,4 @@ src=$wd/analysis/src/poc
 cd $wd
 
 # Execute condense script (non parallel)
-Rscript $src/make_condensed_data.r 
+Rscript $src/make_condensed_data.R 
