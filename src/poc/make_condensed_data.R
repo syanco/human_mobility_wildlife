@@ -66,7 +66,7 @@ sg <- read_csv("out/event-annotation/event_sg.csv")
 #----  Make complete annotated dataset ----#
 
 evt_full <- evttb %>% 
-  head(n = 25) %>% 
+  # head(n = 25) %>% 
   left_join(inddb) %>% 
   collect() %>% 
   mutate(event_id = as.numeric(event_id),
