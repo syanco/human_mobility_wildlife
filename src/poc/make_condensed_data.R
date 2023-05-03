@@ -83,7 +83,8 @@ saveRDS(evt_full, file = glue("{.outP}/anno_full_{Sys.Date()}.rds"))
 evt_day <- evt_full %>% 
   mutate(doy = yday(timestamp)) %>% 
   group_by(ID, doy) %>% 
-  summarize(ghm = mean(ghm, na.rm = T),
+  summarize(species = taxon_canonical_name[1],
+            ghm = mean(ghm, na.rm = T),
             sg = mean(safegraph_daily_count, na.rm = T),
             cbg = mean(cbg_area_m2, na.rm = T),
             sg_norm = sg/cbg,
@@ -105,7 +106,8 @@ saveRDS(evt_day, file = glue("{.outP}/anno_day_{Sys.Date()}.rds"))
 
 evt_wk <- evt_full %>% 
   group_by(ID, wk) %>% 
-  summarize(ghm = mean(ghm, na.rm = T),
+  summarize(species = taxon_canonical_name[1],
+            ghm = mean(ghm, na.rm = T),
             sg = mean(safegraph_daily_count, na.rm = T),
             cbg = mean(cbg_area_m2, na.rm = T),
             sg_norm = sg/cbg,
@@ -128,7 +130,8 @@ saveRDS(evt_wk, file = glue("{.outP}/anno_week_{Sys.Date()}.rds"))
 evt_mo <- evt_full %>% 
   mutate(month = month(timestamp)) %>% 
   group_by(ID, month) %>% 
-  summarize(ghm = mean(ghm, na.rm = T),
+  summarize(species = taxon_canonical_name[1],
+            ghm = mean(ghm, na.rm = T),
             sg = mean(safegraph_daily_count, na.rm = T),
             cbg = mean(cbg_area_m2, na.rm = T),
             sg_norm = sg/cbg,
