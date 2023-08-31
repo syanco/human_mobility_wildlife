@@ -60,7 +60,7 @@ mkdir -p $outP
 # earthengine create folder -p $geePtsP
 
 # entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
-entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/$entity.csv | tail -n +2))
+entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id analysis/ctfs/$entity.csv | tail -n +2))
 
 n=${#entIds[@]}
 

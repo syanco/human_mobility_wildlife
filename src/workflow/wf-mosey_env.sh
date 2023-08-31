@@ -19,7 +19,7 @@ cd $wd
 ssh grace "ls -lh $dbr" #8.3GB
 
 #download the file
-scp grace:$dbr mosey__mod.db
+scp grace:$dbr mosey_mod.db
 # 
 # #disconnect from vpn
 # /opt/cisco/anyconnect/bin/vpn disconnect
@@ -30,12 +30,12 @@ scp grace:$dbr mosey__mod.db
 
 # mamba activate annotate
 
-wd=~/projects/covid-19_movement/
+wd=/Users/scottyanco/Documents/covid-19_movement
 src=$wd/analysis/src
 # db=$wd/processed_data/mosey_mod.db
 db=$wd/processed_data/mosey_mod.db
 
-export MOSEYENV_SRC=~/projects/covid-19_movement/analysis/src/mosey #for mosey_anno_gee.sh
+export MOSEYENV_SRC=/Users/scottyanco/Documents/covid-19_movement/analysis/src/mosey #for mosey_anno_gee.sh
 
 cd $wd
 
@@ -104,7 +104,7 @@ $MOSEYENV_SRC/gee_ingest.sh re_anno $geePtsP $gcsInURL $csvP #$sesid
 #Don't run this until all import tasks have finished
 #https://code.earthengine.google.com/tasks
 
-$MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP $envP #"${envs[*]}"
+$MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP #$envP #"${envs[*]}"
 
 #----
 #---- Import into mosey ----#
@@ -115,7 +115,7 @@ sqlite3 $db "alter table event_clean add column tmax REAL;"
 # sqlite3 $db "alter table event_clean add column tmin REAL;"
 # sqlite3 $db "alter table event_clean add column lst REAL;"
 sqlite3 $db "alter table event_clean add column ndvi REAL;"
-sqlite3 $db "alter table event_clean add column elev REAL;"
+# sqlite3 $db "alter table event_clean add column elev REAL;"
 # sqlite3 $db "alter table event_clean add column dist2road REAL;"
 
 #points and annotations are stored in event_clean

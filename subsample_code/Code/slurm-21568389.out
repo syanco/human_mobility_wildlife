@@ -1,0 +1,92 @@
+/var/spool/slurmd/job21568389/slurm_script: line 9: SBATCH: command not found
+here() starts at /gpfs/gibbs/pi/jetz/from_loomis/de293/Anthropause/Anthropause_2023/Code
+Running startup script...
+Initializing database connection...
+ individual_id             yr                  wk              n         
+ Min.   :  11522613   Length:140704      Min.   : 1.00   Min.   :   1.0  
+ 1st Qu.:1716235376   Class :character   1st Qu.: 7.00   1st Qu.:  26.0  
+ Median :2561165113   Mode  :character   Median :13.00   Median :  73.0  
+ Mean   :2137296532                      Mean   :13.31   Mean   : 100.8  
+ 3rd Qu.:2561450688                      3rd Qu.:18.00   3rd Qu.:  80.0  
+ Max.   :2619087621                      Max.   :35.00   Max.   :5067.0  
+Disconnecting from databse...
+Parsed with column specification:
+cols(
+  event_id = col_double(),
+  timestamp = col_datetime(format = ""),
+  date_hour = col_datetime(format = ""),
+  StateFIPS = col_character(),
+  CountyFIPS = col_character(),
+  TractCode = col_character(),
+  BlockGroup = col_double(),
+  cbg_2010 = col_character(),
+  State = col_character(),
+  County = col_character(),
+  MTFCC = col_character(),
+  cbg_area_m2 = col_double(),
+  safegraph_daily_count = col_logical()
+)
+Warning: 9486268 parsing failures.
+   row                   col           expected actual                                                                                                    file
+139215 safegraph_daily_count 1/0/T/F/TRUE/FALSE   51   '/gpfs/gibbs/pi/jetz/from_loomis/de293/Anthropause/Anthropause_2023/Data/event-annotation/event_sg.csv'
+139216 safegraph_daily_count 1/0/T/F/TRUE/FALSE   24   '/gpfs/gibbs/pi/jetz/from_loomis/de293/Anthropause/Anthropause_2023/Data/event-annotation/event_sg.csv'
+139217 safegraph_daily_count 1/0/T/F/TRUE/FALSE   32   '/gpfs/gibbs/pi/jetz/from_loomis/de293/Anthropause/Anthropause_2023/Data/event-annotation/event_sg.csv'
+139218 safegraph_daily_count 1/0/T/F/TRUE/FALSE   19   '/gpfs/gibbs/pi/jetz/from_loomis/de293/Anthropause/Anthropause_2023/Data/event-annotation/event_sg.csv'
+139221 safegraph_daily_count 1/0/T/F/TRUE/FALSE   1458 '/gpfs/gibbs/pi/jetz/from_loomis/de293/Anthropause/Anthropause_2023/Data/event-annotation/event_sg.csv'
+...... ............. [... truncated]
+Parsed with column specification:
+cols(
+  event_id = col_double(),
+  ghm = col_double()
+)
+[1] "integer64"
+Loading required package: bit64
+Loading required package: bit
+Attaching package bit
+package:bit (c) 2008-2012 Jens Oehlschlaegel (GPL-2)
+creators: bit bitwhich
+coercion: as.logical as.integer as.bit as.bitwhich which
+operator: ! & | xor != ==
+querying: print length any all min max range sum summary
+bit access: length<- [ [<- [[ [[<-
+for more help type ?bit
+
+Attaching package: ‘bit’
+
+The following object is masked from ‘package:base’:
+
+    xor
+
+Attaching package bit64
+package:bit64 (c) 2011-2012 Jens Oehlschlaegel
+creators: integer64 seq :
+coercion: as.integer64 as.vector as.logical as.integer as.double as.character as.bin
+logical operator: ! & | xor != == < <= >= >
+arithmetic operator: + - * / %/% %% ^
+math: sign abs sqrt log log2 log10
+math: floor ceiling trunc round
+querying: is.integer64 is.vector [is.atomic} [length] format print str
+values: is.na is.nan is.finite is.infinite
+aggregation: any all min max range sum prod
+cumulation: diff cummin cummax cumsum cumprod
+access: length<- [ [<- [[ [[<-
+combine: c rep cbind rbind as.data.frame
+WARNING don't use as subscripts
+WARNING semantics differ from integer
+for more help type ?bit64
+Error in `fn_fmls()`:
+! `fn` must be an R function, not a primitive function.
+Backtrace:
+     ▆
+  1. └─conflicted (local) require(bit64)
+  2.   └─conflicted:::conflicts_register()
+  3.     └─conflicted::conflict_scout(pkgs)
+  4.       └─conflicted:::map2(names(conflicts), conflicts, superset_principle)
+  5.         └─base::mapply(.f, .x, .y, MoreArgs = list(...), SIMPLIFY = FALSE)
+  6.           └─conflicted (local) `<fn>`(dots[[1L]][[1L]], dots[[2L]][[1L]])
+  7.             └─conflicted:::is_superset(fun, non_base, base = base)
+  8.               └─rlang::fn_fmls(fn = base_obj)
+  9.                 └─rlang:::check_closure(fn)
+ 10.                   └─rlang:::stop_input_type(x, what, ..., arg = arg, call = call)
+ 11.                     └─rlang::abort(message, ..., call = call, arg = arg)
+Execution halted

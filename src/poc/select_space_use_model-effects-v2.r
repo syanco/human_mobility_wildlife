@@ -61,6 +61,7 @@ suppressWarnings(
     library(patchwork)
     library(brms)
     library(grid)
+    library(emmeans)
   }))
 
 call_fun <- function(f,x,...) {
@@ -96,7 +97,7 @@ int_sp <- word(int_modlist, 1, sep = "_")
 
 # #-- Additive Models --#
 # 
-message('Loading additive models...')
+message('Loading additive‚ models...')
 add_modlist <- list.files(path=file.path(.datP, "area_additive/"), 
                           full.names = F)
 add_modlist_full <- list.files(path=file.path(.datP, "area_additive/"), 
@@ -428,7 +429,11 @@ for(i in 1:length(int_modlist_full)){
 # combine dfs
 res_out_df <- do.call("bind_rows", res_out)
 write_csv(x = res_out_df, file = glue("out/area_mod_summary_{Sys.Date()}.csv"))
+
+sg_es_df <- do.call("bind_rows", sg_effects_out)
 write_csv(x = sg_es_df, file = glue("out/area_sg_effects_{Sys.Date()}.csv"))
+
+ghm_es_df <- do.call("bind_rows", ghm_effects_out)
 write_csv(x = ghm_es_df, file = glue("out/area_ghm_effects_{Sys.Date()}.csv"))
 
 #---- Standardized Effects plot ----#

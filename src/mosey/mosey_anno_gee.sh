@@ -39,9 +39,9 @@ studyIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/stu
 # indIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/individual.csv | tail -n +2))
 
 #envs.csv
-envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id ctfs/env.csv | tail -n +2))
-bands=($(mlr --csv --opprint filter '$run == 1' then cut -f band ctfs/env.csv | tail -n +2))
-colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name ctfs/env.csv | tail -n +2))
+envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id analysis/ctfs/env.csv | tail -n +2))
+bands=($(mlr --csv --opprint filter '$run == 1' then cut -f band analysis/ctfs/env.csv | tail -n +2))
+colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name analysis/ctfs/env.csv | tail -n +2))
 
 # Remove \r suffix
 studyIds=( ${studyIds[@]%$'\r'} )

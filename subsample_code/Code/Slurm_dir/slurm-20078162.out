@@ -1,0 +1,17 @@
+/var/spool/slurmd/job20078162/slurm_script: line 9: SBATCH: command not found
+here() starts at /gpfs/gibbs/pi/jetz/from_loomis/de293/Anthropause/Anthropause_2023/Code
+Running startup script...
+Initializing database connection...
+ individual_id             yr                  wk              n         
+ Min.   :  11522613   Length:140704      Min.   : 1.00   Min.   :   1.0  
+ 1st Qu.:1716235376   Class :character   1st Qu.: 7.00   1st Qu.:  26.0  
+ Median :2561165113   Mode  :character   Median :13.00   Median :  73.0  
+ Mean   :2137296532                      Mean   :13.31   Mean   : 100.8  
+ 3rd Qu.:2561450688                      3rd Qu.:18.00   3rd Qu.:  80.0  
+ Max.   :2619087621                      Max.   :35.00   Max.   :5067.0  
+Error in gzfile(file, "wb") : cannot open the connection
+Calls: save -> gzfile
+In addition: Warning message:
+In gzfile(file, "wb") :
+  cannot open compressed file '/gpfs/loomis/pi/jetz/de293/Anthropause/Anthropause_2023/out/one_point_per_day.Rdata', probable reason 'No such file or directory'
+Execution halted
