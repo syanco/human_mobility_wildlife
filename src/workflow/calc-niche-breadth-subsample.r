@@ -107,6 +107,7 @@ yearvec <- c("2019", "2020")
 
 registerDoMC(.nc)
 
+# foreach(j = 1:10, .errorhandling = "pass", .inorder = F) %:%
 foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
   foreach(i = unique(yearvec), .errorhandling = "pass", .inorder = F) %dopar% {
     
