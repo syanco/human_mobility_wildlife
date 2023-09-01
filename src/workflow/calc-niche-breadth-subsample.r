@@ -31,7 +31,7 @@ if(interactive()) {
   
   .wd <- getwd()
   
-  .outPF <- file.path(.wd,'out/niche_determinant_anthropause.csv')
+  .outPF <- file.path(.wd,'out/niche_determinant_anthropause_subsample.csv')
   .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   
   .nc <- 2
@@ -49,7 +49,7 @@ if(interactive()) {
   .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
   .nc <- ag$nc
-  .samp_size <- ag$nc
+  .samp_size <- ag$ss
   
 }
 
@@ -178,7 +178,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
         
         tryCatch({
           
-          if(nrow(evt_tmp) > 50){ # only use weeks with 50 or more points     
+          if(nrow(evt_tmp) >= 50){ # only use weeks with 50 or more points     
             
             # subsample
             if(is.null(.samp_size)){ #if sample size is null, then use the full dataset

@@ -399,6 +399,21 @@
       sbatch $src/hpc/run_calc_niche_breadth.sh
     #
   
+    #- MVNH Breadth Subsampling -#
+      
+      # Create csv to store results
+      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year, n" > ./out/niche_determinant_anthropause_subsample.csv
+
+      # Make log file to track successful outputs
+      echo "studyid, individual, scientificname, year, status, week" > out/niche_log_subsample.csv
+  
+      # Inputs: db:event_clean  + out filepath + no. cores
+      # Outputs: csv 
+      
+      sbatch $src/hpc/run_calc_niche_breadth_subsample.sh
+    #
+  
+  
     #- Fit niche breadth models -#
       
       sbatch $src/hpc/run_fit_niche_breadth_dot_models.sh
