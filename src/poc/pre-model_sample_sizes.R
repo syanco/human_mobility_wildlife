@@ -188,3 +188,27 @@ print(evt1 %>%
         filter(complete.cases(.)) %>% 
         group_by(species) %>% 
         summarise(n = n_distinct(ind_f)), n= 100)
+
+
+# if we set the niche cutoff to 30 per week
+niche_week <- evt1 %>% 
+  select(species, ind_f, yr, wk, tmax, ndvi, elev) %>% 
+  filter(complete.cases(.)) %>% 
+  group_by(species, ind_f, yr, wk) %>% 
+  summarize(n = n())
+
+x <- niche_week %>% 
+  filter(n > 30) %>% 
+  group_by(species) %>% 
+  summarise(n_ind = n_distinct(ind_f)) %>%
+  ungroup() %>% 
+  filter(n_ind > 5)
+sum(x$n_ind)
+
+ind_samps <- evt1 %>% 
+  group_by(ind_f, yr) %>% 
+  summarize(n = n())
+
+ggplot(ind_samps) +
+  geom_histogram(aes(x = n))
+summary(ind_samps$n)

@@ -9,9 +9,9 @@
 # #Connect to vpn
 # /opt/cisco/anyconnect/bin/vpn connect access.yale.edu
 # 
-wd=~/projects/covid-19_movement/out/anno
+wd=/Users/scottyanco/Documents/covid-19_movement/out/anno
 # dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db
-dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db
+dbr=/home/sy522/project/covid-19_movement/processed_datamosey_mod_2023.db
 
 cd $wd
 
@@ -28,12 +28,11 @@ scp grace:$dbr mosey_mod.db
 #---- mosey_env
 #----
 
-# mamba activate annotate
 
 wd=/Users/scottyanco/Documents/covid-19_movement
 src=$wd/analysis/src
 # db=$wd/processed_data/mosey_mod.db
-db=$wd/processed_data/mosey_mod.db
+db=$wd/processed_data/mosey_mod_2023.db
 
 export MOSEYENV_SRC=/Users/scottyanco/Documents/covid-19_movement/analysis/src/mosey #for mosey_anno_gee.sh
 
@@ -46,10 +45,10 @@ cd $wd
 # mkdir ctfs
 
 sql="select study_id, 1 as run
-from study_clean
+from study_trim
 order by study_id"
 
-sqlite3 -header -csv $db "$sql;" > ctfs/study.csv
+sqlite3 -header -csv $db "$sql;" > analysis/ctfs/study.csv
 
 #--
 #-- Set up variables
@@ -92,8 +91,7 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 #---- Import studies into GEE
 #----
 
-#TODO: db should be optional
-#TODO: this harcodes to a ctfs/ dir in the main dir but I want that to sit in
+
 ## analysis/ - let ths be passed by arg
 $MOSEYENV_SRC/gee_ingest.sh re_anno $geePtsP $gcsInURL $csvP #$sesid
 
@@ -111,16 +109,16 @@ $MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP #$envP #"${envs[*]}"
 #----
 
 # add columns to db to receive annos
-sqlite3 $db "alter table event_clean add column tmax REAL;"
+sqlite3 $db "alter table event_trim add column tmax REAL;"
 # sqlite3 $db "alter table event_clean add column tmin REAL;"
 # sqlite3 $db "alter table event_clean add column lst REAL;"
-sqlite3 $db "alter table event_clean add column ndvi REAL;"
-# sqlite3 $db "alter table event_clean add column elev REAL;"
+sqlite3 $db "alter table event_trim add column ndvi REAL;"
+sqlite3 $db "alter table event_trim add column elev REAL;"
 # sqlite3 $db "alter table event_clean add column dist2road REAL;"
 
 #points and annotations are stored in event_clean
 #for testing, see db/anno_test.sql for ddl to create event_test
-$MOSEYENV_SRC/import_anno.sh $gcsOutURL $annoP $db --table event_clean
+$MOSEYENV_SRC/import_anno.sh $gcsOutURL $annoP $db --table event_trim
 
 # Send db back to HPC
 scp $db grace:$dbr

@@ -79,6 +79,10 @@ mean_diff <- diff_df %>%
   pull(mdiff) %>% 
   round(1)
 
+med_diff <- diff_df %>% 
+  summarize(mdiff = median(diff_km)) %>% 
+  pull(mdiff) %>% 
+  round(1)
 
 ####---- Plots ----####
 

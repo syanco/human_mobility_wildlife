@@ -10,11 +10,10 @@
                   
 #------------------------------------------------------------------------------#
 
-# Top-level workfow script to execute/describe steps to run analyses associated 
-# with the North American COVID-19 & Animal Movemnt project. 
+# Top-level workfow script to executeanalyses associated 
+# with the North American COVID-19 & Animal Movement project. 
 
-# This project is led by: Ruth Oliver, Diego Ellis-Soto, Scott Yanco, Brett 
-# Jesmer, & Walter Jetz (PI). 
+# This project is led by: Ruth Oliver & Scott Yanco
 
 # This workflow is generally built to be run in a high performance computing 
 # (HPC) environment. Thus, most steps in the workflow simply use `sbatch` to 
@@ -43,28 +42,12 @@
 ####----  Initialization  ----####
   
   # define working directory
-  wd=/home/sy522/project/covid-19_movement
+  wd=/Users/scottyanco/Documents/covid-19_movement
   src=$wd/analysis/src
   
   # Go to working directory
   cd $wd
   
-  # Make scripts executable (mostly to make docopts visible via `-h` flag)
-  chmod +x $src/workflow/clean_movement.r
-  chmod +x $src/workflow/compute-cbg-area.r
-  chmod +x $src/workflow/annotate-events-cbg.r
-  chmod +x $src/workflow/process-safegraph.r
-  chmod +x $src/workflow/annotate-events-safegraph.r
-  chmod +x $src/workflow/annotate-events-ghm.r
-  chmod +x $src/workflow/annotate-events-census.r
-  chmod +x $src/workflow/extract-ghm-cbg.r
-  chmod +x $src/workflow/fit-dBBMMs.r
-  chmod +x $src/workflow/calc-space-use.r
-
-  
-  # Turn on miniconda (only necessary on HPC when not using SLURM)
-  # module load miniconda
-
 ####
 
 
@@ -74,33 +57,14 @@
   ##-- Working DB --##
 
     # Make a copy of db to be modified
-    cp $wd/raw_data/mosey.db $wd/processed_data/mosey_mod.db
+    cp $wd/raw_data/mosey.db $wd/processed_data/mosey_mod_2023.db
     # cp $wd/raw_data/mosey_swap.db $wd/processed_data/mosey_swap_mod.db
   
   ##
-
-  ##-- Run Cleaning --##
   
-    # Inputs:   db:event + analysis/ctfs/dates.csv
-    # Outputs:  db:event_mod + db:event_clean
-    # Depends:  clone of mosey_env (https://github.com/benscarlson/mosey_env)
+  ##-- Trim Data to Time/Area of Interest --##
   
-    # SLURM:
-    sbatch $src/hpc/run_clean_movement.sh
-
-    # ON DEMAND:
-    # conda activate spatial
-    # Rscript $src/workflow/clean_movement.r --db $wd/processed_data/mosey_mod.db
-  
-    # TODO: 
-    #   * Remove hardcoded study filters
-    #   * Simplify date filtering
-    #   * Add spatial filtering (events outside US).
-    #   * Allow quantile thresholds to be passed by arg
-  ##
-
-####
-
+  Rscript $src/workflow/trim_data.r --db $wd/processed_data/mosey_mod_2023.db
 
 
 ####----  Annotate Data ----####
@@ -112,9 +76,6 @@
     
     # INTERACTIVE - RUN LOCAL (script must be run interactively; pulls db from hpc then puts it back)
     $src/workflow/wf-mosey_env.sh
-    
-    # TODO:
-    #   * Add conda environment for mosey_env
   
   ##
     
@@ -165,7 +126,6 @@
       #   * Use conda rather than module r?
     
     #
-
     
     #- Annotate events with cbg info -#
     
@@ -209,7 +169,6 @@
     
     #
 
-
     #- Annotate events with SafeGraph -#
     
       # Inputs: db:event_clean + cbg info csv + sg data csv
@@ -252,53 +211,6 @@
     #
   
   ##
-  ##
-
-  ##-- Optional Annotations --##
-
-#TODO: probably just delete all this
-
-    # #- Extract TNC GHM to census geometries -#
-    # 
-    #   # Inputs: cbg shp file + ghm raster
-    #   # outputs: shp file (cbg info + ghm)
-    # 
-    #   # SLURM:
-    #   sbatch $src/hpc/run_extract_ghm_cbg.sh
-    # 
-    #   # ON DEMAND:
-    #   # Rscript $src/workflow/extract-ghm-cbg.r
-    # 
-    #   # TODO:
-    #   #   * Fix/update docopts in extract-ghm-cbg.r
-    #   #   * Pass input/output paths as arg?
-    #   #   * Use conda rather than module r?
-    # 
-    # #
-
-    # #- Annotate events with census population density -#
-    # 
-    #   # Inputs: db:eventclean + safegraph open census data csv
-    #   # Outputs: csv (event_id + total_population_2019)
-    # 
-    #   # SLURM:
-    #   sbatch $src/hpc/run_annotate_events_census.sh
-    #   
-    #   # ON DEMAND:
-    #   # Rscript $src/workflow/annotate-events-census.r
-    # 
-    #   # TODO:
-    #   #   * Fix/update docopts in extract-ghm-cbg.r
-    #   #   * Pass input/output paths as arg?
-    #   #   * Use conda rather than module r?
-    #   #   * Clarify inputs
-    # 
-    # #
-    
-    # TODO:
-    #   * Clarify use of optional annos - deprecate?
-
-  ##
 
 
   # ##---  Merge Swap DB  ---##
@@ -307,8 +219,33 @@
   # 
   # ##
 
+####
 
-####----  Analysis ----####
+
+##-- Run Cleaning --##
+  
+    # Inputs:   db:event + analysis/ctfs/dates.csv
+    # Outputs:  db:event_mod + db:event_clean
+    # Depends:  clone of mosey_env (https://github.com/benscarlson/mosey_env)
+  
+    # SLURM:
+    sbatch $src/hpc/run_clean_movement.sh
+
+    # ON DEMAND:
+    # conda activate spatial
+    # Rscript $src/workflow/clean_movement.r --db $wd/processed_data/mosey_mod.db
+  
+    # TODO: 
+    #   * SEPARATE OUTLIER REMOVAL FROM RELEVANCE FILTER
+    #   * Remove hardcoded study filters
+    #   * Simplify date filtering
+    #   * Add spatial filtering (events outside US).
+    #   * Allow quantile thresholds to be passed by arg
+  ##
+
+####
+
+####----  Calculate Repsonses ----####
 
   ##---  Space Use  ---##
 
@@ -355,31 +292,54 @@
     
     #
 
-    #- Fit Subsampled dBBMMs -#
-      
-      # Inputs: db:event_clean + out/dbbmm_log.csv (blank) + 
-      #           out/dbbmm_bigmem_log.csv (blank) + no. cores
-      # Outputs: rdata files in out/ (one per individual) 
+    #- Check area size ~ sample size -#
+    
+    Rscript $src/workflow/check_area_size_sample_balance.R
 
-      # Make log file to track successful outputs
-      echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_log_subsample.csv
-  
-      # Make big mem log file to track ind-year combos saved for the big mem parition
-      echo "species, ind_id, study_id, year, out_type, filename, produced, out_date, n" > out/dbbmm_bigmem_log_subsample.csv
-  
-      # SLURM:
-      sbatch ~/project/covid-19_movement/analysis/src/hpc/run_fit_dBBMMs_subsample.sh
-
-      # ON DEMAND:
-      # conda activate covid
-      # Rscript $src/workflow/fit-dBBMMs.r $wd/processed_data/mosey_mod.db $wd/out 1
-      
-      # TODO:
-      #   * big mem log likely unneccesary, deprecate/delete
-  
     #
 
-    #- Fit space use models -#
+  ##
+  
+  
+  ##-- Niche Breadth --##
+    
+    #- Calculate MVNH Breadth -#
+      
+      # Create csv to store results
+      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year" > ./out/niche_determinant_anthropause.csv
+
+      # Make log file to track successful outputs
+      echo "studyid, individual, scientificname, year, status, week" > out/niche_log.csv
+  
+      # Inputs: db:event_clean  + out filepath + no. cores
+      # Outputs: csv 
+      
+      sbatch $src/hpc/run_calc_niche_breadth.sh
+    #
+  
+
+    #- MVNH Breadth Subsampling -#
+      
+      # Create csv to store results
+      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year, n" > ./out/niche_determinant_anthropause_subsample.csv
+
+      # Make log file to track successful outputs
+      echo "studyid, individual, scientificname, year, status, week" > out/niche_log_subsample.csv
+  
+      # Inputs: db:event_clean  + out filepath + no. cores
+      # Outputs: csv 
+      
+      sbatch $src/hpc/run_calc_niche_breadth_subsample.sh
+
+    #
+
+
+  ##
+
+
+####---- Inferential Models ----####
+
+ #- Fit space use models -#
       
       # Inputs: space use csv + trait csv + no. cores
       # Outputs: model rdata objects 
@@ -403,47 +363,11 @@
       plot_space_use.r
     #
 
-  ##
-  
-  
-  ##-- Niche Breadth --##
-    
-    #- Calculate MVNH Breadth -#
-      
-      # Create csv to store results
-      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year" > ./out/niche_determinant_anthropause.csv
-
-      # Make log file to track successful outputs
-      echo "studyid, individual, scientificname, year, status, week" > out/niche_log.csv
-  
-      # Inputs: db:event_clean  + out filepath + no. cores
-      # Outputs: csv 
-      
-      sbatch $src/hpc/run_calc_niche_breadth.sh
-    #
-  
-    #- MVNH Breadth Subsampling -#
-      
-      # Create csv to store results
-      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year, n" > ./out/niche_determinant_anthropause_subsample.csv
-
-      # Make log file to track successful outputs
-      echo "studyid, individual, scientificname, year, status, week" > out/niche_log_subsample.csv
-  
-      # Inputs: db:event_clean  + out filepath + no. cores
-      # Outputs: csv 
-      
-      sbatch $src/hpc/run_calc_niche_breadth_subsample.sh
-    #
-  
-  
     #- Fit niche breadth models -#
       
       sbatch $src/hpc/run_fit_niche_breadth_dot_models.sh
       sbatch $src/hpc/run_fit_niche_breadth_additive_models.sh
       sbatch $src/hpc/run_fit_niche_breadth_interactive_models.sh #interaction model
-
-  ##
 
   ##-- Intra-Individual Analysis --##
   

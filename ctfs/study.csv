@@ -1,56 +1,52 @@
-study_id,study_name,run
-9493874,LifeTrack Rough-legged buzzards,0
-20873986,LifeTrack Bald Eagle,0
-24797204,Vulture Movements,0
-45525232,Fall Migrant Raptors - U.S. Atlantic Flyway - Biodiversity Research Institute,0
-88283014,Bald Eagle - Haliaeetus leucocephalus - Biodiversity Research Institute,0
-103426553,LifeTrack Peregrine falcon,0
-133810762,Antigone_canadensis_Minnesota,0
-247850178,ACR Heron and Egret telemetry project,0
-259354593,Golden Eagle Nevada,0
-351564596,American Woodcock Migration Ecology in Eastern North America,0
-430263960,Bald Eagle (Haliaeetus leucocephalus) in the Pacific Northwest,0
-474651680,"Odocoileus virginianus DeNicola Staten Island, NY, USA",0
-619097045,USGS WERC Dixon Field Station Compiled Avian Telemetry,1
-970414473,Common Ravens - Yellowstone,0
-1044238185,Jackson Moose,0
-1088836380,Carnivore movements near Black Rock Forest New York,0
-1153281001,"Odocoileus virginianus DeNicola Ft. Indiantown Gap, PA, USA",0
-1233029719,Illinois white-tailed deer and predators,0
-1265606810,"Cervus canadensis, SE Manitoba Canada",0
-1303056617,"White-tailed deer females - Staten Island, NY, USA",0
-1345819920,Alaska Brown Bear Study_Belant,0
-1346049486,Alaska Elk Study_Belant,0
-1346153721,Michigan Wolf Study_Belant,0
-1352128684,Missouri Black Bear Study_Belant,0
-1352148863,Michigan White-tailed Deer Movement Study_Belant,0
-1418296656,"Long-billed Curlew (Numenius americanus) full annual cycle movement ecology - A.Boyce/SCBI (Montana, USA)",0
-1442516400,Greater snow goose migration,0
-1450581443,Nevada Dept of Wildlife - FEHA studies,0
-1450604622,Nevada Dept of Wildlife - NOGO studies,0
-1631574074,Ouachita Oklahoma Black Bear,0
-1674593154,Olympic Cougar Project,0
-1891142364,tmp_bear_COVID_howley,0
-1891172051,tmp_bighorn_COVID_montheith,0
-1891252069,tmp_bobcat_COVID_prugh,0
-1891254100,tmp_Cougar_COVID_avgar,0
-1891257164,tmp_Cougar_COVID_wilmers,0
-1891403240,tmp_moose_COVID_montheith,0
-1891587670,tmp_snailkite_COVID_fletcher,0
-1892309488,tmp_muledeer_COVID_montheith,0
-1892312952,tmp_pronghorn_COVID_avgar,0
-1893821864,tmp_muledeer_covid_avgar_1,0
-1893842849,tmp_muledeer_COVID_avgar_2,0
-1893871371,tmp_muledeer_covid_avgar_4,0
-1893933910,tmp_muledeer_covid_avgar_5,0
-1893991893,tmp_muledeer_covid_avgar_6,0
-1894068157,tmp_muledeer_covid_avgar_7,0
-1894723431,tmp_coyote_prugh,0
-1967912018,tmp_muledeer_COVID_ortega,0
-1967920769,tmp_pigs_covid_cherry,0
-1967925459,tmp_whitetaileddeer_COVID_cherry,0
-1967929987,tmp_elk_COVID_cherry,0
-1969467709,tmp_moose_COVID_monteith,0
-1969471890,tmp_bighorn_COVID_monteith,0
-1969667219,tmp_moose_COVID_martinez,0
-2051515123,tmp_muledeer_benson,0
+study_id,run
+9493874,1
+20873986,1
+24797204,1
+45525232,1
+88283014,1
+103426553,1
+133810762,1
+247850178,1
+259354593,1
+430263960,1
+474651680,1
+619097045,1
+970414473,1
+1044238185,1
+1088836380,1
+1153281001,1
+1233029719,1
+1265606810,1
+1303056617,1
+1345819920,1
+1346049486,1
+1346153721,1
+1352128684,1
+1352148863,1
+1418296656,1
+1442516400,1
+1450581443,1
+1450604622,1
+1631574074,1
+1674593154,1
+1891142364,1
+1891252069,1
+1891254100,1
+1891257164,1
+1892309488,1
+1892312952,1
+1893821864,1
+1893842849,1
+1893871371,1
+1893933910,1
+1893991893,1
+1894068157,1
+1894723431,1
+1967912018,1
+1967920769,1
+1967925459,1
+1967929987,1
+1969467709,1
+1969471890,1
+1969667219,1
+2051515123,1
