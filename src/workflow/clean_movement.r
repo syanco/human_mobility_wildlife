@@ -2,19 +2,7 @@
 
 # DESCRIPTION #
 # 
-# This script preps and cleans data for the COVID-19 Animal Movement Project
-# See project documentation for details about anticipated directory structure.
-# Major tasks of this script:
-#   * Annotate dataset with the study periods:
-#     * Pre-LD 2019
-#     * LD 2019
-#     * Post-LD 2019
-#     * Pre-LD 2020
-#     * LD 2020
-#     * Post-LD 2020
-#   * Remove events outside relevant study periods.
-#   * Basic data cleaning:
-#     * ID and remove outliers
+# This script cleans data for the COVID-19 Animal Movement Project
 
 
 '
@@ -91,67 +79,24 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
 invisible(assert_that(length(dbListTables(db))>0))
 
-evt <- tbl(db,'event')  # %>%  collect()
-evt_cln <- tbl(db,'event_clean') %>%  collect()
+
 
 # dbBegin(db)
 
 #---- Perform analysis ----#
 
-#-- Make a filtered table by study period
-
-# get list of inidviduals to remove from study base don bad coords
-indtb <- tbl(db, "individual") %>%  collect()
-# ind_cln <- tbl(db, "individual_clean") %>%  collect()
-
-# extract only relevnt time periods
-mod <- evt %>%
-  filter((timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2019"] & 
-            timestamp < !!periods$date[periods$cutpoint == "stop_2019"])
-         | (timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2020"] & 
-              timestamp < !!periods$date[periods$cutpoint == "stop_2020"])) %>%
-  mutate(yr = strftime('%Y', timestamp),
-         trt = case_when(
-           timestamp >= !!periods$date[periods$cutpoint == "start_pre-ld_2019"] &
-             timestamp < !!periods$date[periods$cutpoint == "start_ld_2019"] ~ "pre-ld_2019",
-           timestamp >= !!periods$date[periods$cutpoint == "start_ld_2019"] &
-             timestamp < !!periods$date[periods$cutpoint == "start_post-ld_2019"] ~ "ld_2019",
-           timestamp >= !!periods$date[periods$cutpoint == "start_post-ld_2019"] &
-             timestamp < !!periods$date[periods$cutpoint == "stop_2019"] ~ "post-ld_2019",
-           timestamp >= !!periods$date[periods$cutpoint == "start_pre-ld_2020"] &
-             timestamp < !!periods$date[periods$cutpoint == "start_ld_2020"] ~ "pre-ld_2020",
-           timestamp >= !!periods$date[periods$cutpoint == "start_ld_2020"] &
-             timestamp < !!periods$date[periods$cutpoint == "start_post-ld_2020"] ~ "ld_2020",
-           timestamp >= !!periods$date[periods$cutpoint == "start_post-ld_2020"] &
-             timestamp < !!periods$date[periods$cutpoint == "stop_2020"] ~ "post-ld_2020")
-  ) %>% 
-  collect()
-
-# remove specific studies from db
-#TODO: remove hardcode here
-rminds <- indtb %>% 
-  filter(study_id == 1891172051 | study_id == 1891403240) %>% 
-  pull(individual_id)
-rminds <- c(rminds, 2548934748)
-
-
-mod <- mod %>% 
-  filter(individual_id %notin% rminds)
-
-# write results back to db
-dbWriteTable(conn = db, name = "event_mod", value = mod, append = F, overwrite = T)
-
-
 #-- Clean Outliers
 
-evt1 <- tbl(db, "event_mod")
+evt_trm <- tbl(db,'event_trim') %>%  collect()
+ind_trm <- tbl(db, "individual_trim") %>%  collect()
+std_trm <- tbl(db, "study_trim") %>%  collect()
 
-cnt <- evt1 %>% 
+cnt <- evt_trm %>% 
   group_by(individual_id) %>% 
   summarise(n = n())
 
 # get step lengths and turn angles across dataset
-evt_sf <- evt1 %>% 
+evt_calc <- evt_trm %>% 
   # left_join(cnt) %>% 
   # filter(n < 3) %>% 
   as.data.frame() %>% 
@@ -166,11 +111,11 @@ evt_sf <- evt1 %>%
          dt = as.numeric(difftime(timestamp, dplyr::lag(timestamp, 1)), units='secs'), # time diff (secs)
          v = sl/dt, # velocity (m/s)
          bearing = bearing(cbind(lon,lat), cbind(lag_lon, lag_lat)), # bearing since last point
-         ta = 180-abs(180 - abs(bearing - dplyr::lag(bearing, 1)) %% 360), # tunr angle from current bearing and last bearing
+         ta = 180-abs(180 - abs(bearing - dplyr::lag(bearing, 1)) %% 360), # turn angle from current bearing and last bearing
          wk = lubridate::week(timestamp))
 
 # calculate qunatile-based cutoffs
-cuts <- evt_sf %>% 
+cuts <- evt_calc %>% 
   as.data.frame() %>% 
   group_by(individual_id) %>% 
   summarize(
@@ -180,7 +125,7 @@ cuts <- evt_sf %>%
   ) 
 
 # filter outliers
-evt_out <- evt_sf %>% 
+evt_out <- evt_calc %>% 
   # just join the cutpoints back to the dataset
   left_join(cuts) %>% 
   # conservative outlier thresh, must be past 95% quant for either sl and TA
@@ -196,21 +141,14 @@ dbWriteTable(conn = db, name = "event_clean", value = evt_out, append = FALSE, o
 #-- Update Individual and Event Tables
 
 # Individual Table
-ind <- tbl(db, "individual") %>% 
-  # mutate(individual_id = as.character(individual_id)) %>% 
-  collect()
-
-ind_out <- ind %>% 
+ind_out <- ind_trm %>% 
   semi_join(evt_out, by = "individual_id")   # only retain inds contained in cleaned event table
 
 # write table back to db
 dbWriteTable(conn = db, name = "individual_clean", value = ind_out, append = FALSE, overwrite = T)
 
 # Study Table
-std <- tbl(db, "study") %>% 
-  collect()
-
-std_out <- std %>% 
+std_out <- std_trm %>% 
   semi_join(ind_out, by = "study_id") # only retain studies contained in cleaned individual table
 
 # write table back to db

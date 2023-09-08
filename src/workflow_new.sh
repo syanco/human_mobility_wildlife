@@ -41,12 +41,16 @@
 
 ####----  Initialization  ----####
   
-  # define working directory
+  # define local working directory
   wd=/Users/scottyanco/Documents/covid-19_movement
   src=$wd/analysis/src
   
+  # defiune remot (HPC working directory)
+  wdr=/home/sy522/project/covid-19_movement
+  srcr=$wdr/analysis/src
+  
   # Go to working directory
-  cd $wd
+  cd $wdr
   
 ####
 
@@ -92,15 +96,15 @@
       conda activate covid
       module load dSQ
       
-      Rscript $src/workflow/create_intersection_joblist.r
+      Rscript $srcr/workflow/create_intersection_joblist.r
 
-      dsq --job-file $src/workflow/joblist.txt --mem-per-cpu 40g -t 02:00:00
+      dsq --job-file $srcr/workflow/joblist.txt --mem-per-cpu 40g -t 02:00:00
 
       # The step above generates a .sh file to submit the job to the Slurm manager
       # Thus, after running the previous line, thje file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2023-04-03.sh
+      sbatch dsq-joblist-2023-09-07.sh
       
       # TODO: 
       #   * Rewrite for non-DSQ (for reproducibility)?
@@ -115,7 +119,7 @@
       # Outputs: csv (cbg info + area)
 
       # SLURM:
-      sbatch $src/hpc/run_compute_cbg_area.sh
+      sbatch $srcr/hpc/run_compute_cbg_area.sh
       
       # ON DEMAND:
       # Rscript $src/workflow/compute-cbg-area.r
@@ -133,7 +137,7 @@
       # Outputs: csv (event_id + cbg info + cbg area)
 
       # SLURM:
-      sbatch $src/hpc/run_annotate_events_cbg.sh
+      sbatch $srcr/hpc/run_annotate_events_cbg.sh
       
       # ON DEMAND:
       # Rscript $src/workflow/annotate-events-cbg.r
@@ -156,7 +160,7 @@
       # Outputs: sg data csv (one file per cbg/week)
 
       # SLURM:
-      sbatch $src/hpc/run_process_safegraph_data.sh
+      sbatch $srcr/hpc/run_process_safegraph_data.sh
       
       # ON DEMAND:
       # Rscript $src/workflow/process-safegraph-data.r
@@ -175,7 +179,7 @@
       # Outputs: csv (event_id + timestamp + cbg info = cbg area + sg count)
   
       # SLURM:
-      sbatch $src/hpc/run_annotate_events_safegraph.sh
+      sbatch $srcr/hpc/run_annotate_events_safegraph.sh
       
       # ON DEMAND:
       # Rscript $src/workflow/annotate-events-safegraph.r
@@ -198,7 +202,7 @@
       # Ouputs: csv (event_id + ghm)
 
       # SLURM:
-      sbatch $src/hpc/run_annotate_events_ghm.sh
+      sbatch $srcr/hpc/run_annotate_events_ghm.sh
     
       # ON DEMAND:
       # Rscript $src/workflow/annotate-events-ghm.r
@@ -212,12 +216,6 @@
   
   ##
 
-
-  # ##---  Merge Swap DB  ---##
-  # 
-  #   # Rscript $src/workflow/merge_dbs.r
-  # 
-  # ##
 
 ####
 
