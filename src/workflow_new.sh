@@ -105,10 +105,6 @@
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
       sbatch dsq-joblist-2023-09-08.sh
-      
-      # TODO: 
-      #   * Rewrite for non-DSQ (for reproducibility)?
-      #   * make conda env for this step, remove module r, dsq?
     
     #
 
@@ -124,11 +120,6 @@
       # ON DEMAND:
       # Rscript $src/workflow/compute-cbg-area.r
       
-      # TODO:
-      #   * Fix/update docopts in compute-cbg-area.r
-      #   * Pass .shp location as arg?
-      #   * Use conda rather than module r?
-    
     #
     
     #- Annotate events with cbg info -#
@@ -141,11 +132,6 @@
       
       # ON DEMAND:
       # Rscript $src/workflow/annotate-events-cbg.r
-
-      # TODO:
-      #   * Fix/update docopts in annotate-events-cbg.r
-      #   * Pass input/output paths as arg?
-      #   * Use conda rather than module r?
     
     #
   
@@ -164,12 +150,6 @@
       
       # ON DEMAND:
       # Rscript $src/workflow/process-safegraph-data.r
-      
-      # TODO:
-      #   * Fix/update docopts in process-safegraph-data.r
-      #   * Pass input/output paths as arg?
-      #   * Use conda rather than module r?
-      #   * comment out/delete deprecated code line 118 and beyond?
     
     #
 
@@ -183,11 +163,6 @@
       
       # ON DEMAND:
       # Rscript $src/workflow/annotate-events-safegraph.r
-      
-      # TODO:
-      #   * Fix/update docopts in annotate-events-safegraph.r
-      #   * Pass input/output paths as arg?
-      #   * Use conda rather than module r?
   
     #
 
@@ -206,11 +181,6 @@
     
       # ON DEMAND:
       # Rscript $src/workflow/annotate-events-ghm.r
-      
-      # TODO:
-      #   * Fix/update docopts in annotate-events-ghm.r
-      #   * Pass input/output paths as arg?
-      #   * Use conda rather than module r?
     
     #
   
@@ -222,9 +192,9 @@
 
 ##-- Run Cleaning --##
   
-    # Inputs:   db:event + analysis/ctfs/dates.csv
+    # Inputs:   db:event_trim 
     # Outputs:  db:event_mod + db:event_clean
-    # Depends:  clone of mosey_env (https://github.com/benscarlson/mosey_env)
+
   
     # SLURM:
     sbatch $src/hpc/run_clean_movement.sh
@@ -233,12 +203,6 @@
     # conda activate spatial
     # Rscript $src/workflow/clean_movement.r --db $wd/processed_data/mosey_mod.db
   
-    # TODO: 
-    #   * SEPARATE OUTLIER REMOVAL FROM RELEVANCE FILTER
-    #   * Remove hardcoded study filters
-    #   * Simplify date filtering
-    #   * Add spatial filtering (events outside US).
-    #   * Allow quantile thresholds to be passed by arg
   ##
 
 ####
