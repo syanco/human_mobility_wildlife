@@ -104,7 +104,7 @@
       # Thus, after running the previous line, thje file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2023-09-07.sh
+      sbatch dsq-joblist-2023-09-08.sh
       
       # TODO: 
       #   * Rewrite for non-DSQ (for reproducibility)?
