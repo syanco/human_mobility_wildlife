@@ -26,7 +26,7 @@ if(interactive()) {
   .outP <- file.path(.wd,'out/single_species_models/area_additive')
 
   .cores <- 20
-  .minsp <- 10
+  .minsp <- 5
   .iter <- 5000
   .thin <- 4
   
