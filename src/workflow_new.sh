@@ -188,7 +188,7 @@
   
   ##
 
-  ##-- Run Cleaning --##
+  ##-- Clean Data --##
     
       # Inputs:   db:event_trim 
       # Outputs:  db:event_mod + db:event_clean
@@ -212,9 +212,18 @@
       # Inputs: db:event_clean  + out filepath + no. cores
       # Outputs: csv 
       
-      sbatch $src/hpc/run_calc_niche_breadth_subsample.sh
+      sbatch $srcr/hpc/run_calc_niche_breadth_subsample.sh
 
   ##
+
+ ##- Filter to Min Sample - Report Sample Size  -#
+      
+
+      sbatch $srcr/hpc/run_calc_niche_breadth_subsample.sh
+
+  ##
+
+
 
 ####
 

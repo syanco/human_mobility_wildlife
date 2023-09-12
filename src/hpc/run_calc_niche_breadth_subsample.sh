@@ -21,7 +21,7 @@ src=$wd/analysis/src/workflow
 cd $wd
 
 #copy db to tmp
-cp $wd/processed_data/mosey_mod.db /tmp/
+cp $wd/processed_data/mosey_mod_2023.db /tmp/
 
 
 # Vector of subsample sizes
