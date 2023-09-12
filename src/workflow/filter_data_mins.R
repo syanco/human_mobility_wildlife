@@ -12,12 +12,15 @@ Usage:
 filter_data_mins.r [--db=<db>] <wkmin> <minsp>
 filter_data_mins.r (-h | --help)
 
+Parameters
+  wkmin:    Minimum sample size per week
+  minsp:    Minimum individuals per species
+
 Options:
 -h --help     Show this screen.
 -v --version     Show version.
 -d --db=<db>  Path to movement database. Defaults to <wd>/data/move.db
--w --wkmin    Minimum sample size per week
--m --minsp    Minimum individuals per species
+
 ' -> doc
 
 #---- Input Parameters ----#

@@ -19,4 +19,4 @@ src=$wd/analysis/src/workflow
 cd $wd
 
 # Execute cleaning script (non parallel)
-Rscript $src/filter_data_mins.R --db $wd/processed_data/mosey_mod_2023.db --wkmin 30 --minsp 5
+Rscript $src/filter_data_mins.R --db $wd/processed_data/mosey_mod_2023.db 30 5
