@@ -74,6 +74,7 @@ periods <- read_csv(file.path(.wd,'analysis/ctfs/dates.csv'),
                     col_types=list("date" = col_date(format = "%m/%d/%Y"))) 
 
 #---- Initialize database ----#
+message("Connecting to database...")
 invisible(assert_that(file.exists(.dbPF)))
 
 db <- dbConnect(RSQLite::SQLite(), .dbPF)
@@ -86,6 +87,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 #-- Load Cleaned Data
 
+message("Loading data...")
 evt_cln <- tbl(db,'event_clean') %>%  collect()
 ind_cln <- tbl(db, "individual_clean") %>%  collect()
 # ind_cln <- tbl(db, "individual_trim") %>%  collect()
@@ -94,6 +96,7 @@ std_cln <- tbl(db, "study_clean") %>%  collect()
 
 #-- Remove species with too few individuals
 
+message(glue("Removing species below theshold of {.minsp} individuals..."))
 # get ind count per species
 sp_sum <- evt_cln %>%
   group_by(species) %>%
@@ -106,6 +109,8 @@ evt_sp <- evt_cln %>%
 
 #-- Remove weeks with too few fixes per week
 
+message(glue("Removing weeks below threshold of {.wkmin} fixes per individual"))
+
 fix_sum <- evt_sp %>% 
   group_by(ind_f, yr, wk) %>% 
   summarize(n= n()) %>% 
@@ -117,10 +122,15 @@ evt_out <- evt_sp %>%
 
 #-- Write out individual table
 
+message("Writing event table back to database...")
+
+message("Writing out ")
 # write table back to db
 dbWriteTable(conn = db, name = "event_final", value = evt_out, append = FALSE, overwrite = T)
 
 #-- Sync up study and individual tables
+
+message("Updating and writing individual table back to database...")
 
 # Individual Table
 ind_out <- ind_cln %>% 
@@ -129,9 +139,35 @@ ind_out <- ind_cln %>%
 # write table back to db
 dbWriteTable(conn = db, name = "individual_final", value = ind_out, append = FALSE, overwrite = T)
 
+message("Updating and writing study table back to database...")
+
 # Study Table
-std_out <- std_trm %>% 
+std_out <- std_cln %>% 
   semi_join(ind_out, by = "study_id") # only retain studies contained in cleaned individual table
 
 # write table back to db
 dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, overwrite = T)
+
+#-- Write our sample size summaries
+
+message("Writing out sample size report...")
+
+sink("out/sample_report_after_data_clean.txt")
+print(glue("Description of sample sizes after all data cleaning, prior to estimating dBBMMs and MVNH Niche Breadths"))
+print(glue("\n ##########################################################"))
+
+print(glue("\n \n Total number of species in data: {nrow(sp_sum)}"))
+
+print(glue("\n \n Individuals per species:
+           {sp_sum %>% print( n=36, max_footer_lines=0)}"))
+
+print(glue("\n ##########################################################"))
+
+print(glue("\n \n Total number of fixes in data: {sum(fix_sum$n)}"))
+
+print(glue("\n \n Fixes per species:
+           {evt_out %>% group_by(species) %>% summarize(n = n()) %>% as_tibble() %>% print( n=36, max_footer_lines=0)}"))
+
+sink()
+
+message("Script Complete!")

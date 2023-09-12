@@ -219,7 +219,7 @@
  ##- Filter to Min Sample - Report Sample Size  -#
       
 
-      sbatch $srcr/hpc/run_calc_niche_breadth_subsample.sh
+      sbatch $srcr/hpc/run_filter_data_mins.sh
 
   ##
 
