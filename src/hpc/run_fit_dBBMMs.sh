@@ -16,7 +16,7 @@ conda activate covid
 wd=~/project/covid-19_movement
 
 #copy db to tmp
-cp $wd/processed_data/mosey_mod.db /tmp/
+cp $wd/processed_data/mosey_mod_2023.db /tmp/
 
 # Execute cleaning script (non parallel)
-Rscript $wd/analysis/src/workflow/fit-dBBMMs.r /tmp/mosey_mod.db $wd/out 24
+Rscript $wd/analysis/src/workflow/fit-dBBMMs.r /tmp/mosey_mod_2023.db $wd/out 24

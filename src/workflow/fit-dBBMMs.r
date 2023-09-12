@@ -85,7 +85,7 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual') %>% 
+indtb <- tbl(db,'individual_final') %>% 
   collect() 
 
 indtb <- indtb[!duplicated(indtb),]
@@ -128,7 +128,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
       #---- Perform analysis ----#
       message(glue("Gathering movement data for individual {ind[j]}, year {yearvec[i]}..."))
       
-      evt0 <- tbl(db, "event_clean")
+      evt0 <- tbl(db, "event_final")
       
       scientificname <- indtb %>% 
         filter(individual_id == !!ind[j]) %>% 
@@ -155,11 +155,11 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
       
       dbDisconnect(db) 
       
-      # TODO: this is an arbitrary minimum... check
-      if(nrow(evt_mod) <= 25){
-        message(glue("Insufficient records for individual {ind[j]}, year {yearvec[i]}, movin on..."))
+      # if event data is large...
+      # TODO:  I think this upper size check is unecessary - maybe remove someday, but for now I just set the threshold very high
+      if(nrow(evt_mod) > 100000){
         
-        # Make entry in log file
+        # ...make an entry in the big mem log file - save dbbmm for later
         outlog <- data.frame("species" = scientificname, 
                              "ind_id" = ind[j], 
                              "study_id" = studyid, 
@@ -168,133 +168,87 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                              "filename" = glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"), 
                              "produced" = 0, 
                              "out_date" = as.character(Sys.Date()))
-        write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
+        write.table(outlog, glue("{.outPF}/dbbmm_bigmem_log.csv"), append = T, row.names = F, 
                     col.names = F, sep = ",")
-        
       } else {
-        # if event data is large...
-        # TODO:  I think this upper size check is unecessary - maybe remove someday, but for now I just set the threshold very high
-        if(nrow(evt_mod) > 50000){
-          # Just make anentry in the big mem log file - save dbbmm for later
-          # outlog <- matrix(c(scientificname, as.integer(ind[j]), as.integer(studyid), yearvec[i], "dbbm", 
-          #                    glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-          #                    0, as.character(Sys.Date())), 
-          #                  nrow = 1)
-          outlog <- data.frame("species" = scientificname, 
-                               "ind_id" = ind[j], 
-                               "study_id" = studyid, 
-                               "year" = yearvec[i], 
-                               "out_type" = "dbbm", 
-                               "filename" = glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"), 
-                               "produced" = 0, 
-                               "out_date" = as.character(Sys.Date()))
-          write.table(outlog, glue("{.outPF}/dbbmm_bigmem_log.csv"), append = T, row.names = F, 
-                      col.names = F, sep = ",")
-        } else {
-          # ...else proceed with fitting dbbmm
+        # ...else proceed with fitting dbbmm
+        
+        
+        #-- Fit dBBMMs
+        message("Estimating dBBMMs...")
+        tryCatch({
+          # make minimal df for `move`    
+          evt_tmp <- evt_mod %>% 
+            select(lon, lat, timestamp, wk)
           
+          evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, trt = evt_tmp$trt,
+                         proj=CRS("+proj=longlat"))
+          burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
+          #id "intended fix rate"
+          fixmed <- median(timeLag(x=evt_mv, units="mins"))
+          evt_burst <- burst(evt_mv, burstid)
+          evt_mv_t <- spTransform(evt_burst, center = T)
+          dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
+                                                  location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                                                    rep(5, n.locs(evt_mv_t))}else{
+                                                      evt_mod$horizontal_accuracy},
+                                                  margin = 11, 
+                                                  window.size = 31)
+          # remove any segments with gaps > 3x the intended fix rate
+          dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
           
-          #-- Fit dBBMMs
-          message("Estimating dBBMMs...")
-          tryCatch({
-            # make minimal df for `move`    
-            evt_tmp <- evt_mod %>% 
-              select(lon, lat, timestamp, wk)
+          dbbm <- brownian.bridge.dyn(dbb_var, 
+                                      location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                                        rep(5, n.locs(evt_mv_t))}else{
+                                          evt_mod$horizontal_accuracy} ,
+                                      time.step = (fixmed/15),
+                                      dimSize = 1000,
+                                      ext = 10,
+                                      margin = 11, window.size = 31)
+        }, error = function(e){cat(glue("ERROR: unspecified error in fitting dBBMM for ind {ind[j]}, yr {yearvec[i]}", 
+                                        "\n"))})
+        tryCatch({
+          if(exists("dbbm")){
+            # write the dbbmm objects to list
+            tmp_out <- list("dBBMM Variance" = dbb_var,
+                            "dBBMM Object" = dbbm,
+                            "events" = evt_mod
+            )
+          } else {
+            message(glue("No dbbmm object in memory, nothing written to tmp for individual {ind[j]}, {yearvec[i]}"))
+          }
+        }, error = function(e){cat("ERROR: couldnt write dBBMM objects to tmp", 
+                                   "\n")})
+        
+        #-- Save individual output
+        
+        message(glue("Writing output for individual {ind[j]} to file..."))
+        tryCatch({
+          if(exists("tmp_out")){
+            save(tmp_out,
+                 file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
+            )
             
-            evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, trt = evt_tmp$trt,
-                           proj=CRS("+proj=longlat"))
-            burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
-            #id "intended fix rate"
-            fixmed <- median(timeLag(x=evt_mv, units="mins"))
-            evt_burst <- burst(evt_mv, burstid)
-            evt_mv_t <- spTransform(evt_burst, center = T)
-            dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
-                                                    # TODO check on error modeling
-                                                    location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
-                                                      #TODO: fixed at 5m - maybe reset to the global mean horiz accuracy in the data?
-                                                      rep(5, n.locs(evt_mv_t))}else{
-                                                        evt_mod$horizontal_accuracy},
-                                                    
-                                                    #TODO: think about these...
-                                                    margin = 11, 
-                                                    window.size = 31)
-            # remove any segments with gaps > 3x the intended fix rate
-            dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
-            
-            dbbm <- brownian.bridge.dyn(dbb_var, 
-                                        #TODO: need to come up with a way to select this more dynamically based on the scale of the data
-                                        # raster = 100,
-                                        # If we have horiz accuracy use that, otherwise use fixed accuracy
-                                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
-                                                                #TODO: fixed at 5m - maybe reset to the global mean horiz accuracy in the data?
-                                                                rep(5, n.locs(evt_mv_t))}else{
-                                                                evt_mod$horizontal_accuracy} ,
-                                        # location.error = rep(10, n.locs(evt_mv_t)),
-                                        time.step = (fixmed/15),
-                                        # burstType = levels(burstid),
-                                        #TODO: below is somewhat arbitrary
-                                        dimSize = 1000,
-                                        ext = 10,
-                                        margin = 11, window.size = 31)
-          }, error = function(e){cat(glue("ERROR: unspecified error in fitting dBBMM for ind {ind[j]}, yr {yearvec[i]}", 
-                                          "\n"))})
-          tryCatch({
-            if(exists("dbbm")){
-              # # Get UD volume
-              # vol <- getVolumeUD(dbbm)
-              # 
-              # # Make 95% mask
-              # mask95 <- vol
-              # mask95[mask95>0.95] <- NA
-              # mask95[mask95<0.95] <- 1
-              # 
-              # # Clip out 95% UD
-              # ud95 <- dbbm*mask95
-              
-              # write the dbbmm objects to list
-              tmp_out <- list("dBBMM Variance" = dbb_var,
-                              "dBBMM Object" = dbbm,
-                              # "Contours" =  raster2contour(dbbm),
-                              # "UD Volume" = vol,
-                              # "95% Mask" = mask95,
-                              # "95% UD" = ud95,
-                              "events" = evt_mod
-              )
-            } else {
-              message(glue("No dbbmm object in memory, nothing written to tmp for individual {ind[j]}, {yearvec[i]}"))
-            }
-          }, error = function(e){cat("ERROR: couldnt write dBBMM objects to tmp", 
-                                     "\n")})
-          
-          #-- Save individual output
-          
-          message(glue("Writing output for individual {ind[j]} to file..."))
-          tryCatch({
-            if(exists("tmp_out")){
-              save(tmp_out,
-                   file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
-              )
-              
-              # Make entry in log file
-              outlog <- data.frame("species" = scientificname, 
-                                   "ind_id" = ind[j], 
-                                   "study_id" = studyid, 
-                                   "year" = yearvec[i], 
-                                   "out_type" = "dbbm", 
-                                   "filename" = glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"), 
-                                   "produced" = 1, 
-                                   "out_date" = as.character(Sys.Date()))
-              write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
-                          col.names = F, sep = ",")
-            }else {
-              message(glue("No tmp list in memory, nothing written to file for {ind[j]}, {yearvec[i]}"))
-            }
-          }, error = function(e){cat("ERROR: couldnt save tmp_out to file", 
-                                     "\n")})
-        } # fi
+            # Make entry in log file
+            outlog <- data.frame("species" = scientificname, 
+                                 "ind_id" = ind[j], 
+                                 "study_id" = studyid, 
+                                 "year" = yearvec[i], 
+                                 "out_type" = "dbbm", 
+                                 "filename" = glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"), 
+                                 "produced" = 1, 
+                                 "out_date" = as.character(Sys.Date()))
+            write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
+                        col.names = F, sep = ",")
+          }else {
+            message(glue("No tmp list in memory, nothing written to file for {ind[j]}, {yearvec[i]}"))
+          }
+        }, error = function(e){cat("ERROR: couldnt save tmp_out to file", 
+                                   "\n")})
       } # fi
-    } # fi end the check whether individual has been previously considered
-  } #i (end loop through years) : #j (end loop through individuals)
+    } # fi
+  } # fi end the check whether individual has been previously considered
+} #i (end loop through years) : #j (end loop through individuals)
 
 #---- Finalize script ----#
 
