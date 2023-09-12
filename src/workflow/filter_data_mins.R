@@ -17,7 +17,7 @@ Options:
 -v --version     Show version.
 -d --db=<db>  Path to movement database. Defaults to <wd>/data/move.db
 -w --wkmin    Minimum sample size per week
--m --minsop    Minimum individuals per species
+-m --minsp    Minimum individuals per species
 ' -> doc
 
 #---- Input Parameters ----#
@@ -82,6 +82,8 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 #---- Perform analysis ----#
 
+# dbListTables(db)
+
 #-- Load Cleaned Data
 
 evt_cln <- tbl(db,'event_clean') %>%  collect()
@@ -94,10 +96,42 @@ std_cln <- tbl(db, "study_clean") %>%  collect()
 
 # get ind count per species
 sp_sum <- evt_cln %>%
-  left_join(ind_cln %>% select(individual_id, taxon_canonical_name), by = "individual_id") %>% 
-  mutate(species = taxon_canonical_name,
-         ind_f = as.factor(individual_id)) %>% 
   group_by(species) %>%
   summarize(nind = length(unique(ind_f))) %>%
-  filter(nind > .minsp) #require a minimum# of individuals
+  filter(nind >= .minsp) #require a minimum# of individuals
 
+evt_sp <- evt_cln %>% 
+  semi_join(sp_sum, by = "species")
+
+
+#-- Remove weeks with too few fixes per week
+
+fix_sum <- evt_sp %>% 
+  group_by(ind_f, yr, wk) %>% 
+  summarize(n= n()) %>% 
+  filter((n >= .wkmin))
+
+evt_out <- evt_sp %>% 
+  semi_join(fix_sum, by = "ind_f")
+
+
+#-- Write out individual table
+
+# write table back to db
+dbWriteTable(conn = db, name = "event_final", value = evt_out, append = FALSE, overwrite = T)
+
+#-- Sync up study and individual tables
+
+# Individual Table
+ind_out <- ind_cln %>% 
+  semi_join(evt_out, by = "individual_id")   # only retain inds contained in cleaned event table
+
+# write table back to db
+dbWriteTable(conn = db, name = "individual_final", value = ind_out, append = FALSE, overwrite = T)
+
+# Study Table
+std_out <- std_trm %>% 
+  semi_join(ind_out, by = "study_id") # only retain studies contained in cleaned individual table
+
+# write table back to db
+dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, overwrite = T)
