@@ -45,7 +45,7 @@ gcsURL=${argv[2]} # The gcs url to the folder that will hold csvs for import to 
 outP=${argv[3]} # The path to the folder that will hold csvs for import to gcs
 
 #Set defaults for optional paramters
-[[ -z "$db" ]] && db=processed_data/mosey_mod.db
+[[ -z "$db" ]] && db=processed_data/mosey_mod_2023.db
 # [[ -z "$db" ]] && db=processed_data/mosey_mod.db
 
 # Local parameters
@@ -95,7 +95,7 @@ do
   sql="select f.event_id as anno_id, e.lon, e.lat,
     strftime('%Y-%m-%dT%H:%M:%SZ',e.timestamp) as timestamp, 
     	(row_number() over (order by e.lon, e.lat)-1)/$groupSize as grp 
-    from event_clean f 
+    from event_trim f 
         inner join event e
     on f.event_id = e.event_id
     where f.study_id = ${entId}"

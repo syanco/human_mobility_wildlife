@@ -6,7 +6,7 @@
 #SBATCH --partition day
 #SBATCH -c 10
 #SBATCH --mem-per-cpu 20G
-#SBATCH -J calc_size_with_TMAX-TMIN
+#SBATCH -J calc_area_size
 
 # Load conda env
 module load miniconda
@@ -20,9 +20,9 @@ src=$wd/analysis/src/workflow
 cd $wd
 
 #copy db to tmp
-cp $wd/processed_data/mosey_mod.db /tmp/
+cp $wd/processed_data/mosey_mod_2023.db /tmp/
 
 
 # Execute calc size script/
-Rscript $src/calc-space-use.r ./out /tmp/mosey_mod.db ./out/dbbmm_log.csv 10 -c
+Rscript $src/calc-space-use.r ./out /tmp/mosey_mod_2023.db ./out/dbbmm_log.csv 10 -c
 

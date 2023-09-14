@@ -244,15 +244,12 @@
       echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > out/dbbmm_bigmem_log.csv
   
       # SLURM:
-      sbatch ~/project/covid-19_movement/analysis/src/hpc/run_fit_dBBMMs.sh
+      sbatch $srcr/hpc/run_fit_dBBMMs.sh
 
       # ON DEMAND:
       # conda activate covid
       # Rscript $src/workflow/fit-dBBMMs.r $wd/processed_data/mosey_mod.db $wd/out 1
-      
-      # TODO:
-      #   * big mem log likely unneccesary, deprecate/delete
-  
+
     #
 
 

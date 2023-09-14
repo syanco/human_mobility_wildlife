@@ -283,7 +283,7 @@ entities <- read_csv(file.path(.wd,'ctfs',glue('{.entity}.csv'))) %>% filter(run
       #View(anno$getInfo()); quit()
       #glue('{.outPF}_{group}') #OLD, remove
       
-      fileN <- glue('{.std}_{.col_name}')
+      fileN <- glue('{.std}_{.col_name}_{group}')
       
       task <- ee$batch$Export$table$toCloudStorage(
         collection=anno,

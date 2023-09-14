@@ -54,7 +54,8 @@ sqlite3 -header -csv $db "$sql;" > analysis/ctfs/study.csv
 #-- Set up variables
 #--
 
-geePtsP=users/syanco/covid-mvmnt/tracks #folder holding the gee point datasets
+geePtsP=users/syanco/covid-mvmnt/tracks_2023 #folder holding the gee point datasets
+# geePtsP=project/covid-mvmnt/assets/tracks #folder holding the gee point datasets
 gcsBucket=covid-mvmnt-bucket
 gcsInP=ingest_gee #This holds the csvs that will be imported to gee
 gcsOutP=annotated #This is the output folder for annotated csvs (excluding bucket)

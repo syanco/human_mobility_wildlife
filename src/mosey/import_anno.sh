@@ -41,8 +41,8 @@ echo db: $db
 #envs=(${argv[3]})
 
 #Set defaults
-[[ -z "$table" ]] && table="event_clean"
-[[ -z "$clean" ]] && clean="true"
+[[ -z "$table" ]] && table="event_trim"
+[[ -z "$clean" ]] && clean="false"
 
 # echo $gcsOutURL
 # echo $annoP
@@ -106,7 +106,7 @@ do
 		#gsutil ls $gcsOutURL/${annoN}_*.csv
 		#It seems zsh attemps to expand the * before sending to gsutil.
 		# Wrap this in '' so that shell will not expand it
-		gsutil -q stat $gcsCSV
+		gsutil -q stat $gcsOutURL/${annoN}/${annoN}_*.csv
 
 		return_value=$? #returns 0 if files exist, 1 if there are no results
 
@@ -115,12 +115,12 @@ do
 			continue
 		fi
 		
-		echo "Downloading $gcsCSV ..."
+		echo "Downloading $gcsOutURL/${annoN}/${annoN}_*.csv ..."
 		
-		gsutil cp $gcsCSV $annoP
+		gsutil cp $gcsOutURL/${annoN}/${annoN}_*.csv $annoP
 
-    # echo "Merging individual task files..."
-    # awk '(NR == 1) || (FNR > 1)' $annoP/${annoN}_*.csv > $annoPF
+    echo "Merging individual task files..."
+    awk '(NR == 1) || (FNR > 1)' $annoP/${annoN}_*.csv > $annoPF
     
 		echo Updating the database...
 		#Note that .import loads empty fields in csv as "", not NULL

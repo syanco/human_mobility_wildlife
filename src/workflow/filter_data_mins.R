@@ -91,22 +91,40 @@ invisible(assert_that(length(dbListTables(db))>0))
 #-- Load Cleaned Data
 
 message("Loading data...")
-evt_cln <- tbl(db,'event_clean') %>%  collect()
-ind_cln <- tbl(db, "individual_clean") %>%  collect()
+evt_cln <- tbl(db,'event_trim') %>%  collect()
+ind_cln <- tbl(db, "individual_trim") %>%  collect()
 # ind_cln <- tbl(db, "individual_trim") %>%  collect()
-std_cln <- tbl(db, "study_clean") %>%  collect()
+std_cln <- tbl(db, "study_trim") %>%  collect()
 # std_cln <- tbl(db, "study_trim") %>%  collect()
+
+beepr::beep()
+
+#-- Remove incomplete cases
+
+message(glue("Removing weeks wihtout complete env annotations"))
+
+evt_out2 <- evt_cln %>% 
+  mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T"),
+         wk = week(timestamp)) %>% 
+  drop_na(tmax, ndvi, elev)
+
+# evt_comp <- evt_fix %>%
+#   select(species, ind_f, tmax, ndvi, elev) %>%
+#   filter(complete.cases(.))
+# 
+# evt_out <- evt_sp %>%
+#   semi_join(evt_comp, by = "ind_f")
 
 #-- Remove species with too few individuals
 
 message(glue("Removing species below theshold of {.minsp} individuals..."))
 # get ind count per species
-sp_sum <- evt_cln %>%
+sp_sum <- evt_out2 %>%
   group_by(species) %>%
   summarize(nind = length(unique(ind_f))) %>%
   filter(nind >= .minsp) #require a minimum# of individuals
 
-evt_sp <- evt_cln %>% 
+evt_sp <- evt_out2 %>% 
   semi_join(sp_sum, by = "species")
 
 
@@ -119,8 +137,10 @@ fix_sum <- evt_sp %>%
   summarize(n= n()) %>% 
   filter((n >= .wkmin))
 
-evt_out <- evt_sp %>% 
+evt_fix <- evt_sp %>% 
   semi_join(fix_sum, by = "ind_f")
+
+
 
 
 #-- Write out individual table
@@ -129,7 +149,7 @@ message("Writing event table back to database...")
 
 message("Writing out ")
 # write table back to db
-dbWriteTable(conn = db, name = "event_final", value = evt_out, append = FALSE, overwrite = T)
+dbWriteTable(conn = db, name = "event_final", value = evt_fix, append = FALSE, overwrite = T)
 
 #-- Sync up study and individual tables
 
@@ -137,7 +157,7 @@ message("Updating and writing individual table back to database...")
 
 # Individual Table
 ind_out <- ind_cln %>% 
-  semi_join(evt_out, by = "individual_id")   # only retain inds contained in cleaned event table
+  semi_join(evt_fix, by = "individual_id")   # only retain inds contained in cleaned event table
 
 # write table back to db
 dbWriteTable(conn = db, name = "individual_final", value = ind_out, append = FALSE, overwrite = T)
@@ -151,6 +171,21 @@ std_out <- std_cln %>%
 # write table back to db
 dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, overwrite = T)
 
+
+#-- Generate Sample Size Sumaries
+
+# No of species
+(no_sp <- evt_fix %>% pull(species) %>% unique() %>% length())
+
+# Inds per species
+(inds_p_sp <- evt_fix %>% group_by(species) %>% summarize(n = n_distinct(ind_f)))
+
+# Fixes per species
+(fix_p_sp <- evt_fix %>% group_by(species) %>% summarize(n = n()))
+
+# No of individuals
+(no_inds <- evt_fix %>% pull(ind_f) %>% unique() %>% length())
+
 #-- Write our sample size summaries
 
 message("Writing out sample size report...")
@@ -159,17 +194,17 @@ sink("out/sample_report_after_data_clean.txt")
 print(glue("Description of sample sizes after all data cleaning, prior to estimating dBBMMs and MVNH Niche Breadths"))
 print(glue("\n ##########################################################"))
 
-print(glue("\n \n Total number of species in data: {nrow(sp_sum)}"))
+print(glue("\n \n Total number of species in data: {no_sp}"))
 
-print(glue("\n \n Individuals per species:
-           {sp_sum %>% print( n=36, max_footer_lines=0)}"))
+print(glue("\n \n Total number of individuals in data: {no_inds}"))
+
+print(glue("\n \n Individuals per species: \n {inds_p_sp}"))
 
 print(glue("\n ##########################################################"))
 
-print(glue("\n \n Total number of fixes in data: {sum(fix_sum$n)}"))
+print(glue("\n \n Total number of fixes in data: {sum(fix_p_sp$n)}"))
 
-print(glue("\n \n Fixes per species:
-           {evt_out %>% group_by(species) %>% summarize(n = n()) %>% as_tibble() %>% print( n=36, max_footer_lines=0)}"))
+print(glue("\n \n Fixes per species: \n {fix_p_sp}"))
 
 sink()
 

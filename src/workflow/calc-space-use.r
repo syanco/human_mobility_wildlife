@@ -39,7 +39,7 @@ if(interactive()) {
   # rd <- here::here
   
   .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
   .ctf <- file.path(.wd, "out/dbbmm_log.csv")
   .continue = T
   
@@ -102,7 +102,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 # evt_cen <- tbl(db, "event_census") %>% 
 #   collect()
 
-ind <- tbl(db,'individual') %>% 
+ind <- tbl(db,'individual_final') %>% 
   collect() %>% 
   pull(individual_id)
 
@@ -114,7 +114,7 @@ ind <- tbl(db,'individual') %>%
 #                 `synchronous` = NULL)
 # invisible(assert_that(length(dbListTables(db))>0))
 
-evt_anno <- tbl(db, "event_clean") %>% 
+evt_anno <- tbl(db, "event_final") %>% 
   collect()
 
 dbDisconnect(db)
@@ -170,20 +170,9 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
         # plot(UDr)
         for(j in 1:nlayers(UDr)){
           
-          # # Get Phenology data
-          # if(ctf$year[i] == "2020"){ #grab the correct phenology map
-          #   # reproject the UD to match the spring data
-          #   tmpr <- projectRaster(from = rb[[j]], to = sp2020)
-          #   phen <- sum(values(tmpr*sp2020), na.rm = T)/ncell(tmpr[tmpr > 0])
-          # } else {
-          #   tmpr <- projectRaster(from = rb[[j]], to = sp2019)
-          #   phen <- sum(values(tmpr*sp2019), na.rm = T)/ncell(tmpr[tmpr > 0])
-          # } #else
-          
           # Get UD area
           ud95 <- UDr[[j]]<=.95
           a <- sum(values(ud95))*res(ud95)[1]*res(ud95)[1]
-          # a
           
           # get week number
           week <- as.numeric(substring(names(UDr[[j]]),2))
@@ -208,30 +197,15 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
             filter(event_id %in% evtids) %>% 
             summarize(ghm = mean(ghm, na.rm = T))
           
-          # # Get pop density
-          # pop <- evt_cen %>%
-          #   filter(event_id %in% evtids) %>% 
-          #   summarize(pop = mean(total_population_2019, na.rm = T))
-          
           # Get NDVI
           ndvi <- evt_anno %>% 
             filter(event_id %in% evtids) %>% 
             summarize(ndvi = mean(ndvi, na.rm = T))
           
-          # Get lst
-          # lst <- evt_anno %>% 
-          #   filter(event_id %in% evtids) %>% 
-          #   summarize(lst = mean(lst, na.rm = T))
-          
-          # Get tmax
+          # Get TMAX
           tmax <- evt_anno %>% 
             filter(event_id %in% evtids) %>% 
             summarize(tmax = mean(tmax, na.rm = T))
-          
-          # # Get tmin
-          # tmin <- evt_anno %>% 
-          #   filter(event_id %in% evtids) %>% 
-          #   summarize(tmin = mean(tmin, na.rm = T))
           
           #unpack underlying data
           evt_tmp <- tmp_out$events 
@@ -262,11 +236,8 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                           sg, 
                           ghm,
                           cbg_area, 
-                          # pop, 
                           ndvi, 
-                          # lst,
                           tmax,
-                          # tmin,
                           n, 
                           a_bb, 
                           fixmed, 
@@ -298,20 +269,9 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
       # plot(UDr)
       for(j in 1:nlayers(UDr)){
         
-        # # Get Phenology data
-        # if(ctf$year[i] == "2020"){ #grab the correct phenology map
-        #   # reproject the UD to match the spring data
-        #   tmpr <- projectRaster(from = rb[[j]], to = sp2020)
-        #   phen <- sum(values(tmpr*sp2020), na.rm = T)/ncell(tmpr[tmpr > 0])
-        # } else {
-        #   tmpr <- projectRaster(from = rb[[j]], to = sp2019)
-        #   phen <- sum(values(tmpr*sp2019), na.rm = T)/ncell(tmpr[tmpr > 0])
-        # } #else
-        
         # Get UD area
         ud95 <- UDr[[j]]<=.95
         a <- sum(values(ud95))*res(ud95)[1]*res(ud95)[1]
-        # a
         
         # get week number
         week <- as.numeric(substring(names(UDr[[j]]),2))
@@ -336,30 +296,15 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
           filter(event_id %in% evtids) %>% 
           summarize(ghm = mean(ghm, na.rm = T))
         
-        # # Get pop density
-        # pop <- evt_cen %>%
-        #   filter(event_id %in% evtids) %>% 
-        #   summarize(pop = mean(total_population_2019, na.rm = T))
-        
         # Get NDVI
         ndvi <- evt_anno %>% 
           filter(event_id %in% evtids) %>% 
           summarize(ndvi = mean(ndvi, na.rm = T))
         
-        # Get lst
-        lst <- evt_anno %>% 
-          filter(event_id %in% evtids) %>% 
-          summarize(lst = mean(lst, na.rm = T))
-        
         # Get tmax
         tmax <- evt_anno %>% 
           filter(event_id %in% evtids) %>% 
           summarize(tmax = mean(tmax, na.rm = T))
-        
-        # Get tmin
-        tmin <- evt_anno %>% 
-          filter(event_id %in% evtids) %>% 
-          summarize(tmin = mean(tmin, na.rm = T))
         
         #unpack underlying data
         evt_tmp <- tmp_out$events 
@@ -390,11 +335,8 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                         sg, 
                         ghm,
                         cbg_area, 
-                        # pop, 
                         ndvi, 
-                        lst,
                         tmax,
-                        tmin,
                         n, 
                         a_bb, 
                         fixmed, 

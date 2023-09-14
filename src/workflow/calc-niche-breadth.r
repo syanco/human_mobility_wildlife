@@ -31,7 +31,7 @@ if(interactive()) {
   .wd <- getwd()
   
   .outPF <- file.path(.wd,'out/niche_determinant_anthropause.csv')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
   
   .nc <- 2
   
@@ -79,11 +79,11 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual') %>%  # Load a tibble with all individual animals
+indtb <- tbl(db,'individual_final') %>%  # Load a tibble with all individual animals
   collect()
 
 # Load the entire event table:
-evt0 <- tbl(db, "event_clean")%>%
+evt0 <- tbl(db, "event_final")%>%
   collect()
 
 message("Disconnecting from databse...")
@@ -95,10 +95,6 @@ ind <- indtb %>%
 ind <- ind[ind  %in% unique(evt0$individual_id)]
 
 yearvec <- c("2019", "2020")
-
-# Add empty columns study:
-
-# log <- read_csv(glue("{.outPF}/niche_log.csv")) #####
 
 registerDoMC(.nc)
 
@@ -130,7 +126,6 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
              week = week(timestamp),
              n_indiv_week_year = paste0(individual_id, '_' , week, '_' , yr),
              tmax_scale = scale(tmax),
-             # tmin_scale = scale(tmin),
              ndvi_scale = scale(ndvi),
              elev_scale = scale(elev)
              ) %>% 
@@ -141,7 +136,6 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
     message("Estimating Multivariate niches")
     
     wk <- unique(evt_mod$week)
-    # wk = wk[complete.cases(wk)]
     if(length(wk)==0){print(paste0('No data for year ', i, 
                                    ' writing in logfile'))
       
@@ -153,10 +147,8 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
         week = NA,
         status = 0)
       
-      # logfile_template$studyid <- studyid
       write.table(tmp_dummy_fail, glue("./out/niche_log.csv"), append = T, 
                   row.names = F, col.names = F, sep = ",")
-      
       
     } else { # if no weeks in data
       

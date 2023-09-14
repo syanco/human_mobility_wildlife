@@ -9,7 +9,7 @@ if(interactive()) {
   rd <- here::here
   
   .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
   
   .nc <- 2
   
@@ -61,41 +61,46 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual') %>% 
+indtb <- tbl(db,'individual_trim') %>% 
   collect() 
 
-indtb <- indtb[!duplicated(indtb),]
-
-evttb <- tbl(db, 'event_clean') %>% 
+evttb <- tbl(db, 'event_trim') %>% 
   collect() %>% 
   left_join(indtb, by = c("individual_id", "study_id"))
 
 message("Disconnecting from databse...")
 dbDisconnect(db)
+beepr::beep()
+
+evt1 <- evttb
+# %>% 
+#   filter(study_id != 351564596) %>%
+#   filter(study_id != 1891587670) %>% 
+#   mutate(ind_f = as.factor(individual_id),
+#          species = taxon_canonical_name)%>%  # create factor version of ind for REs)
+#   mutate(species = case_when( # correct species names
+#     study_id == 1442516400 ~ "Anser caerulescens",
+#     study_id == 1233029719 ~ "Odocoileus virginianus",
+#     study_id == 1631574074 ~ "Ursus americanus",
+#     study_id == 1418296656 ~ "Numenius americanus",
+#     study_id == 474651680  ~ "Odocoileus virginianus",
+#     study_id == 1044238185 ~ "Alces alces",
+#     study_id == 2548691779 ~ "Odocoileus hemionus", # !!! CORRECT IN WORKFLOW !!! #
+#     study_id == 2575515057 ~ "Cervus elaphus",  # !!! CORRECT IN WORKFLOW !!! #
+#     TRUE ~ species
+#   ))%>% 
+#   mutate(species = case_when(
+#     species == "Chen caerulescens" ~ "Anser caerulescens",
+#     TRUE ~ species
+#   )) %>% 
+#   distinct() 
 
 
-evt1 <- evttb %>% 
-  filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) %>% 
-  mutate(ind_f = as.factor(individual_id),
-         species = taxon_canonical_name)%>%  # create factor version of ind for REs)
-  mutate(species = case_when( # correct species names
-    study_id == 1442516400 ~ "Anser caerulescens",
-    study_id == 1233029719 ~ "Odocoileus virginianus",
-    study_id == 1631574074 ~ "Ursus americanus",
-    study_id == 1418296656 ~ "Numenius americanus",
-    study_id == 474651680  ~ "Odocoileus virginianus",
-    study_id == 1044238185 ~ "Alces alces",
-    study_id == 2548691779 ~ "Odocoileus hemionus", # !!! CORRECT IN WORKFLOW !!! #
-    study_id == 2575515057 ~ "Cervus elaphus",  # !!! CORRECT IN WORKFLOW !!! #
-    TRUE ~ species
-  ))%>% 
-  mutate(species = case_when(
-    species == "Chen caerulescens" ~ "Anser caerulescens",
-    TRUE ~ species
-  )) %>% 
-  distinct() 
-
+# x <- evt1 %>% 
+#   filter(study_id == 9493874)
+# x_comp <- x %>% 
+#   select(species, tmax, lat, lon) %>% 
+#   filter(complete.cases(.)) 
 
 # How many species in data?
 evt1 %>% 
@@ -104,26 +109,38 @@ evt1 %>%
   length()
 
 # How many have any complete cases?
-evt1 %>% 
-  select(species, tmax, ndvi) %>% 
-  filter(complete.cases(.)) %>% 
+evt_complete <- evt1 %>% 
+  select(species, tmax, ndvi, elev ) %>% 
+  filter(complete.cases(.)) 
+
+evt_complete %>% 
   pull(species) %>% 
   unique() %>% 
   length()
 
+# How many fixes are complete
+evt1 %>% 
+  select(species, tmax, ndvi, elev) %>% 
+  filter(complete.cases(.)) %>%
+  nrow()
 
-# List with at least some complete cases
+# List spp with at least some complete cases
 (complete_spp <- evt1 %>% 
-    select(species, tmax, ndvi) %>% 
+    select(species, individual_id, tmax, ndvi) %>% 
     filter(complete.cases(.)) %>% 
     pull(species) %>% 
+    unique())
+
+(complete_ind <- evt1 %>% 
+    select(species, individual_id, tmax, ndvi) %>% 
+    filter(complete.cases(.)) %>% 
+    pull(individual_id) %>% 
     unique())
 
 # List with all spp.
 (all_spp <- evt1 %>% 
     pull(species) %>% 
-    unique() %>% 
-    length())
+    unique() )
 
 # For which species did annotation totally fail
 evt1 %>% 
@@ -143,7 +160,7 @@ evt1 %>%
 
 # Full data for non annotated
 failed_dat <- evt1 %>% 
-  filter(species %notin% complete_spp)
+  filter(individual_id %notin% complete_ind)
 
 summary(failed_dat$ndvi)
 summary(failed_dat$tmax)

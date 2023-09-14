@@ -20,9 +20,9 @@ src=$wd/analysis/src/workflow
 cd $wd
 
 #copy db to tmp
-cp $wd/processed_data/mosey_mod.db /tmp/
+cp $wd/processed_data/mosey_mod_2023.db /tmp/
 
 
 # Execute calc size script/
-Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause.csv 24
+Rscript $src/calc-niche-breadth.r /tmp/mosey_mod_2023.db ./out/niche_determinant_anthropause.csv 24
 
