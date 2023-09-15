@@ -83,8 +83,32 @@
     $src/workflow/wf-mosey_env.sh
   
   ##
+  
+  
     
   #**** Move to HPC here. ****#
+  
+   ##- MVNH Breadth Subsampling -#
+      
+      # Create csv to store results
+      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year, n" > ./out/niche_determinant_anthropause_subsample.csv
+
+      # Make log file to track successful outputs
+      echo "studyid, individual, scientificname, year, status, week" > out/niche_log_subsample.csv
+  
+      # Inputs: db:event_clean  + out filepath + no. cores
+      # Outputs: csv 
+      
+      sbatch $srcr/hpc/run_calc_niche_breadth_subsample.sh
+
+  ##
+
+ ##- Filter to Min Sample - Report Sample Size  -#
+      
+
+      sbatch $srcr/hpc/run_filter_data_mins.sh
+
+  ##
   
   ##-- Census Annotations --##
   
@@ -201,27 +225,7 @@
       # conda activate spatial
       # Rscript $src/workflow/clean_movement.r --db $wd/processed_data/mosey_mod.db
     
-  ##- MVNH Breadth Subsampling -#
-      
-      # Create csv to store results
-      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year, n" > ./out/niche_determinant_anthropause_subsample.csv
-
-      # Make log file to track successful outputs
-      echo "studyid, individual, scientificname, year, status, week" > out/niche_log_subsample.csv
-  
-      # Inputs: db:event_clean  + out filepath + no. cores
-      # Outputs: csv 
-      
-      sbatch $srcr/hpc/run_calc_niche_breadth_subsample.sh
-
-  ##
-
- ##- Filter to Min Sample - Report Sample Size  -#
-      
-
-      sbatch $srcr/hpc/run_filter_data_mins.sh
-
-  ##
+ 
 
 
 
