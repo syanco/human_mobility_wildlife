@@ -29,8 +29,8 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/projects/covid-19_movement'
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .wd <- '/Users/scottyanco/Documents/covid-19_movement/'
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023_stash.db')
   
 } else {
   library(docopt)
@@ -91,6 +91,8 @@ evt_trm <- tbl(db,'event_final') %>%  collect()
 ind_trm <- tbl(db, "individual_final") %>%  collect()
 std_trm <- tbl(db, "study_final") %>%  collect()
 
+# beepr::beep()
+
 cnt <- evt_trm %>% 
   group_by(individual_id) %>% 
   summarise(n = n())
@@ -105,6 +107,7 @@ evt_calc <- evt_trm %>%
   arrange(timestamp) %>% 
   mutate(rn = row_number(),
          # lead_d = geometry[row_number()+1],
+         # timestamp = parse_date_time(timestamp, "ymd_HMS"),
          lag_lon = dplyr::lag(lon, 1), #get pvs lon
          lag_lat = dplyr::lag(lat, 1), # get pvs lat
          sl = distGeo(cbind(lon,lat), cbind(lag_lon, lag_lat)), # step length (m)
@@ -116,7 +119,7 @@ evt_calc <- evt_trm %>%
 
 # calculate qunatile-based cutoffs
 cuts <- evt_calc %>% 
-  as.data.frame() %>% 
+  # as.data.frame() %>% 
   group_by(individual_id) %>% 
   summarize(
     qta = quantile(ta, probs = 0.95, na.rm = T, names = F),
@@ -154,6 +157,43 @@ std_out <- std_trm %>%
 # write table back to db
 dbWriteTable(conn = db, name = "study_clean", value = std_out, append = FALSE, overwrite = T)
 
+
+
+#-- Generate Sample Size Sumaries
+
+# No of species
+(no_sp <- evt_out %>% pull(species) %>% unique() %>% length())
+
+# Inds per species
+(inds_p_sp <- evt_out %>% group_by(species) %>% summarize(n = n_distinct(ind_f)))
+
+# Fixes per species
+(fix_p_sp <- evt_out %>% group_by(species) %>% summarize(n = n()))
+
+# No of individuals
+(no_inds <- evt_out %>% pull(ind_f) %>% unique() %>% length())
+
+#-- Write our sample size summaries
+
+message("Writing out sample size report...")
+
+sink("out/sample_report_after_data_clean.txt")
+print(glue("Description of sample sizes after all data cleaning, prior to estimating dBBMMs and MVNH Niche Breadths"))
+print(glue("\n ##########################################################"))
+
+print(glue("\n \n Total number of species in data: {no_sp}"))
+
+print(glue("\n \n Total number of individuals in data: {no_inds}"))
+
+print(glue("\n \n Individuals per species: \n {inds_p_sp}"))
+
+print(glue("\n ##########################################################"))
+
+print(glue("\n \n Total number of fixes in data: {sum(fix_p_sp$n)}"))
+
+print(glue("\n \n Fixes per species: \n {fix_p_sp}"))
+
+sink()
 
 #---- Finalize script ----#
 

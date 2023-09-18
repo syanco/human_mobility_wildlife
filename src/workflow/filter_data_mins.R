@@ -30,7 +30,7 @@ if(interactive()) {
   # .wd <- '~/projects/covid-19_movement'
   .wd <- '~/Documents/covid-19_movement/'
   
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023_stash.db')
   .wkmin <- 30
   .minsp <- 5
   
@@ -104,9 +104,11 @@ beepr::beep()
 message(glue("Removing weeks wihtout complete env annotations"))
 
 evt_out2 <- evt_cln %>% 
-  mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T"),
-         wk = week(timestamp)) %>% 
+  mutate(timestamp2 = ymd_hms(timestamp),
+         # timestamp_char <- as.character(timestamp2)
+         wk = week(timestamp2)) %>% 
   drop_na(tmax, ndvi, elev)
+
 
 # evt_comp <- evt_fix %>%
 #   select(species, ind_f, tmax, ndvi, elev) %>%
@@ -209,3 +211,4 @@ print(glue("\n \n Fixes per species: \n {fix_p_sp}"))
 sink()
 
 message("Script Complete!")
+

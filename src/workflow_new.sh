@@ -211,9 +211,7 @@
     #
   
   ##
->>>>>>>>>>
->>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
->>>>>>>>>>
+
   
   ##-- Clean Data --##
     
@@ -259,7 +257,9 @@
 
     #
 
-
+>>>>>>>>>>
+>>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
+>>>>>>>>>>
 
     #- Calculate dBBMM areas and collate environment -#
 
