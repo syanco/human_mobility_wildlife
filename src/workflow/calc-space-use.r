@@ -102,7 +102,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 # evt_cen <- tbl(db, "event_census") %>% 
 #   collect()
 
-ind <- tbl(db,'individual_final') %>% 
+ind <- tbl(db,'individual_clean') %>% 
   collect() %>% 
   pull(individual_id)
 
@@ -114,7 +114,7 @@ ind <- tbl(db,'individual_final') %>%
 #                 `synchronous` = NULL)
 # invisible(assert_that(length(dbListTables(db))>0))
 
-evt_anno <- tbl(db, "event_final") %>% 
+evt_anno <- tbl(db, "event_clean") %>% 
   collect()
 
 dbDisconnect(db)

@@ -92,7 +92,7 @@ area <- fread(paste0(.datPF,"event-annotation/cbg-area.csv"), colClasses = "char
   select(cbg_2010, cbg_area_m2)
 
 message("reading in event table...")
-evt_df <- dbGetQuery(db,'SELECT event_id from event_clean')
+evt_df <- dbGetQuery(db,'SELECT event_id from event_final')
 
 message("joining event table with cbg info..")
 evt_cbg <- evt_df %>%

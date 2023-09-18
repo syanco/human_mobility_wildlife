@@ -85,7 +85,7 @@ ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
 
 # read in event table
 message("reading in event table...")
-evt_sf <- dbGetQuery(db,'SELECT event_id,lon,lat from event_clean') %>%
+evt_sf <- dbGetQuery(db,'SELECT event_id,lon,lat from event_final') %>%
   collect() %>%
   st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 

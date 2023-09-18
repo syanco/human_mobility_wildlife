@@ -79,11 +79,11 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual_final') %>%  # Load a tibble with all individual animals
+indtb <- tbl(db,'individual_clean') %>%  # Load a tibble with all individual animals
   collect()
 
 # Load the entire event table:
-evt0 <- tbl(db, "event_final")%>%
+evt0 <- tbl(db, "event_clean")%>%
   collect()
 
 message("Disconnecting from databse...")

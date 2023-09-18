@@ -87,9 +87,9 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 #-- Clean Outliers
 
-evt_trm <- tbl(db,'event_trim') %>%  collect()
-ind_trm <- tbl(db, "individual_trim") %>%  collect()
-std_trm <- tbl(db, "study_trim") %>%  collect()
+evt_trm <- tbl(db,'event_final') %>%  collect()
+ind_trm <- tbl(db, "individual_final") %>%  collect()
+std_trm <- tbl(db, "study_final") %>%  collect()
 
 cnt <- evt_trm %>% 
   group_by(individual_id) %>% 

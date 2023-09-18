@@ -130,10 +130,9 @@
       # Thus, after running the previous line, thje file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2023-09-08.sh
+      sbatch dsq-joblist-2023-09-15.sh
     
     #
-
 
     #- Compute cbg area -#
 
@@ -147,7 +146,7 @@
       # Rscript $src/workflow/compute-cbg-area.r
       
     #
-    
+
     #- Annotate events with cbg info -#
     
       # Inputs: db:event_clean + cbg intersection csv + cbg area csv
@@ -179,6 +178,7 @@
     
     #
 
+
     #- Annotate events with SafeGraph -#
     
       # Inputs: db:event_clean + cbg info csv + sg data csv
@@ -193,7 +193,9 @@
     #
 
   ##
-
+>>>>>>>>>>
+>>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
+>>>>>>>>>>
 
   ##-- Human Modification Annotations --#
   
@@ -212,6 +214,7 @@
   
   ##
 
+  
   ##-- Clean Data --##
     
       # Inputs:   db:event_trim 
@@ -257,6 +260,7 @@
     #
 
 
+
     #- Calculate dBBMM areas and collate environment -#
 
       # Inputs: db:event_clean + db:event_census + out filepath + 
@@ -277,6 +281,8 @@
 
     #- Check area size ~ sample size -#
     
+    # RUN INTERACTIVE 
+    # TODO:  check/finalize
     Rscript $src/workflow/check_area_size_sample_balance.R
 
     #
@@ -301,7 +307,9 @@
     #
   
 
-
+>>>>>>>>>>
+>>>>>>>>>>>>>>>  SCRIPT CHECKED UP TO HERE
+>>>>>>>>>> 
 
 
   ##

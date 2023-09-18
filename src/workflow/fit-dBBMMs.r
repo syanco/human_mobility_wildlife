@@ -37,7 +37,7 @@ if(interactive()) {
   rd <- here::here
   
   .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
   
   .nc <- 2
   
@@ -85,7 +85,7 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual_final') %>% 
+indtb <- tbl(db,'individual_clean') %>% 
   collect() 
 
 indtb <- indtb[!duplicated(indtb),]
@@ -128,7 +128,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
       #---- Perform analysis ----#
       message(glue("Gathering movement data for individual {ind[j]}, year {yearvec[i]}..."))
       
-      evt0 <- tbl(db, "event_final")
+      evt0 <- tbl(db, "event_clean")
       
       scientificname <- indtb %>% 
         filter(individual_id == !!ind[j]) %>% 
