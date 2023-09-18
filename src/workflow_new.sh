@@ -109,7 +109,9 @@
       sbatch $srcr/hpc/run_filter_data_mins.sh
 
   ##
-  
+>>>>>>>>>>
+>>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
+>>>>>>>>>>
   ##-- Census Annotations --##
   
     #- Intersect events with cbg geometries -#
@@ -257,9 +259,7 @@
 
     #
 
->>>>>>>>>>
->>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
->>>>>>>>>>
+
 
     #- Calculate dBBMM areas and collate environment -#
 
