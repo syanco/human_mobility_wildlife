@@ -114,7 +114,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
     # check whether individual has been previously considered
     if(log %>% 
        filter(ind_id == ind[j] & year == yearvec[i]) %>% 
-       nrow() == 0){
+       nrow() == 0) {
       message(glue("Starting individual {ind[j]}, year {yearvec[i]}..."))  
       
       #---- Initialize database ----#
@@ -240,13 +240,12 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                                  "out_date" = as.character(Sys.Date()))
             write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
                         col.names = F, sep = ",")
-          }else {
+          } else {
             message(glue("No tmp list in memory, nothing written to file for {ind[j]}, {yearvec[i]}"))
           }
         }, error = function(e){cat("ERROR: couldnt save tmp_out to file", 
                                    "\n")})
-      } # fi
-    } # fi
+      } # fi data not too large
   } # fi end the check whether individual has been previously considered
 } #i (end loop through years) : #j (end loop through individuals)
 
