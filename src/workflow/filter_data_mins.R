@@ -64,6 +64,7 @@ suppressWarnings(
     library(RSQLite)
     library(sf)
     library(geosphere)
+    library(lubridate)
   }))
 
 #Source all files in the auto load funs directory
