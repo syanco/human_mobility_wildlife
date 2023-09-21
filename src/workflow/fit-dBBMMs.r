@@ -33,7 +33,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/projects/covid-19_movement'
+  .wd <- getwd()
   rd <- here::here
   
   .outPF <- file.path(.wd,'out')

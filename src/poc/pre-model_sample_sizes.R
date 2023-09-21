@@ -61,10 +61,10 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual_trim') %>% 
+indtb <- tbl(db,'individual_clean') %>% 
   collect() 
 
-evttb <- tbl(db, 'event_trim') %>% 
+evttb <- tbl(db, 'event_clean') %>% 
   collect() %>% 
   left_join(indtb, by = c("individual_id", "study_id"))
 
@@ -72,7 +72,8 @@ message("Disconnecting from databse...")
 dbDisconnect(db)
 beepr::beep()
 
-evt1 <- evttb
+
+evt1 <- evt_out
 # %>% 
 #   filter(study_id != 351564596) %>%
 #   filter(study_id != 1891587670) %>% 
@@ -112,6 +113,7 @@ evt1 %>%
 evt_complete <- evt1 %>% 
   select(species, tmax, ndvi, elev ) %>% 
   filter(complete.cases(.)) 
+
 
 evt_complete %>% 
   pull(species) %>% 

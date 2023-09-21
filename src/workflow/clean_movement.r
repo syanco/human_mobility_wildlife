@@ -30,7 +30,7 @@ if(interactive()) {
   library(here)
   
   .wd <- '/Users/scottyanco/Documents/covid-19_movement/'
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023_stash.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
   
 } else {
   library(docopt)
@@ -88,9 +88,8 @@ invisible(assert_that(length(dbListTables(db))>0))
 #-- Clean Outliers
 
 evt_trm <- tbl(db,'event_final') %>%  collect()
-ind_trm <- tbl(db, "individual_final") %>%  collect()
-std_trm <- tbl(db, "study_final") %>%  collect()
-
+ind <- tbl(db, "individual") %>%  collect()
+std <- tbl(db, "study") %>%  collect()
 # beepr::beep()
 
 cnt <- evt_trm %>% 
@@ -137,6 +136,8 @@ evt_out <- evt_calc %>%
     v < 25) %>% # remove observations faster than 25 m/s
   ungroup() 
 
+# beepr::beep()
+
 # write table back to db
 dbWriteTable(conn = db, name = "event_clean", value = evt_out, append = FALSE, overwrite = T)
 
@@ -144,14 +145,14 @@ dbWriteTable(conn = db, name = "event_clean", value = evt_out, append = FALSE, o
 #-- Update Individual and Event Tables
 
 # Individual Table
-ind_out <- ind_trm %>% 
+ind_out <- ind %>% 
   semi_join(evt_out, by = "individual_id")   # only retain inds contained in cleaned event table
 
 # write table back to db
 dbWriteTable(conn = db, name = "individual_clean", value = ind_out, append = FALSE, overwrite = T)
 
 # Study Table
-std_out <- std_trm %>% 
+std_out <- std %>% 
   semi_join(ind_out, by = "study_id") # only retain studies contained in cleaned individual table
 
 # write table back to db

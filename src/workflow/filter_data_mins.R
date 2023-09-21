@@ -30,7 +30,7 @@ if(interactive()) {
   # .wd <- '~/projects/covid-19_movement'
   .wd <- '~/Documents/covid-19_movement/'
   
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023_stash.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
   .wkmin <- 30
   .minsp <- 5
   
@@ -93,6 +93,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 message("Loading data...")
 evt_cln <- tbl(db,'event_trim') %>%  collect()
+# evt_fin <- tbl(db,'event_final') %>%  collect()
 ind_cln <- tbl(db, "individual_trim") %>%  collect()
 # ind_cln <- tbl(db, "individual_trim") %>%  collect()
 std_cln <- tbl(db, "study_trim") %>%  collect()
@@ -100,7 +101,7 @@ std_cln <- tbl(db, "study_trim") %>%  collect()
 
 # beepr::beep()
 
-#-- Remove incomplete cases
+# -- Remove incomplete cases
 
 message(glue("Removing weeks wihtout complete env annotations"))
 
@@ -150,9 +151,8 @@ evt_fix <- evt_sp %>%
 
 message("Writing event table back to database...")
 
-message("Writing out ")
 # write table back to db
-dbWriteTable(conn = db, name = "event_final", value = evt_fix, append = FALSE, overwrite = T)
+dbWriteTable(conn = db, name = "event_final2", value = evt_fix, append = FALSE, overwrite = T)
 
 #-- Sync up study and individual tables
 

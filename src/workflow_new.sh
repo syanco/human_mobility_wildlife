@@ -109,9 +109,7 @@
       sbatch $srcr/hpc/run_filter_data_mins.sh
 
   ##
->>>>>>>>>>
->>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
->>>>>>>>>>
+
   ##-- Census Annotations --##
   
     #- Intersect events with cbg geometries -#
@@ -132,8 +130,9 @@
       # Thus, after running the previous line, thje file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2023-09-15.sh
-    
+      sbatch dsq-joblist-2023-09-19.sh
+
+
     #
 
     #- Compute cbg area -#
@@ -163,7 +162,6 @@
     #
   
   ##
-
 
   ##-- SafeGraph Annotations --##
   
@@ -214,7 +212,7 @@
   
   ##
 
-  
+
   ##-- Clean Data --##
     
       # Inputs:   db:event_trim 
@@ -230,7 +228,9 @@
     
  
 
-
+>>>>>>>>>>
+>>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
+>>>>>>>>>>
 
 ####
 
