@@ -29,7 +29,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '/Users/scottyanco/Documents/covid-19_movement/'
+  .wd <- getwd()
   .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
   
 } else {
@@ -87,7 +87,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 #-- Clean Outliers
 
-evt_trm <- tbl(db,'event_final') %>%  collect()
+evt_trm <- tbl(db,'event_final2') %>%  collect()
 ind <- tbl(db, "individual") %>%  collect()
 std <- tbl(db, "study") %>%  collect()
 # beepr::beep()

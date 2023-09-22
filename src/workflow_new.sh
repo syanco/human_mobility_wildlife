@@ -228,9 +228,7 @@
     
  
 
->>>>>>>>>>
->>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
->>>>>>>>>>
+
 
 ####
 
@@ -259,7 +257,9 @@
 
     #
 
-
+>>>>>>>>>>
+>>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
+>>>>>>>>>>
 
     #- Calculate dBBMM areas and collate environment -#
 
