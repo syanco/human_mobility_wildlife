@@ -40,7 +40,7 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
 invisible(assert_that(length(dbListTables(db))>0))
 
-n_total <- 'select count(*) as num from event_final' %>%
+n_total <- 'select count(*) as num from event_final2' %>%
   dbGetQuery(db,.)
 
 

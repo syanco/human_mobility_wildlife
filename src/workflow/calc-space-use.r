@@ -35,7 +35,7 @@ if(interactive()) {
   library(here)
   
   # .wd <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement'
-  .wd <- '~/projects/covid-19_movement/'
+  .wd <- getwd()
   # rd <- here::here
   
   .outPF <- file.path(.wd,'out')
@@ -114,7 +114,7 @@ ind <- tbl(db,'individual_clean') %>%
 #                 `synchronous` = NULL)
 # invisible(assert_that(length(dbListTables(db))>0))
 
-evt_anno <- tbl(db, "event_clean") %>% 
+evt_anno <- tbl(db, "event_clean2") %>% 
   collect()
 
 dbDisconnect(db)

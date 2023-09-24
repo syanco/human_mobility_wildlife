@@ -257,9 +257,7 @@
 
     #
 
->>>>>>>>>>
->>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE
->>>>>>>>>>
+
 
     #- Calculate dBBMM areas and collate environment -#
 
@@ -271,7 +269,7 @@
       echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, ndvi, tmax, n, a_bb, fixmed, m_error" > ./out/dbbmm_size.csv
 
       # SLURM:
-      sbatch $src/hpc/run_calc_space_use.sh
+      sbatch $srcr/hpc/run_calc_space_use.sh
       
       # ON DEMAND:
       # conda activate covid
@@ -279,13 +277,6 @@
     
     #
 
-    #- Check area size ~ sample size -#
-    
-    # RUN INTERACTIVE 
-    # TODO:  check/finalize
-    Rscript $src/workflow/check_area_size_sample_balance.R
-
-    #
 
   ##
   
@@ -303,7 +294,7 @@
       # Inputs: db:event_clean  + out filepath + no. cores
       # Outputs: csv 
       
-      sbatch $src/hpc/run_calc_niche_breadth.sh
+      sbatch $srcr/hpc/run_calc_niche_breadth.sh
     #
   
 
@@ -324,13 +315,21 @@
        
       # SLURM
 
-      sbatch $src/hpc/run_fit_space_use_dot_models.sh # dot
-      sbatch $src/hpc/run_fit_space_use_interactive_models.sh # interactive
-      sbatch $src/hpc/run_fit_space_use_additive_models.sh
+      sbatch $srcr/hpc/run_fit_space_use_dot_models.sh # dot
+      sbatch $srcr/hpc/run_fit_space_use_interactive_models.sh # interactive
+      sbatch $srcr/hpc/run_fit_space_use_additive_models.sh
 
       # ON DEMAND:
       # conda activate brms
       # Rscript $wd/analysis/src/workflow/fit-space-use-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area 24 10 10000 5
+ 
+    #- Check area size ~ sample size -#
+    
+    # RUN INTERACTIVE 
+    # TODO:  check/finalize
+    Rscript $src/workflow/check_area_size_sample_balance.R
+
+    #
 
     #
   
@@ -343,10 +342,12 @@
 
     #- Fit niche breadth models -#
       
-      sbatch $src/hpc/run_fit_niche_breadth_dot_models.sh
-      sbatch $src/hpc/run_fit_niche_breadth_additive_models.sh
-      sbatch $src/hpc/run_fit_niche_breadth_interactive_models.sh #interaction model
-
+      sbatch $srcr/hpc/run_fit_niche_breadth_dot_models.sh
+      sbatch $srcr/hpc/run_fit_niche_breadth_additive_models.sh
+      sbatch $srcr/hpc/run_fit_niche_breadth_interactive_models.sh #interaction model
+>>>>>>>>>>
+>>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE (models only, not plots or outputs)
+>>>>>>>>>>
   ##-- Intra-Individual Analysis --##
   
     #Area
