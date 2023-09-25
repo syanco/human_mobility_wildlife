@@ -114,7 +114,7 @@ ind <- tbl(db,'individual_clean') %>%
 #                 `synchronous` = NULL)
 # invisible(assert_that(length(dbListTables(db))>0))
 
-evt_anno <- tbl(db, "event_clean2") %>% 
+evt_anno <- tbl(db, "event_clean") %>% 
   collect()
 
 dbDisconnect(db)
