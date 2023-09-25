@@ -43,7 +43,7 @@ if(interactive()) {
   .test <- TRUE
   rd <- here::here
   
-  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db'
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,'analysis/event-cbg-intersection/')
@@ -94,7 +94,7 @@ cbg_sf <- read_sf(paste0(.datPF,"safegraph_open_census_data_2010_to_2019_geometr
 # read in event table
 message("reading in event table...")
 
-evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_final') %>%
+evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_final2') %>%
   st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
 #evt_sf <- dbGetQuery(db,'SELECT * from event_clean') %>%
