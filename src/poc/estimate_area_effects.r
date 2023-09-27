@@ -108,8 +108,8 @@ add_sp <- word(add_modlist, 1, sep = "_")
 int_sp == add_sp
 
 # One species missing from interactive model - so insert NULL
-int_sp <- append(int_sp, "NULL", after = 12)
-int_modlist_full <- append(int_modlist_full, "NULL", after = 12)
+# int_sp <- append(int_sp, "NULL", after = 12)
+# int_modlist_full <- append(int_modlist_full, "NULL", after = 12)
 
 
 #---- Estimate Effects ----#

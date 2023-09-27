@@ -180,11 +180,11 @@ size_wide <- size_paired %>%
   pivot_wider(id_cols = c(ind_f, wk, species), 
               values_from = c(log_area_scale, sg_norm, ghm_scale, ndvi_scale, tmax_scale), 
               names_from = year_f) %>% 
-  mutate(size_diff = log_area_scale_2020-log_area_scale_2019,
-         sg_diff = sg_norm_2020-sg_norm_2019,
-         ghm_diff = ghm_scale_2020-ghm_scale_2019,
-         ndvi_diff = ndvi_scale_2020-ndvi_scale_2019,
-         tmax_diff = tmax_scale_2020-tmax_scale_2019) %>% 
+  mutate(size_diff = log_area_scale_2019-log_area_scale_2020,
+         sg_diff = sg_norm_2019-sg_norm_2020,
+         ghm_diff = ghm_scale_2019-ghm_scale_2020,
+         ndvi_diff = ndvi_scale_2019-ndvi_scale_2020,
+         tmax_diff = tmax_scale_2019-tmax_scale_2020) %>% 
   filter(!is.nan(sg_diff)) %>% 
   filter(!is.na(sg_diff))
 

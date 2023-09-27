@@ -213,12 +213,12 @@ breadth_wide <- breadth_paired %>%
   pivot_wider(id_cols = c(ind_f, week, scientificname), 
               values_from = c(breadth_scale, log_area_scale, sg_norm, ghm_scale, ndvi_scale, tmax_scale), 
               names_from = year_f) %>% 
-  mutate(breadth_diff = breadth_scale_2020-breadth_scale_2019,
-         area_diff = log_area_scale_2020-log_area_scale_2019,
-         sg_diff = sg_norm_2020-sg_norm_2019,
-         ghm_diff = ghm_scale_2020-ghm_scale_2019,
-         ndvi_diff = ndvi_scale_2020-ndvi_scale_2019,
-         tmax_diff = tmax_scale_2020-tmax_scale_2019) %>% 
+  mutate(breadth_diff = breadth_scale_2019-breadth_scale_2020,
+         area_diff = log_area_scale_2019-log_area_scale_2020,
+         sg_diff = sg_norm_2019-sg_norm_2020,
+         ghm_diff = ghm_scale_2019-ghm_scale_2020,
+         ndvi_diff = ndvi_scale_2019-ndvi_scale_2020,
+         tmax_diff = tmax_scale_2019-tmax_scale_2020) %>% 
   filter(!is.nan(sg_diff)) %>% 
   filter(!is.na(sg_diff))
 

@@ -298,10 +298,6 @@
     #
   
 
->>>>>>>>>>
->>>>>>>>>>>>>>>  SCRIPT CHECKED UP TO HERE
->>>>>>>>>> 
-
 
   ##
 
@@ -333,21 +329,25 @@
 
     #
   
-    #- Generate model results and diagnostic sheets-#
+    #- Generate area model results -#
       # TODO: Scott work scratch code into workflow
       # 
-      # Only runs interactively:
-      plot_space_use.r
+      #Get standardized effect sizes
+      # Run interactively:
+      select_space_use_model-effects.r
     #
+    
+    #- Area "meta-analysis"
+    estimate_area_effects.r
+    summarize_effects_area.R
+
 
     #- Fit niche breadth models -#
       
       sbatch $srcr/hpc/run_fit_niche_breadth_dot_models.sh
       sbatch $srcr/hpc/run_fit_niche_breadth_additive_models.sh
       sbatch $srcr/hpc/run_fit_niche_breadth_interactive_models.sh #interaction model
->>>>>>>>>>
->>>>>>>>>>>>>>>  SCRIPT RUN UP TO HERE (models only, not plots or outputs)
->>>>>>>>>>
+
   ##-- Intra-Individual Analysis --##
   
     #Area

@@ -119,8 +119,8 @@ int_sp == add_sp
 int_sp == dot_sp
 dot_sp == add_sp
 
-append(int_sp, "NULL", after = 12)
-int_modlist_full <- append(int_modlist_full, "NULL", after = 12)
+# append(int_sp, "NULL", after = 12)
+# int_modlist_full <- append(int_modlist_full, "NULL", after = 12)
 #---- Make Plots ----#
 
 pal2 <- c("#E66100", "#5D3A9B") # 2 color pallete
