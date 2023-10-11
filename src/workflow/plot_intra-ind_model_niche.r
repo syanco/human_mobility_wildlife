@@ -3,10 +3,10 @@ library(brms)
 library(ggthemes)
 library(glue)
 
-load("out/intra_ind_models/niche_intra_ind_add_mod_2023-04-26.rdata")
+load("out/intra_ind_models/niche_intra_ind_add_mod_2023-09-27.rdata")
 add_mod <- out$mod
 add_mod
-load("out/intra_ind_models/niche_intra_ind_int_mod_2023-04-26.rdata")
+load("out/intra_ind_models/niche_intra_ind_int_mod_2023-09-27.rdata")
 int_mod <- out$mod
 int_mod
 
@@ -15,7 +15,7 @@ waic(add_mod, int_mod, compare = T)
 
 conditional_effects(int_mod)
 
-pp_check(add_mod)
+pp_check(int_mod)
 pp_check(add_mod, type='error_scatter_avg')
 
 fe <- fixef(add_mod) #get fixed effects
@@ -125,7 +125,7 @@ ce_ghm <- conditional_effects(x=add_mod,
 ggsave(filename = glue("out/niche_intra_ind_ghm.png"), ghm_ce_plot,
        width = 6, height = 6)
 
-
+#--- INTERACTION MODELS
 
 # get observed quantiles of ghm to set "low" and "high" human mod
 ghmq <- quantile(out$data$ghm_diff, probs = c(0.05, 0.95), na.rm = T)
@@ -134,23 +134,35 @@ ce_int <- conditional_effects(x=int_mod,
                               int_conditions = list(ghm_diff = ghmq),
                               re_formula = NA)
 (int_ce_plot <-  plot(ce_int, 
-                     plot = F,
-                     rug = F,
-                     line_args = list("se" = T))[[1]] + 
-    scale_color_manual(values = palnew, name = "Human \n Modification",
-                       labels = c("High", "Low")) +
-    scale_fill_manual(values = palnew, name = "Human \n Modification",
-                      labels = c("High", "Low")) +
-    theme_tufte() +
+                      plot = F,
+                      rug = F,
+                      line_args = list("se" = T))[[1]] + 
+    scale_color_manual(name ="model structure",
+                       values = c("#F98177","#8895BF"),
+                       labels = c("low modification",
+                                  "high modification")) +
+    scale_fill_manual(name ="model structure",
+                      values = c("#F98177","#8895BF"),
+                      labels = c("low modification",
+                                 "high modification")) +
+    theme_minimal() +
     # xlab(glue("{expression(delta)} Human Mobility")) +
     xlab(bquote(~Delta~"Human Mobility")) +
-    ylab(bquote(~Delta~"Niche Breadth"))+
+    ylab(bquote(~Delta~"Space Use"))+
     geom_vline(aes(xintercept = 0), linetype = "dashed") +
     geom_hline(aes(yintercept = 0), linetype = "dashed") +
-    theme(axis.line = element_line(size = .5),
-          # axis.text = element_blank(),
-          axis.ticks = element_blank(),
-          # axis.title = element_blank(),
-          # aspect.ratio = 1
-    ))
+    theme_minimal() +
+    theme(panel.grid.major.y = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          panel.grid.minor.x = element_blank(),
+          legend.position = "none",
+          plot.title = element_text(face = "bold"),
+          axis.text.y = element_text(size = 8),
+          axis.title.y = element_blank(),
+          axis.title.x = element_text(size = 10, 
+                                      face = "bold"),
+          axis.ticks.x = element_line(color = "#4a4e4d"),
+          text = element_text(family = "Arial", color = "#4a4e4d")) +
+    labs(x = "Change in human mobility", y = "Change in area size")
+)
 ggsave(filename = glue("out/niche_intra_ind_int.png"), int_ce_plot)

@@ -22,19 +22,25 @@ sg_dat <- read_csv("out/area_sg_marginal_2023-09-26.csv") %>%
          class = case_when(species %in% birds ~ "bird",
                            TRUE ~ "mammal")) 
 
+sg_dat %>% 
+  ggplot(aes(x=Estimate, color = class))+geom_density()
+
 brm_sg <- brm(
   Estimate | weights(wei, scale = TRUE) ~ 0 + class, 
-  data = sg_dat, 
+  data = sg_dat ,
   cores = 4,
-  iter = 100000,
-  thin = 3,
-  init = 0
-  # control = list(adapt_delta = 0.99)
+  iter = 1000000,
+  thin = 5,
+  init = 0,
+  control = list(adapt_delta = 0.99)
 )
 
 brm_sg
-# plot(brm_sg)
 
+beepr::beep()
+pp_check(brm_sg)
+plot(brm_sg)
+bayesplot::mcmc_pairs(brm_sg)
 pd_sg <- p_direction(brm_sg) %>% 
   mutate(Parameter = case_when(Parameter == "b_classbird" ~ "classbird",
                    Parameter == "b_classmammal" ~ "classmammal"))
@@ -56,7 +62,7 @@ ghm_dat <- read_csv("out/area_ghm_marginal_2023-09-26.csv") %>%
 
 
 brm_ghm <- brm(
-  Estimate | weights(wei, scale = TRUE) ~ 0 + class, 
+  Estimate | weights(wei, scale = TRUE) ~ 0 + class + (1|species), 
   data = ghm_dat, 
   cores = 4,
   iter = 100000,
@@ -64,7 +70,9 @@ brm_ghm <- brm(
   init = 0
   # control = list(adapt_delta = 0.99)
 )
+beepr::beep()
 
+plot(brm_ghm)
 brm_ghm
 pd_ghm <- p_direction(brm_ghm) %>% 
   mutate(Parameter = case_when(Parameter == "b_classbird" ~ "classbird",

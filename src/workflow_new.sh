@@ -330,8 +330,7 @@
     #
   
     #- Generate area model results -#
-      # TODO: Scott work scratch code into workflow
-      # 
+    
       #Get standardized effect sizes
       # Run interactively:
       select_space_use_model-effects.r
@@ -348,15 +347,27 @@
       sbatch $srcr/hpc/run_fit_niche_breadth_additive_models.sh
       sbatch $srcr/hpc/run_fit_niche_breadth_interactive_models.sh #interaction model
 
+    #- Generate niche model results -#
+    
+      #Get standardized effect sizes
+      # Run interactively:
+      select_niche_model_effetcs.r
+    #  
+    
+    #- Area "meta-analysis"
+      estimate_niche_effects.r
+      summarize_effects_area.R
+    #
+
   ##-- Intra-Individual Analysis --##
   
     #Area
-    sbatch $src/hpc/run_fit_intra_ind_mod_additive_area.sh
-    sbatch $src/hpc/run_fit_intra_ind_mod_int_area.sh
+    sbatch $srcr/hpc/run_fit_intra_ind_mod_additive_area.sh
+    sbatch $srcr/hpc/run_fit_intra_ind_mod_int_area.sh
     
     #Niche
-    sbatch $src/hpc/run_fit_intra_ind_mod_additive_niche.sh
-    sbatch $src/hpc/run_fit_intra_ind_mod_int_niche.sh
+    sbatch $srcr/hpc/run_fit_intra_ind_mod_additive_niche.sh
+    sbatch $srcr/hpc/run_fit_intra_ind_mod_int_niche.sh
   ##
 
 

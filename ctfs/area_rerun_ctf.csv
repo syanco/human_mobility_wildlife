@@ -1,0 +1,7 @@
+﻿species,adapt_delta,iter,thin,warmup
+Anaas acuta,NULL,100000,5,50000
+Anser albifrons,NULL,100000,5,50000
+Anser caerulescens,NULL,100000,5,50000
+Chen rossii,NULL,100000,5,50000
+Ardea alba,0.99,NULL,NULL,NULL
+Odocoileus virginianus,NULL,100000,5,50000

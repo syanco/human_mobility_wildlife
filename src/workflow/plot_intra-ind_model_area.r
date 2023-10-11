@@ -3,10 +3,10 @@ library(brms)
 library(ggthemes)
 library(glue)
 
-load("out/intra_ind_models/size_intra_ind_add_mod_2023-04-26.rdata")
+load("out/intra_ind_models/size_intra_ind_add_mod_2023-09-27.rdata")
 add_mod <- out$mod
 add_mod
-load("out/intra_ind_models/size_intra_ind_int_mod_2023-04-26.rdata")
+load("out/intra_ind_models/size_intra_ind_int_mod_2023-09-27.rdata")
 int_mod <- out$mod
 int_mod
 

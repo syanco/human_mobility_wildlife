@@ -109,6 +109,8 @@ add_sp <- word(add_modlist, 1, sep = "_")
 #check that lists are same
 int_sp == add_sp
 
+add_sp <- append(add_sp, "NULL", after = 25)
+add_modlist_full <- append(add_modlist_full, "NULL", after = 25)
 
 #---- Make Plots ----#
 
@@ -265,7 +267,7 @@ for(i in 1:length(int_modlist_full)){
       #                                                     "sg_norm" = sgq))
       
       
-      area_effects_out[[i]] <- fixef(addmod) %>%  #get fixed effects
+      area_effects_out[[i]] <- fixef(intmod) %>%  #get fixed effects
         as.data.frame() %>% 
         rename("LCL" = "Q2.5",
                "HCL" = "Q97.5") %>% 
