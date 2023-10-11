@@ -315,6 +315,11 @@
       sbatch $srcr/hpc/run_fit_space_use_interactive_models.sh # interactive
       sbatch $srcr/hpc/run_fit_space_use_additive_models.sh
 
+
+        # Model reruns for problematic MCMCs
+      sbatch $srcr/hpc/run_refit_space_use_additive_models.sh
+
+
       # ON DEMAND:
       # conda activate brms
       # Rscript $wd/analysis/src/workflow/fit-space-use-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area 24 10 10000 5
