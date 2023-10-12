@@ -136,7 +136,7 @@ foreach(i = 1:nrow(mcmc_ctf), .errorhandling = "pass", .inorder = F) %dopar% {
   # Unpack params
   .iter <- ifelse(is.na(mcmc_ctf$iter[i]), 5000, mcmc_ctf$iter[i])
   .thin <- ifelse(is.na(mcmc_ctf$thin[i]), 5, mcmc_ctf$thin[i])
-  .warmup <- ifelse(is.na(mcmc_ctf$warmup[i]), 5000, mcmc_ctf$warmup[i])
+  .warmup <- ifelse(is.na(mcmc_ctf$warmup[i]), 2000, mcmc_ctf$warmup[i])
   .adapt_delta <- ifelse(is.na(mcmc_ctf$adapt_delta[i]), 0.8, mcmc_ctf$adapt_delta[i])
   
   #filter data
