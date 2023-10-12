@@ -173,7 +173,7 @@ foreach(i = 1:nrow(mcmc_ctf), .errorhandling = "pass", .inorder = F) %dopar% {
     iter = .iter,
     thin = .thin,
     warmup = .warmup,
-    control = list(adapt_delta = adapt_delta)
+    control = list(adapt_delta = .adapt_delta)
   )
 
   #stash results into named list
