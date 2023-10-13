@@ -353,6 +353,10 @@
       sbatch $srcr/hpc/run_fit_niche_breadth_additive_models.sh
       sbatch $srcr/hpc/run_fit_niche_breadth_interactive_models.sh #interaction model
 
+        # Model reruns for problematic MCMCs
+      sbatch $srcr/hpc/run_refit_niche_breadth_additive_models.sh
+      sbatch $srcr/hpc/run_refit_niche_breadth_interactive_models.sh
+
     #- Generate niche model results -#
     
       #Get standardized effect sizes
