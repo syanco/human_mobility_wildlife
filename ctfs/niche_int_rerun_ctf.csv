@@ -1,9 +1,9 @@
 ﻿species,adapt_delta,iter,thin,warmup,run
-Anas acuta,0.99,,,,1
-Anas americana,0.99,,,,1
-Anas clypeata,0.99,,,,1
-Anas crecca,0.99,,,,1
-Anas discors,0.99,,,,1
-Anser albifrons,0.99,,,,1
-Ardea alba,0.99,,,,1
-Grus canadensis,0.99,,,,1
+Anas acuta,0.99,,,,0
+Anas americana,0.99,,,,0
+Anas clypeata,0.99,,,,0
+Anas crecca,0.99,,,,0
+Anas discors,0.999,,,,1
+Anser albifrons,0.999,,,,1
+Ardea alba,0.99,,,,0
+Grus canadensis,0.999,,,,1
