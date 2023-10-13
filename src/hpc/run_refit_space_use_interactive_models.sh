@@ -6,7 +6,7 @@
 #SBATCH --partition day
 #SBATCH -c 8
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J refit_ADD_space
+#SBATCH -J refit_INT_space
 
 # Load conda env
 module load miniconda
