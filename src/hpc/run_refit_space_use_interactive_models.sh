@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 2-
+#SBATCH -t 1-
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition day
