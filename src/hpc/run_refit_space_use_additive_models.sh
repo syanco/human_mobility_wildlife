@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH -t 12:00:00
+#SBATCH -t 1-
 #SBATCH --mail-type ALL
 #SBATCH --mail-user scott.yanco@yale.edu
 #SBATCH --partition day
 #SBATCH -c 8
 #SBATCH --mem-per-cpu 10G
-#SBATCH -J fit_space_use_mods_ADD
+#SBATCH -J refit_ADD_area
 
 # Load conda env
 module load miniconda

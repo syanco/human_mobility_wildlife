@@ -318,6 +318,7 @@
 
         # Model reruns for problematic MCMCs
       sbatch $srcr/hpc/run_refit_space_use_additive_models.sh
+      sbatch $srcr/hpc/run_refit_space_use_interactive_models.sh
 
 
       # ON DEMAND:

@@ -82,8 +82,9 @@ source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
 
 #- Load Control File 
 
-mcmc_ctf <- read_csv(file.path(.wd, "analysis/ctfs/area_rerun_ctf.csv"),
-                     col_types = "cnnnn")
+mcmc_ctf <- read_csv(file.path(.wd, "analysis/ctfs/area_int_rerun_ctf.csv"),
+                     col_types = "cnnnn") %>% 
+  filter(run == 1)
 
 #---- Load data ----#
 message("Loading data...")
