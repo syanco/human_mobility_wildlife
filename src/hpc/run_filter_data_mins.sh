@@ -8,8 +8,8 @@
 #SBATCH --mem-per-cpu 50G
 
 # Load conda env
-module load miniconda
-conda activate spatial
+module load R
+# conda activate spatial
 
 # Declare WD
 wd=~/project/covid-19_movement
