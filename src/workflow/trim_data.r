@@ -6,13 +6,13 @@
 # Correct species naming issues in data
 
 '
-Prep and clean data for the COVID-19 Animal Movement Project
+Trim data for the COVID-19 Animal Movement Project
 See project documentation for details about anticipated directory structure.
 Expects db to be of format mosey_db, with a table named "event"
 
 Usage:
-clean_movement.r [--db=<db>] 
-clean_movement.r (-h | --help)
+trim_data.r [--db=<db>] 
+trim_data.r (-h | --help)
 
 Control files:
   analysis/ctfs/dates.csv
@@ -60,6 +60,7 @@ suppressWarnings(
     library(RSQLite)
     library(sf)
     library(geosphere)
+    library(rnaturalearth)
   }))
 
 #Source all files in the auto load funs directory
@@ -130,8 +131,8 @@ mod2 <- mod %>%
     study_id == 1418296656 ~ "Numenius americanus",
     study_id == 474651680  ~ "Odocoileus virginianus",
     study_id == 1044238185 ~ "Alces alces",
-    study_id == 2548691779 ~ "Odocoileus hemionus", # !!! CORRECT IN WORKFLOW !!! #
-    study_id == 2575515057 ~ "Cervus elaphus",  # !!! CORRECT IN WORKFLOW !!! #
+    study_id == 2548691779 ~ "Odocoileus hemionus", 
+    study_id == 2575515057 ~ "Cervus elaphus",
     TRUE ~ species
   ))%>% 
   mutate(species = case_when(
@@ -139,12 +140,29 @@ mod2 <- mod %>%
     TRUE ~ species
   ))
 
+# Filter to US only #
+mod2_sf <- st_as_sf(mod2, coords = c("lon", "lat"), crs = 4326)
+
+us <- ne_countries(scale = "medium", returnclass = "sf") %>% 
+  filter(name == "United States")
+
+# Find cells that overlap land in Canada and US
+keep_fixes <- apply(st_intersects(mod2_sf, us, sparse = F), 
+                    1, 
+                    function(x){
+                      ifelse(sum(x[1])>0, T, F)
+                    }
+)
+
+# Filter grid to only cells on land
+mod3 <- mod2[keep_fixes,]
+
 # write results back to db
-dbWriteTable(conn = db, name = "event_trim", value = mod2, append = F, overwrite = T)
+dbWriteTable(conn = db, name = "event_trim", value = mod3, append = F, overwrite = T)
 
 # Correct the individual table
 ind_out <- indtb %>% 
-  semi_join(mod2, by = "individual_id")   # only retain inds contained in cleaned event table
+  semi_join(mod3, by = "individual_id")   # only retain inds contained in cleaned event table
 
 # write table back to db
 dbWriteTable(conn = db, name = "individual_trim", value = ind_out, append = FALSE, overwrite = T)

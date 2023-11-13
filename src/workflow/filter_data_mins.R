@@ -27,7 +27,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  # .wd <- '~/projects/covid-19_movement'
+  # .wd <- '~/project/covid-19_movement'
   .wd <- '~/Documents/covid-19_movement/'
   
   .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
@@ -181,14 +181,23 @@ dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, o
 (no_sp <- evt_fix %>% pull(species) %>% unique() %>% length())
 
 # Inds per species
-(inds_p_sp <- evt_fix %>% group_by(species) %>% summarize(n = n_distinct(ind_f)))
+(inds_p_sp <- evt_fix %>% group_by(species) %>% 
+    summarize(n = n_distinct(ind_f)) %>%
+    janitor::adorn_totals("row") )
 
 # Fixes per species
-(fix_p_sp <- evt_fix %>% group_by(species) %>% summarize(n = n()))
+(fix_p_sp <- evt_cln %>% group_by(species) %>%
+    summarize(n = n()) %>%
+    janitor::adorn_totals("row") )
 
 # No of individuals
 (no_inds <- evt_fix %>% pull(ind_f) %>% unique() %>% length())
 
+# No of studies
+(no_stds <- evt_cln %>% 
+    group_by(species) %>%
+    summarize(n = n_distinct(study_id)) %>%
+    janitor::adorn_totals("row") )
 #-- Write our sample size summaries
 
 message("Writing out sample size report...")

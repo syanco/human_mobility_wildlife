@@ -6,7 +6,7 @@ library(lme4)
 library(sjPlot)
 
 size_dat <- read_csv("out/dbbmm_size.csv") %>% 
-  filter(area < 20000000000) %>% 
+  # filter(area < 20000000000) %>% 
   mutate(ind_f = as.factor(ind_id),
          log_area = log(area), #get log of weekly area use
          # log_area_scale = scale(log_area), # standardize it
@@ -36,24 +36,21 @@ size_dat <- read_csv("out/dbbmm_size.csv") %>%
 summary(size_dat$scale_n)
 
 
-ggplot(size_dat)+
-  geom_point(aes(x = n, y = area))+
-  facet_wrap(~species)
-mod <- lmer(area ~ n + (1|species/ind_f), data = size_dat)
+# ggplot(size_dat)+
+#   geom_point(aes(x = n, y = area))+
+#   facet_wrap(~species)
+mod <- lmer(area ~ scale_n + (1|species/ind_f), data = size_dat)
 mod_log<- lmer(log_area ~ scale_n + (1|species/ind_f), data = size_dat)
 
 summary(mod)
-summary(mod_log)
-
-100*(exp(fixef(mod_log)["scale_n"])-1)
 
 confint(mod)
-ci_log <- confint(mod_log)
-100*(exp(ci_log["scale_n",])-1)
 
-
-plot_model(mod, type = "eff")
-plot_model(mod_log, type = "eff")
+plot_model(mod, type = "eff")+
+  theme_classic()+
+  ylab("Area Size")+
+  xlab("Sample Size (scaled)")+
+  ggtitle("")
 
 
 

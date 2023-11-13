@@ -109,8 +109,8 @@ add_sp <- word(add_modlist, 1, sep = "_")
 #check that lists are same
 int_sp == add_sp
 
-add_sp <- append(add_sp, "NULL", after = 25)
-add_modlist_full <- append(add_modlist_full, "NULL", after = 25)
+add_sp <- append(add_sp, "NULL", after = 24)
+add_modlist_full <- append(add_modlist_full, "NULL", after = 24)
 
 #---- Make Plots ----#
 
@@ -481,106 +481,106 @@ area_es_df <- do.call("bind_rows", area_effects_out)%>%
 write_csv(x = area_es_df, file = glue("out/niche_area_effects_{Sys.Date()}.csv"))
 
 
-#---- Standardized Effects plot ----#
-
-pal2 <- c("#E66100", "#5D3A9B") # 2 color pallete
-pal3 <- c(pal2, "#808080") # add gray to the pallete
-palnew <- c("#7552A3", "#CEBEDA")
-palgray <- c("#808080", "#D3D3D3")
-
-coeff_pal <- c("ns_add" = "#808080", "sig_add" = "#E66100", "low_int" = "#CEBEDA", "high_int" ="#7552A3")
-
-
-# SG
-
-
-
-(sg_coef_plot <- ggplot(sg_es_df) +
-    geom_point(aes(x = Estimate, y = reorder(species, Estimate), 
-                   color = sig_code), position = position_dodge2(width = 0.5)) +
-    geom_linerange(aes(xmin = LCL, xmax = HCL, 
-                       y = reorder(species, Estimate),
-                       color = sig_code), position = position_dodge2(width = 0.5)) +
-    scale_color_manual(name = "", values = coeff_pal) +
-    geom_vline(aes(xintercept = 0), linetype = "dashed") +
-    ylab("Species") +
-    xlab("Standardized Conditional Effect") +
-    ggtitle("Human Mobility") +
-    theme_classic())
-
-
-
-(sg_coef_plot_zoom <- ggplot(sg_es_df) +
-    geom_point(aes(x = Estimate, y = reorder(species, Estimate), 
-                   color = sig_code), position = position_dodge2(width = 0.5)) +
-    geom_linerange(aes(xmin = LCL, xmax = HCL, 
-                       y = reorder(species, Estimate),
-                       color = sig_code), position = position_dodge2(width = 0.5)) +
-    scale_color_manual(name = "", values = coeff_pal) +
-    geom_vline(aes(xintercept = 0), linetype = "dashed") +
-    ylab("Species") +
-    xlab("Standardized Conditional Effect") +
-    ggtitle("Human Mobility") +
-    xlim(-1,1)+
-    theme_classic())
-
-(sg_coef_plot_facet <- ggplot(sg_es_df) +
-    geom_point(aes(x = Estimate, y = reorder(species, Estimate), 
-                   color = sig_code), position = position_dodge2(width = 0.5)) +
-    geom_linerange(aes(xmin = LCL, xmax = HCL, 
-                       y = reorder(species, Estimate),
-                       color = sig_code), position = position_dodge2(width = 0.5)) +
-    scale_color_manual(name = "", values = coeff_pal) +
-    geom_vline(aes(xintercept = 0), linetype = "dashed") +
-    ylab("") +
-    xlab("Standardized Conditional Effect") +
-    ggtitle("Human Mobility") +
-    theme_classic() +
-    facet_wrap(~class+species, scales = "free", ncol = 1, strip.position = "left",
-               labeller = label_wrap_gen(width = 10))+
-    theme(axis.text.y = element_blank(),
-          # strip.background = element_blank(),
-          # strip.text.x = element_blank(),
-          axis.ticks.y = element_blank(),
-          strip.text = element_text(size = 5),
-          NULL))
-ggsave(sg_coef_plot_facet, file = "out/facet_test.png", width = 4, height = 12)
-
-
-# GHM
-
-(ghm_coef_plot <- ggplot(ghm_es_df) +
-    geom_point(aes(x = Estimate, y = reorder(species, Estimate), color = sig_code), 
-               position = position_dodge2(width = 0.5)) +
-    geom_linerange(aes(xmin = LCL, xmax = HCL, 
-                       y = reorder(species, Estimate), color = sig_code),
-                   position = position_dodge2(width = 0.5),) +
-    scale_color_manual(name = "", values = coeff_pal) +
-    geom_vline(aes(xintercept = 0), linetype = "dashed") +
-    ylab("Species") +
-    xlab("Standardized Conditional Effect") +
-    ggtitle("Human Modification") +
-    theme_classic())
-
-
-
-(ghm_coef_plot_zoom <- ggplot(ghm_es_df) +
-    geom_point(aes(x = Estimate, y = reorder(species, Estimate), color = sig_code), 
-               position = position_dodge2(width = 0.5)) +
-    geom_linerange(aes(xmin = LCL, xmax = HCL, 
-                       y = reorder(species, Estimate), color = sig_code),
-                   position = position_dodge2(width = 0.5),) +
-    scale_color_manual(name = "", values = coeff_pal) +
-    geom_vline(aes(xintercept = 0), linetype = "dashed") +
-    ylab("Species") +
-    xlab("Standardized Conditional Effect") +
-    ggtitle("Human Modification") +
-    xlim(c(-0.5, 0.5)) +
-    theme_classic())
-
-(coef_comb <- sg_coef_plot + ghm_coef_plot + plot_layout(guides = "collect"))
-(coef_zoom_comb <- sg_coef_plot_zoom + ghm_coef_plot_zoom + plot_layout(guides = "collect"))
-
-ggsave(coef_comb, file = "out/space_use_coef.png", width = 10, height = 6)
-ggsave(coef_zoom_comb, file = "out/space_use_coef_zoom.png", width = 10, height = 6)
+# #---- Standardized Effects plot ----#
+# 
+# pal2 <- c("#E66100", "#5D3A9B") # 2 color pallete
+# pal3 <- c(pal2, "#808080") # add gray to the pallete
+# palnew <- c("#7552A3", "#CEBEDA")
+# palgray <- c("#808080", "#D3D3D3")
+# 
+# coeff_pal <- c("ns_add" = "#808080", "sig_add" = "#E66100", "low_int" = "#CEBEDA", "high_int" ="#7552A3")
+# 
+# 
+# # SG
+# 
+# 
+# 
+# (sg_coef_plot <- ggplot(sg_es_df) +
+#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), 
+#                    color = sig_code), position = position_dodge2(width = 0.5)) +
+#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
+#                        y = reorder(species, Estimate),
+#                        color = sig_code), position = position_dodge2(width = 0.5)) +
+#     scale_color_manual(name = "", values = coeff_pal) +
+#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
+#     ylab("Species") +
+#     xlab("Standardized Conditional Effect") +
+#     ggtitle("Human Mobility") +
+#     theme_classic())
+# 
+# 
+# 
+# (sg_coef_plot_zoom <- ggplot(sg_es_df) +
+#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), 
+#                    color = sig_code), position = position_dodge2(width = 0.5)) +
+#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
+#                        y = reorder(species, Estimate),
+#                        color = sig_code), position = position_dodge2(width = 0.5)) +
+#     scale_color_manual(name = "", values = coeff_pal) +
+#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
+#     ylab("Species") +
+#     xlab("Standardized Conditional Effect") +
+#     ggtitle("Human Mobility") +
+#     xlim(-1,1)+
+#     theme_classic())
+# 
+# (sg_coef_plot_facet <- ggplot(sg_es_df) +
+#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), 
+#                    color = sig_code), position = position_dodge2(width = 0.5)) +
+#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
+#                        y = reorder(species, Estimate),
+#                        color = sig_code), position = position_dodge2(width = 0.5)) +
+#     scale_color_manual(name = "", values = coeff_pal) +
+#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
+#     ylab("") +
+#     xlab("Standardized Conditional Effect") +
+#     ggtitle("Human Mobility") +
+#     theme_classic() +
+#     facet_wrap(~class+species, scales = "free", ncol = 1, strip.position = "left",
+#                labeller = label_wrap_gen(width = 10))+
+#     theme(axis.text.y = element_blank(),
+#           # strip.background = element_blank(),
+#           # strip.text.x = element_blank(),
+#           axis.ticks.y = element_blank(),
+#           strip.text = element_text(size = 5),
+#           NULL))
+# ggsave(sg_coef_plot_facet, file = "out/facet_test.png", width = 4, height = 12)
+# 
+# 
+# # GHM
+# 
+# (ghm_coef_plot <- ggplot(ghm_es_df) +
+#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), color = sig_code), 
+#                position = position_dodge2(width = 0.5)) +
+#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
+#                        y = reorder(species, Estimate), color = sig_code),
+#                    position = position_dodge2(width = 0.5),) +
+#     scale_color_manual(name = "", values = coeff_pal) +
+#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
+#     ylab("Species") +
+#     xlab("Standardized Conditional Effect") +
+#     ggtitle("Human Modification") +
+#     theme_classic())
+# 
+# 
+# 
+# (ghm_coef_plot_zoom <- ggplot(ghm_es_df) +
+#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), color = sig_code), 
+#                position = position_dodge2(width = 0.5)) +
+#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
+#                        y = reorder(species, Estimate), color = sig_code),
+#                    position = position_dodge2(width = 0.5),) +
+#     scale_color_manual(name = "", values = coeff_pal) +
+#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
+#     ylab("Species") +
+#     xlab("Standardized Conditional Effect") +
+#     ggtitle("Human Modification") +
+#     xlim(c(-0.5, 0.5)) +
+#     theme_classic())
+# 
+# (coef_comb <- sg_coef_plot + ghm_coef_plot + plot_layout(guides = "collect"))
+# (coef_zoom_comb <- sg_coef_plot_zoom + ghm_coef_plot_zoom + plot_layout(guides = "collect"))
+# 
+# ggsave(coef_comb, file = "out/space_use_coef.png", width = 10, height = 6)
+# ggsave(coef_zoom_comb, file = "out/space_use_coef_zoom.png", width = 10, height = 6)
 

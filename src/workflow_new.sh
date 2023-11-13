@@ -46,7 +46,7 @@
   src=$wd/analysis/src
   cd $wd
     
-  # defiune remot (HPC working directory)
+  # define remote (HPC working directory)
   wdr=/home/sy522/project/covid-19_movement
   srcr=$wdr/analysis/src
   
@@ -130,7 +130,7 @@
       # Thus, after running the previous line, thje file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2023-09-25.sh
+      sbatch dsq-joblist-2023-11-11.sh
 
 
     #
@@ -147,7 +147,9 @@
       # Rscript $src/workflow/compute-cbg-area.r
       
     #
-
+---------------------
+>>>>  BOOKMARK   >>>>
+---------------------
     #- Annotate events with cbg info -#
     
       # Inputs: db:event_clean + cbg intersection csv + cbg area csv

@@ -15,7 +15,7 @@ birds <- c("Anas acuta", "Anas americana", "Anas clypeata", "Anas crecca",
           "Ardea alba", "Chen rossii", "Circus cyaneus", "Corvus corax", 
           "Haliaeetus leucocephalus", "Rallus longirostris")
 
-sg_dat <- read_csv("out/area_sg_marginal_2023-09-26.csv") %>% 
+sg_dat <- read_csv("out/area_sg_marginal_2023-10-17.csv") %>% 
   mutate(se = uncertainty/1.96,
          wei = 1/uncertainty^2,
          wei_norm = wei/sum(wei),
@@ -38,12 +38,12 @@ brm_sg <- brm(
 brm_sg
 
 beepr::beep()
-pp_check(brm_sg)
-plot(brm_sg)
-bayesplot::mcmc_pairs(brm_sg)
-pd_sg <- p_direction(brm_sg) %>% 
+# pp_check(brm_sg)
+# plot(brm_sg)
+# bayesplot::mcmc_pairs(brm_sg)
+(pd_sg <- p_direction(brm_sg) %>% 
   mutate(Parameter = case_when(Parameter == "b_classbird" ~ "classbird",
-                   Parameter == "b_classmammal" ~ "classmammal"))
+                   Parameter == "b_classmammal" ~ "classmammal")))
 out_sg <- fixef(brm_sg) %>% 
   as_tibble(rownames = NA) %>% 
   rownames_to_column(var = "Parameter") %>% 
@@ -52,7 +52,7 @@ out_sg <- fixef(brm_sg) %>%
 write_csv(out_sg, "out/area_meta_sg.csv")
 
 # GHM
-ghm_dat <- read_csv("out/area_ghm_marginal_2023-09-26.csv") %>% 
+ghm_dat <- read_csv("out/area_ghm_marginal_2023-10-17.csv") %>% 
   mutate(se = uncertainty/1.96,
         wei = 1/uncertainty^2,
         wei_norm = wei/sum(wei),
@@ -72,11 +72,11 @@ brm_ghm <- brm(
 )
 beepr::beep()
 
-plot(brm_ghm)
+# plot(brm_ghm)
 brm_ghm
-pd_ghm <- p_direction(brm_ghm) %>% 
+(pd_ghm <- p_direction(brm_ghm) %>% 
   mutate(Parameter = case_when(Parameter == "b_classbird" ~ "classbird",
-                               Parameter == "b_classmammal" ~ "classmammal"))
+                               Parameter == "b_classmammal" ~ "classmammal")))
 out_ghm <- fixef(brm_ghm) %>% 
   as_tibble(rownames = NA) %>% 
   rownames_to_column(var = "Parameter") %>% 

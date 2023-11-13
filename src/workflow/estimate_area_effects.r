@@ -147,8 +147,8 @@ for(i in 1:length(int_modlist_full)){
         fe_add <- fixef(out_add$model) #get fixed effects
         
         # get effects significance
-        add_sg_sig <- ifelse(fe_add["sg_norm", "Q2.5"] < 0 & 0 < fe_add["sg_norm", "Q97.5"], "sig", "non-sig")
-        add_ghm_sig <- ifelse(fe_add["ghm_scale", "Q2.5"] < 0 & 0 < fe_add["ghm_scale", "Q97.5"], "sig", "non-sig")
+        add_sg_sig <- ifelse(fe_add["sg_norm", "Q2.5"] < 0 & 0 < fe_add["sg_norm", "Q97.5"], "non-sig", "sig")
+        add_ghm_sig <- ifelse(fe_add["ghm_scale", "Q2.5"] < 0 & 0 < fe_add["ghm_scale", "Q97.5"], "non-sig", "sig")
         
         # get observed quantiles of ghm to set "low" and "high" human mod
         ghmq <- quantile(out$data$ghm_scale, probs = prob_vec, na.rm = T)
@@ -276,8 +276,8 @@ for(i in 1:length(int_modlist_full)){
       fe_add <- fixef(out_add$model) #get fixed effects
       
       # get effects significance
-      add_sg_sig <- ifelse(fe_add["sg_norm", "Q2.5"] < 0 & 0 < fe_add["sg_norm", "Q97.5"], "sig", "non-sig")
-      add_ghm_sig <- ifelse(fe_add["ghm_scale", "Q2.5"] < 0 & 0 < fe_add["ghm_scale", "Q97.5"], "sig", "non-sig")
+      add_sg_sig <- ifelse(fe_add["sg_norm", "Q2.5"] < 0 & 0 < fe_add["sg_norm", "Q97.5"], "non-sig", "sig")
+      add_ghm_sig <- ifelse(fe_add["ghm_scale", "Q2.5"] < 0 & 0 < fe_add["ghm_scale", "Q97.5"], "non-sig", "sig")
       
       # get observed quantiles of ghm to set "low" and "high" human mod
       ghmq <- quantile(out$data$ghm_scale, probs = prob_vec, na.rm = T)

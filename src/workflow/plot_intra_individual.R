@@ -14,12 +14,12 @@ pal <- c("#F98177","#8895BF")
 #-- Load Data --#
 
 #- Niche model
-load("out/intra_ind_models/niche_intra_ind_int_mod_2023-04-26.rdata")
+load("out/intra_ind_models/niche_intra_ind_int_mod_2023-09-27.rdata")
 niche_out <- out
 niche_int_mod <- niche_out$mod
 
 #- Area Model
-load("out/intra_ind_models/size_intra_ind_int_mod_2023-04-26.rdata")
+load("out/intra_ind_models/size_intra_ind_int_mod_2023-09-27.rdata")
 area_out <- out
 area_int_mod <- out$mod
 

@@ -12,7 +12,7 @@ library(bayestestR)
 birds <- c("Anser caerulescens", "Aquila chrysaetos", "Ardea alba", "Corvus corax", 
            "Grus canadensis","Haliaeetus leucocephalus", "Numenius americanus")
 
-sg_dat <- read_csv("out/niche_sg_marginal_2023-09-27.csv") %>% 
+sg_dat <- read_csv("out/niche_sg_marginal_2023-10-17.csv") %>% 
   mutate(se = uncertainty/1.96,
          wei = 1/uncertainty^2,
          wei_norm = wei/sum(wei),
@@ -28,10 +28,10 @@ brm_sg <- brm(
 )
 
 brm_sg
-plot(brm_sg)
-pd_sg <- p_direction(brm_sg) %>% 
+# plot(brm_sg)
+(pd_sg <- p_direction(brm_sg) %>% 
   mutate(Parameter = case_when(Parameter == "b_classbird" ~ "classbird",
-                               Parameter == "b_classmammal" ~ "classmammal"))
+                               Parameter == "b_classmammal" ~ "classmammal")))
 out_sg <- fixef(brm_sg) %>% 
   as_tibble(rownames = NA) %>% 
   rownames_to_column(var = "Parameter") %>% 
@@ -39,7 +39,7 @@ out_sg <- fixef(brm_sg) %>%
 write_csv(out_sg, "out/niche_meta_sg.csv")
 
 # GHM
-ghm_dat <- read_csv("out/niche_ghm_marginal_2023-09-27.csv") %>% 
+ghm_dat <- read_csv("out/niche_ghm_marginal_2023-10-17.csv") %>% 
   mutate(se = uncertainty/1.96,
          wei = 1/uncertainty^2,
          wei_norm = wei/sum(wei),
@@ -57,10 +57,10 @@ brm_ghm <- brm(
 )
 
 brm_ghm
-plot(brm_ghm)
-pd_ghm <- p_direction(brm_ghm) %>% 
+# plot(brm_ghm)
+(pd_ghm <- p_direction(brm_ghm) %>% 
   mutate(Parameter = case_when(Parameter == "b_classbird" ~ "classbird",
-                               Parameter == "b_classmammal" ~ "classmammal"))
+                               Parameter == "b_classmammal" ~ "classmammal")))
 out_ghm <- fixef(brm_ghm) %>% 
   as_tibble(rownames = NA) %>% 
   rownames_to_column(var = "Parameter") %>% 

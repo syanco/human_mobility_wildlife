@@ -277,6 +277,7 @@ for(i in 1:length(int_modlist_full)){
         
         # Design layout
         design <- " #IIII#
+                    #IIII#
                     AAABBB
                     AAABBB
                     AAABBB
@@ -466,6 +467,7 @@ for(i in 1:length(int_modlist_full)){
       
       # Design layout
       design <- "   #IIII#
+                    #IIII#
                     AAABBB
                     AAABBB
                     AAABBB
@@ -480,6 +482,27 @@ for(i in 1:length(int_modlist_full)){
                     HHHHHH
                     HHHHHH
                     HHHHHH"
+      
+      if(sp == "Odocoileus hemionus"){
+        design <- " #IIII#
+                    #IIII#
+                    #IIII#
+                    #IIII#
+                    AAABBB
+                    AAABBB
+                    AAABBB
+                    CCCCCC
+                    CCCCCC
+                    EEEFFF
+                    EEEFFF
+                    GGGGGG
+                    GGGGGG
+                    GGGGGG
+                    GGGGGG
+                    HHHHHH
+                    HHHHHH
+                    HHHHHH"
+      }
       
       # Gather plots
       (model_out <- wrap_elements(study_plot+zoom_map+
@@ -653,6 +676,7 @@ for(i in 1:length(int_modlist_full)){
       
       # Design layout
       design <- "   #IIII#
+                    #IIII#
                     AAABBB
                     AAABBB
                     AAABBB

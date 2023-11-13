@@ -72,16 +72,16 @@ palgray <- c("#808080", "#D3D3D3")
 
 
 
-ce_sg <- conditional_effects(x=int_mod,
-                             effects = "sg_diff",
-                             re_formula = NA)
-# (sg_ce_plot <-  plot(ce_sg, 
+# ce_sg <- conditional_effects(x=int_mod,
+#                              effects = "sg_diff",
+#                              re_formula = NA)
+# (sg_ce_plot <-  plot(ce_sg,
 #                      plot = F,
 #                      rug = F,
 #                      line_args = list("se" = T,
 #                                       "color" = "black",
-#                                       "fill" = "gray"))[[1]] + 
-#     # scale_color_manual(values = palnew[3])+         
+#                                       "fill" = "gray"))[[1]] +
+#     # scale_color_manual(values = palnew[3])+
 #     theme_tufte() +
 #     # xlab(glue("{expression(delta)} Human Mobility")) +
 #     xlab(bquote(~Delta~"Human Mobility")) +
@@ -95,36 +95,36 @@ ce_sg <- conditional_effects(x=int_mod,
 #           aspect.ratio = 1,
 #           # text = element_text(family = "Roboto", size=20)
 #     ))
-
-ggsave(filename = glue("out/area_intra_ind_sg.png"), sg_ce_plot,
-       width = 6, height = 6)
-
-
-ce_ghm <- conditional_effects(x=int_mod,
-                              effects = "ghm_diff",
-                              re_formula = NA)
-(ghm_ce_plot <-  plot(ce_ghm, 
-                      plot = F,
-                      rug = F,
-                      line_args = list("se" = T,
-                                       "color" = "black",
-                                       "fill" = "gray"))[[1]] + 
-    # scale_color_manual(values = palnew[3])+         
-    theme_tufte() +
-    # xlab(glue("{expression(delta)} Human Mobility")) +
-    xlab(bquote(~Delta~"Human Modification")) +
-    ylab(bquote(~Delta~"Space Use"))+
-    geom_vline(aes(xintercept = 0), linetype = "dashed") +
-    geom_hline(aes(yintercept = 0), linetype = "dashed") +
-    theme(axis.line = element_line(size = .5),
-          # axis.text = element_blank(),
-          # axis.ticks = element_blank(),
-          # axis.title = element_blank(),
-          aspect.ratio = 1,
-          # text = element_text(family = "Roboto", size=20)
-    ))
-ggsave(filename = glue("out/area_intra_ind_ghm.png"), ghm_ce_plot,
-       width = 6, height = 6)
+# 
+# ggsave(filename = glue("out/area_intra_ind_sg.png"), sg_ce_plot,
+#        width = 6, height = 6)
+# 
+# 
+# ce_ghm <- conditional_effects(x=int_mod,
+#                               effects = "ghm_diff",
+#                               re_formula = NA)
+# (ghm_ce_plot <-  plot(ce_ghm, 
+#                       plot = F,
+#                       rug = F,
+#                       line_args = list("se" = T,
+#                                        "color" = "black",
+#                                        "fill" = "gray"))[[1]] + 
+#     # scale_color_manual(values = palnew[3])+         
+#     theme_tufte() +
+#     # xlab(glue("{expression(delta)} Human Mobility")) +
+#     xlab(bquote(~Delta~"Human Modification")) +
+#     ylab(bquote(~Delta~"Space Use"))+
+#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
+#     geom_hline(aes(yintercept = 0), linetype = "dashed") +
+#     theme(axis.line = element_line(size = .5),
+#           # axis.text = element_blank(),
+#           # axis.ticks = element_blank(),
+#           # axis.title = element_blank(),
+#           aspect.ratio = 1,
+#           # text = element_text(family = "Roboto", size=20)
+#     ))
+# ggsave(filename = glue("out/area_intra_ind_ghm.png"), ghm_ce_plot,
+#        width = 6, height = 6)
 
 
 
@@ -183,7 +183,7 @@ ce_int <- conditional_effects(x=int_mod,
     theme(panel.grid.major.y = element_blank(),
           panel.grid.minor.y = element_blank(),
           panel.grid.minor.x = element_blank(),
-          legend.position = "none",
+          # legend.position = "none",
           plot.title = element_text(face = "bold"),
           axis.text.y = element_text(size = 8),
           axis.title.y = element_blank(),

@@ -110,6 +110,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 evt0 <- tbl(db, 'event_clean') %>% collect()
 std0 <- tbl(db, 'study_clean') %>% 
   collect() 
+beepr::beep()
 
 # Init lists to store results
 pred_out <- list()
@@ -288,6 +289,7 @@ for(i in 1:length(int_modlist_full)){
         
         # Design layout
         design <- " #IIII#
+                    #IIII#
                     AAABBB
                     AAABBB
                     AAABBB
@@ -479,6 +481,7 @@ for(i in 1:length(int_modlist_full)){
       # Design layout
       design <- "   
                   #IIII#
+                  #IIII#
                   AAABBB
                   AAABBB
                   AAABBB
@@ -666,6 +669,7 @@ for(i in 1:length(int_modlist_full)){
       
       # Design layout
       design <- "   #IIII#
+                    #IIII#
                     AAABBB
                     AAABBB
                     AAABBB

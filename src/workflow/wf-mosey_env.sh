@@ -8,18 +8,18 @@
 # 
 # #Connect to vpn
 # /opt/cisco/anyconnect/bin/vpn connect access.yale.edu
+# # 
+# wd=/Users/scottyanco/Documents/covid-19_movement/out/anno
+# # dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db
+# dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db
 # 
-wd=/Users/scottyanco/Documents/covid-19_movement/out/anno
-# dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db
-dbr=/home/sy522/project/covid-19_movement/processed_datamosey_mod_2023.db
+# cd $wd
 
-cd $wd
-
-#check file size
-ssh grace "ls -lh $dbr" #8.3GB
-
-#download the file
-scp grace:$dbr mosey_mod.db
+# #check file size
+# ssh grace "ls -lh $dbr" #8.3GB
+# 
+# #download the file
+# scp grace:$dbr mosey_mod.db
 # 
 # #disconnect from vpn
 # /opt/cisco/anyconnect/bin/vpn disconnect
