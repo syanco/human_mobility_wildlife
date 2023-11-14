@@ -127,10 +127,10 @@
       dsq --job-file $srcr/workflow/joblist.txt --mem-per-cpu 40g -t 02:00:00
 
       # The step above generates a .sh file to submit the job to the Slurm manager
-      # Thus, after running the previous line, thje file referenced below will be 
+      # Thus, after running the previous line, the file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2023-11-11.sh
+      sbatch dsq-joblist-2023-11-13.sh
 
 
     #
@@ -147,9 +147,7 @@
       # Rscript $src/workflow/compute-cbg-area.r
       
     #
----------------------
->>>>  BOOKMARK   >>>>
----------------------
+
     #- Annotate events with cbg info -#
     
       # Inputs: db:event_clean + cbg intersection csv + cbg area csv
@@ -217,7 +215,7 @@
 
   ##-- Clean Data --##
     
-      # Inputs:   db:event_trim 
+      # Inputs:   db:event_final2 
       # Outputs:  db:event_mod + db:event_clean
   
     
@@ -230,7 +228,9 @@
     
  
 
-
+---------------------
+>>>>  BOOKMARK   >>>>
+---------------------
 
 ####
 
