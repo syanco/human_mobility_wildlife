@@ -1,7 +1,7 @@
 ﻿species,adapt_delta,iter,thin,warmup,run
-Anas acuta,NULL,100000,5,50000,0
+Anas acuta,NULL,100000,5,50000,1
 Anser albifrons,NULL,100000,5,50000,0
 Anser caerulescens,NULL,100000,5,50000,1
-Chen rossii,NULL,100000,5,50000,0
-Ardea alba,0.99,NULL,NULL,NULL,0
+Chen rossii,NULL,100000,5,50000,1
+Ardea alba,0.99,NULL,NULL,NULL,1
 Odocoileus virginianus,NULL,100000,5,50000,0
