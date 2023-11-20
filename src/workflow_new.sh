@@ -315,13 +315,11 @@
       sbatch $srcr/hpc/run_fit_space_use_interactive_models.sh # interactive
       sbatch $srcr/hpc/run_fit_space_use_additive_models.sh
 
-scp -r grace:$wdr/out/single_species_models/area_dot $wd/out/single_species_models/
+# scp -r grace:$wdr/out/single_species_models/area_dot $wd/out/single_species_models/
 scp -r grace:$wdr/out/single_species_models/area_additive $wd/out/single_species_models/
 scp -r grace:$wdr/out/single_species_models/area_interactive $wd/out/single_species_models/
 
- ---------------------
->>>>  BOOKMARK   >>>>
----------------------
+
 # Check model performance
         # (INTERACTIVE)
       $src/area_model_summaries.r
@@ -336,7 +334,7 @@ scp -r grace:$wdr/out/single_species_models/area_interactive $wd/out/single_spec
       # Rscript $wd/analysis/src/workflow/fit-space-use-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area 24 10 10000 5
  
     #- Check area size ~ sample size -#
-    
+ 
     # RUN INTERACTIVE 
     # TODO:  check/finalize
     Rscript $src/workflow/check_area_size_sample_balance.R
@@ -344,7 +342,9 @@ scp -r grace:$wdr/out/single_species_models/area_interactive $wd/out/single_spec
     #
 
     #
-  
+ ---------------------
+>>>>  BOOKMARK   >>>>
+---------------------   
     #- Generate area model results -#
     
       #Get standardized effect sizes
@@ -362,14 +362,14 @@ scp -r grace:$wdr/out/single_species_models/area_interactive $wd/out/single_spec
       sbatch $srcr/hpc/run_fit_niche_breadth_dot_models.sh
       sbatch $srcr/hpc/run_fit_niche_breadth_additive_models.sh
       sbatch $srcr/hpc/run_fit_niche_breadth_interactive_models.sh #interaction model
----------------------
->>>>  BOOKMARK   >>>>
----------------------
+
 
 scp -r grace:$wdr/out/single_species_models/niche_dot $wd/out/single_species_models/
 scp -r grace:$wdr/out/single_species_models/niche_additive $wd/out/single_species_models/
 scp -r grace:$wdr/out/single_species_models/niche_interactive $wd/out/single_species_models/
-
+---------------------
+>>>>  BOOKMARK   >>>>
+---------------------
         # Check model performance
         # (INTERACTIVE)
       $src/niche_model_summaries.r
