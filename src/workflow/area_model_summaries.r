@@ -466,51 +466,51 @@ for(i in 1:length(int_modlist_full)){
       #---- Assemble Plots ---#
       
       # Design layout
-      design <- "   #IIII#
-                    #IIII#
-                    AAABBB
-                    AAABBB
-                    AAABBB
-                    CCCCCC
-                    CCCCCC
-                    EEEFFF
-                    EEEFFF
-                    GGGGGG
-                    GGGGGG
-                    GGGGGG
-                    GGGGGG
-                    HHHHHH
-                    HHHHHH
-                    HHHHHH"
+      design <- "   #GGGG#
+                    #GGGG#
+                    #AAAA#
+                    #AAAA#
+                    #AAAA#
+                    BBBBBB
+                    BBBBBB
+                    CCCDDD
+                    CCCDDD
+                    EEEEEE
+                    EEEEEE
+                    EEEEEE
+                    EEEEEE
+                    FFFFFF
+                    FFFFFF
+                    FFFFFF"
       
       if(sp == "Odocoileus hemionus"){
-        design <- " #IIII#
-                    #IIII#
-                    #IIII#
-                    #IIII#
-                    AAABBB
-                    AAABBB
-                    AAABBB
-                    CCCCCC
-                    CCCCCC
-                    EEEFFF
-                    EEEFFF
-                    GGGGGG
-                    GGGGGG
-                    GGGGGG
-                    GGGGGG
-                    HHHHHH
-                    HHHHHH
-                    HHHHHH"
+        design <- " #GGGG#
+                    #GGGG#
+                    #GGGG#
+                    #GGGG#
+                    #AAAA#
+                    #AAAA#
+                    #AAAA#
+                    BBBBBB
+                    BBBBBB
+                    CCCDDD
+                    CCCDDD
+                    EEEEEE
+                    EEEEEE
+                    EEEEEE
+                    EEEEEE
+                    FFFFFF
+                    FFFFFF
+                    FFFFFF"
       }
       
       # Gather plots
-      (model_out <- wrap_elements(study_plot+zoom_map+
-                                    wrap_elements(int_ce_plot_ghm+int_ce_plot_sg)+ggtitle("Conditional Effects")+
-                                    pp_dens+pp_err+
-                                    trace+
-                                    wrap_elements(full = param_table) + ggtitle("Model Coeeficient Table")+
-                                    wrap_elements(full = data_sum_tbl) + ggtitle("Species Data Summary")+
+      (model_out <- wrap_elements(study_plot+ # A
+                                    wrap_elements(int_ce_plot_ghm+int_ce_plot_sg)+ggtitle("Conditional Effects")+ #B
+                                    pp_dens+pp_err+ #C, D
+                                    trace+ #E
+                                    wrap_elements(full = param_table) + ggtitle("Model Coeeficient Table")+ #F
+                                    wrap_elements(full = data_sum_tbl) + ggtitle("Species Data Summary")+ #G
                                     plot_layout(design = design))+
          ggtitle(glue("{sp} - {mod}")) + 
          theme(plot.title = element_text(size = 40, face = "bold")))

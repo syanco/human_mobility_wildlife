@@ -11,7 +11,7 @@
 # # 
 # wd=/Users/scottyanco/Documents/covid-19_movement/out/anno
 # # dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db
-# dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db
+dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db
 # 
 # cd $wd
 

@@ -15,7 +15,7 @@ birds <- c("Anas acuta", "Anas americana", "Anas clypeata", "Anas crecca",
           "Ardea alba", "Chen rossii", "Circus cyaneus", "Corvus corax", 
           "Haliaeetus leucocephalus", "Rallus longirostris")
 
-sg_dat <- read_csv("out/area_sg_marginal_2023-10-17.csv") %>% 
+sg_dat <- read_csv("out/area_sg_marginal_2023-11-20.csv") %>% 
   mutate(se = uncertainty/1.96,
          wei = 1/uncertainty^2,
          wei_norm = wei/sum(wei),

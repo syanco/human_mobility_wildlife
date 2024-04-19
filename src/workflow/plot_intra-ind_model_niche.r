@@ -2,21 +2,23 @@ library(tidyverse)
 library(brms)
 library(ggthemes)
 library(glue)
+library(emmeans)
+library(bayestestR)
 
-load("out/intra_ind_models/niche_intra_ind_add_mod_2023-09-27.rdata")
+load("out/intra_ind_models/niche_intra_ind_add_mod_2023-11-20.rdata")
 add_mod <- out$mod
 add_mod
-load("out/intra_ind_models/niche_intra_ind_int_mod_2023-09-27.rdata")
+load("out/intra_ind_models/niche_intra_ind_int_mod_2023-11-20.rdata")
 int_mod <- out$mod
 int_mod
 
-loo(add_mod, int_mod)
-waic(add_mod, int_mod, compare = T)
-
-conditional_effects(int_mod)
-
-pp_check(int_mod)
-pp_check(add_mod, type='error_scatter_avg')
+# loo(add_mod, int_mod)
+# waic(add_mod, int_mod, compare = T)
+# 
+# conditional_effects(int_mod)
+# 
+# pp_check(int_mod)
+# pp_check(add_mod, type='error_scatter_avg')
 
 fe <- fixef(add_mod) #get fixed effects
 # add_re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
@@ -133,6 +135,7 @@ ce_int <- conditional_effects(x=int_mod,
                               effects = "sg_diff:ghm_diff",
                               int_conditions = list(ghm_diff = ghmq),
                               re_formula = NA)
+
 (int_ce_plot <-  plot(ce_int, 
                       plot = F,
                       rug = F,
@@ -166,3 +169,28 @@ ce_int <- conditional_effects(x=int_mod,
     labs(x = "Change in human mobility", y = "Change in area size")
 )
 ggsave(filename = glue("out/niche_intra_ind_int.png"), int_ce_plot)
+
+
+####---- Get Marginal Effects at Median ----####
+niche_med_sg <- median(int_mod$data$sg_diff, na.rm = T)
+niche_med_ghm <- median(int_mod$data$ghm_diff, na.rm = T)
+
+
+# Stash df in out lists
+(niche_ghm_effects <- emtrends(int_mod, ~ "sg_diff", var = "ghm_diff", 
+                               at = list("sg_diff" = niche_med_sg))  %>% 
+    as.data.frame() %>% 
+    rename("Estimate" = "ghm_diff.trend",
+           "LCL" = "lower.HPD",
+           "HCL" = "upper.HPD") 
+)
+
+(niche_sg_effects <- emtrends(int_mod, ~ "ghm_diff", var = "sg_diff", 
+                              at = list("ghm_diff" = niche_med_ghm))  %>% 
+    as.data.frame() %>% 
+    rename("Estimate" = "sg_diff.trend",
+           "LCL" = "lower.HPD",
+           "HCL" = "upper.HPD") 
+)
+
+parameters::parameters(int_mod)

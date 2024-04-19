@@ -2,11 +2,13 @@ library(tidyverse)
 library(brms)
 library(ggthemes)
 library(glue)
+library(emmeans)
+library(bayestestR)
 
-load("out/intra_ind_models/size_intra_ind_add_mod_2023-09-27.rdata")
+load("out/intra_ind_models/size_intra_ind_add_mod_2023-11-20.rdata")
 add_mod <- out$mod
 add_mod
-load("out/intra_ind_models/size_intra_ind_int_mod_2023-09-27.rdata")
+load("out/intra_ind_models/size_intra_ind_int_mod_2023-11-20.rdata")
 int_mod <- out$mod
 int_mod
 
@@ -194,3 +196,26 @@ ce_int <- conditional_effects(x=int_mod,
     labs(x = "Change in human mobility", y = "Change in area size")
 )
 ggsave(filename = glue("out/area_intra_ind_int.png"), int_ce_plot, width = 5, height = 5)
+
+
+####---- Get Marginal Effects at Median ----####
+
+area_med_sg <- median(int_mod$data$sg_diff, na.rm = T)
+area_med_ghm <- median(int_mod$data$ghm_diff, na.rm = T)
+
+# Stash df in out lists
+(area_ghm_effects <- emtrends(int_mod, ~ "sg_diff", var = "ghm_diff", 
+                              at = list("sg_diff" = area_med_sg))  %>% 
+    as.data.frame() %>% 
+    rename("Estimate" = "ghm_diff.trend",
+           "LCL" = "lower.HPD",
+           "HCL" = "upper.HPD") )
+
+(area_sg_effects <- emtrends(int_mod, ~ "ghm_diff", var = "sg_diff", 
+                             at = list("ghm_diff" = area_med_ghm))  %>% 
+    as.data.frame() %>% 
+    rename("Estimate" = "sg_diff.trend",
+           "LCL" = "lower.HPD",
+           "HCL" = "upper.HPD") )
+
+parameters::parameters(int_mod)

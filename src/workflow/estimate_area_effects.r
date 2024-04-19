@@ -348,3 +348,4 @@ write_csv(x = sg_es_df, file = glue("out/area_sg_marginal_{Sys.Date()}.csv"))
 ghm_es_df <- do.call("bind_rows", ghm_effects_out)
 write_csv(x = ghm_es_df, file = glue("out/area_ghm_marginal_{Sys.Date()}.csv"))
 
+beepr::beep()

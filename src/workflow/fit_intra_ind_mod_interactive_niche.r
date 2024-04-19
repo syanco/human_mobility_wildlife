@@ -152,7 +152,8 @@ breadth <- read_csv("out/niche_determinant_anthropause.csv") %>%
   filter(studyid != 1891587670) %>%
   mutate(ind_f = as.factor(individual)) %>%  # create factor version of ind for REs)
   left_join(size, by = c("scientificname" = "species", 
-                           "individual" = "ind_id", 
+                           # "individual" = "ind_id", 
+                         "ind_f" = "ind_f",
                            "year" = "year", 
                            "studyid" = "study_id", 
                            "week" = "wk"))
@@ -178,15 +179,15 @@ breadth_paired <- breadth %>%
   filter(individual %in% paired_vec) %>% 
   #filter to mammals only
   left_join(traits, by = c("scientificname" = "Species")) %>% 
-  filter(Family == "Cervidae" | Family == "Canidae" | Family == "Ursidae" |
-           Family == "Felidae" | Family == "Antilocapridae" | Family == "Bovidae") %>% 
+  # filter(Family == "Cervidae" | Family == "Canidae" | Family == "Ursidae" |
+  #          Family == "Felidae" | Family == "Antilocapridae" | Family == "Bovidae") %>% 
   mutate(diet = case_when(Diet.PlantO >= 50 ~ "Herbivore",
                           Diet.Fruit >= 50 ~ "Frugivore",
                           Diet.Scav >= 50 ~ "Savenger",
                           Diet.Inv >= 50 ~ "Insectivore",
                           (Diet.Vend+Diet.Vect+Diet.Vfish) >= 50 ~ "Carnivore",
                           TRUE ~ "Omnivore"),
-         breadth_scale = scale(log(total+0.000000000000000000001)),
+         breadth_scale = scale(log(total+0.00000000000001)),
          log_area = log(area), #get log of weekly area use
          log_area_scale = scale(log_area), # standardize it
          sg_norm = sg / cbg_area, # normalize safegraph data by size of the CBG
@@ -260,6 +261,7 @@ out <- list(
 
 #write out results
 save(out, file = glue("{.outP}/niche_intra_ind_int_mod_{Sys.Date()}.rdata"))
+
 
 #---- Finalize script ----#
 

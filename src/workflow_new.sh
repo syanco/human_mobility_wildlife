@@ -130,7 +130,7 @@
       # Thus, after running the previous line, the file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2023-11-13.sh
+      sbatch dsq-joblist-2024-04-16.sh
 
 
     #
@@ -342,10 +342,11 @@ scp -r grace:$wdr/out/single_species_models/area_interactive $wd/out/single_spec
     #
 
     #
- ---------------------
->>>>  BOOKMARK   >>>>
----------------------   
+ 
     #- Generate area model results -#
+    
+      # MANUALLY RM: (based on model diagnostics)
+      # Anas acuta, Anser caerulescens, Chen rossii, Rallus longirostris
     
       #Get standardized effect sizes
       # Run interactively:
@@ -353,8 +354,8 @@ scp -r grace:$wdr/out/single_species_models/area_interactive $wd/out/single_spec
     #
     
     #- Area "meta-analysis"
-    # estimate_area_effects.r
-    summarize_effects_area.R
+    estimate_area_effects.r
+    # summarize_effects_area.R
 
 
     #- Fit niche breadth models -#
@@ -364,12 +365,10 @@ scp -r grace:$wdr/out/single_species_models/area_interactive $wd/out/single_spec
       sbatch $srcr/hpc/run_fit_niche_breadth_interactive_models.sh #interaction model
 
 
-scp -r grace:$wdr/out/single_species_models/niche_dot $wd/out/single_species_models/
+# scp -r grace:$wdr/out/single_species_models/niche_dot $wd/out/single_species_models/
 scp -r grace:$wdr/out/single_species_models/niche_additive $wd/out/single_species_models/
 scp -r grace:$wdr/out/single_species_models/niche_interactive $wd/out/single_species_models/
----------------------
->>>>  BOOKMARK   >>>>
----------------------
+
         # Check model performance
         # (INTERACTIVE)
       $src/niche_model_summaries.r
@@ -381,8 +380,14 @@ scp -r grace:$wdr/out/single_species_models/niche_interactive $wd/out/single_spe
         # Model reruns for problematic MCMCs
       sbatch $srcr/hpc/run_refit_niche_breadth_additive_models.sh
       sbatch $srcr/hpc/run_refit_niche_breadth_interactive_models.sh
+      
+      
+
 
     #- Generate niche model results -#
+    
+    # MANUALLY RM:
+    # Rallus longirsotris
     
       #Get standardized effect sizes
       # Run interactively:
@@ -391,11 +396,11 @@ scp -r grace:$wdr/out/single_species_models/niche_interactive $wd/out/single_spe
     
     #- Area "meta-analysis"
       estimate_niche_effects.r
-      summarize_effects_area.R
+      # summarize_effects_area.R
     #
 
   ##-- Intra-Individual Analysis --##
-  
+
     #Area
     sbatch $srcr/hpc/run_fit_intra_ind_mod_additive_area.sh
     sbatch $srcr/hpc/run_fit_intra_ind_mod_int_area.sh
@@ -405,8 +410,15 @@ scp -r grace:$wdr/out/single_species_models/niche_interactive $wd/out/single_spe
     sbatch $srcr/hpc/run_fit_intra_ind_mod_int_niche.sh
   ##
 
+---------------------
+>>>>  BOOKMARK   >>>>
+---------------------  
+  scp -r grace:$wdr/out/intra_ind_models $wd/out
 
-  
+# PLot outputs (INTERACTIVE)
+  $srcl/plot_intra-ind_model_area.r
+  $srcl/plot_intra-ind_model_niche.r
+
 ####
 
 

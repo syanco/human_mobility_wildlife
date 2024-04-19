@@ -109,8 +109,8 @@ add_sp <- word(add_modlist, 1, sep = "_")
 #check that lists are same
 int_sp == add_sp
 
-add_sp <- append(add_sp, "NULL", after = 24)
-add_modlist_full <- append(add_modlist_full, "NULL", after = 24)
+# add_sp <- append(add_sp, "NULL", after = 24)
+# add_modlist_full <- append(add_modlist_full, "NULL", after = 24)
 
 #---- Make Plots ----#
 
@@ -134,6 +134,8 @@ for(i in 1:length(int_modlist_full)){
   if(int_modlist_full[i] != "NULL"){
     load(int_modlist_full[i]) # load model
     intmod <- out$model
+    int_dat <- intmod$data %>% 
+      mutate(ind = str_extract(grp, "^\\d+"))
     sp <- out$species
     
     fe <- fixef(intmod) #get fixed effects
@@ -145,6 +147,9 @@ for(i in 1:length(int_modlist_full)){
       if(add_modlist_full[i] != "NULL"){
         load(add_modlist_full[i]) # load model
         addmod <- out$model
+        add_dat <- addmod$data %>% 
+          mutate(ind = str_extract(grp, "^\\d+"))
+        
         sp <- out$species
         
         area_effects_out[[i]] <- fixef(addmod) %>%  #get fixed effects
@@ -155,7 +160,10 @@ for(i in 1:length(int_modlist_full)){
                  sig_code = case_when(
                    LCL < 0 & HCL > 0 ~"ns_add",
                    TRUE ~ "sig_add"
-                 )) %>% 
+                 ),
+                 n_weeks = nrow(add_dat),
+                 n_ind_yrs = length(unique(add_dat$grp)),
+                 n_ind = length(unique(add_dat$ind))) %>% 
           rownames_to_column( var = "variable") %>% 
           filter(variable == "log_area_scale")
         
@@ -167,7 +175,10 @@ for(i in 1:length(int_modlist_full)){
                  sig_code = case_when(
                    LCL < 0 & HCL > 0 ~"ns_add",
                    TRUE ~ "sig_add"
-                 )) %>% 
+                 ),
+                 n_weeks = nrow(add_dat),
+                 n_ind_yrs = length(unique(add_dat$grp)),
+                 n_ind = length(unique(add_dat$ind))) %>% 
           rownames_to_column( var = "variable") %>% 
           filter(variable == "sg_norm")
         
@@ -179,7 +190,10 @@ for(i in 1:length(int_modlist_full)){
                  sig_code = case_when(
                    LCL < 0 & HCL > 0 ~"ns_add",
                    TRUE ~ "sig_add"
-                 )) %>% 
+                 ),
+                 n_weeks = nrow(add_dat),
+                 n_ind_yrs = length(unique(add_dat$grp)),
+                 n_ind = length(unique(add_dat$ind))) %>% 
           rownames_to_column( var = "variable") %>% 
           filter(variable == "ghm_scale")
         # re <- posterior_summary(addmod, variable = c("sd_grp__Intercept", "sigma"))
@@ -275,7 +289,10 @@ for(i in 1:length(int_modlist_full)){
                sig_code = case_when(
                  LCL < 0 & HCL > 0 ~"ns_add",
                  TRUE ~ "sig_add"
-               )) %>% 
+               ),
+               n_weeks = nrow(int_dat),
+               n_ind_yrs = length(unique(int_dat$grp)),
+               n_ind = length(unique(int_dat$ind))) %>% 
         rownames_to_column( var = "variable") %>% 
         filter(variable == "log_area_scale")
       
@@ -288,7 +305,10 @@ for(i in 1:length(int_modlist_full)){
                sig_code = case_when(
                  ghm_cond == "Low" ~"low_int",
                  ghm_cond == "High" ~ "high_int"
-               )) %>% 
+               ),
+               n_weeks = nrow(int_dat),
+               n_ind_yrs = length(unique(int_dat$grp)),
+               n_ind = length(unique(int_dat$ind))) %>% 
         rename("Estimate" = "ghm_scale.trend",
                "LCL" = "lower.HPD",
                "HCL" = "upper.HPD")
@@ -301,7 +321,10 @@ for(i in 1:length(int_modlist_full)){
                sig_code = case_when(
                  ghm_cond == "Low" ~"low_int",
                  ghm_cond == "High" ~ "high_int"
-               ))%>% 
+               ),
+               n_weeks = nrow(int_dat),
+               n_ind_yrs = length(unique(int_dat$grp)),
+               n_ind = length(unique(int_dat$ind))) %>% 
         rename("Estimate" = "sg_norm.trend",
                "LCL" = "lower.HPD",
                "HCL" = "upper.HPD")
@@ -358,6 +381,8 @@ for(i in 1:length(int_modlist_full)){
     if(add_modlist_full[i] != "NULL"){
       load(add_modlist_full[i]) # load model
       addmod <- out$model
+      add_dat <- addmod$data %>% 
+        mutate(ind = str_extract(grp, "^\\d+"))
       sp <- out$species
       
       fe <- fixef(addmod) #get fixed effects
@@ -371,7 +396,10 @@ for(i in 1:length(int_modlist_full)){
                sig_code = case_when(
                  LCL < 0 & HCL > 0 ~"ns_add",
                  TRUE ~ "sig_add"
-               )) %>% 
+               ),
+               n_weeks = nrow(add_dat),
+               n_ind_yrs = length(unique(add_dat$grp)),
+               n_ind = length(unique(add_dat$ind))) %>% 
         rownames_to_column( var = "variable") %>% 
         filter(variable == "log_area_scale")
       
@@ -383,7 +411,10 @@ for(i in 1:length(int_modlist_full)){
                sig_code = case_when(
                  LCL < 0 & HCL > 0 ~"ns_add",
                  TRUE ~ "sig_add"
-               )) %>% 
+               ),
+               n_weeks = nrow(add_dat),
+               n_ind_yrs = length(unique(add_dat$grp)),
+               n_ind = length(unique(add_dat$ind))) %>% 
         rownames_to_column( var = "variable") %>% 
         filter(variable == "sg_norm")
       
@@ -395,7 +426,10 @@ for(i in 1:length(int_modlist_full)){
                sig_code = case_when(
                  LCL < 0 & HCL > 0 ~"ns_add",
                  TRUE ~ "sig_add"
-               )) %>% 
+               ),
+               n_weeks = nrow(add_dat),
+               n_ind_yrs = length(unique(add_dat$grp)),
+               n_ind = length(unique(add_dat$ind))) %>% 
         rownames_to_column( var = "variable") %>% 
         filter(variable == "ghm_scale")      
       #- Standardized Effects Size -#
