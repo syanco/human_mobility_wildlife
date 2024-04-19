@@ -16,7 +16,7 @@ if(interactive()) {
   library(docopt)
   # library(rprojroot)
   
-  ag <- docopt(doc, version = '0.1\n')
+  # ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
   
