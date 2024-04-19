@@ -23,8 +23,8 @@ if(interactive()) {
   source('analysis/src/funs/input_parse.r')
   
   #.list <- trimws(unlist(strsplit(ag$list,',')))
-  .datP <- makePath(ag$dat)
-  .outPF <- makePath(ag$out)
+  # .datP <- makePath(ag$dat)
+  # .outPF <- makePath(ag$out)
   .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
   # vector of probabilities foer conditional estimates
   prob_vec <- c(0.2,0.8)
