@@ -41,17 +41,22 @@
 
 ####----  Initialization  ----####
   
-  # define local working directory
-  wd=/Users/scottyanco/Documents/covid-19_movement
-  src=$wd/analysis/src
+  # define local working directory as dir for project (data and workflow repo)
+  # and local dir for workflow scripts in repo
+  wd=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife
+  src=$wd/src
+  # wd=/Users/scottyanco/Documents/covid-19_movement
+  # src=$wd/analysis/src
   cd $wd
     
   # define remote (HPC working directory)
-  wdr=/home/sy522/project/covid-19_movement
-  srcr=$wdr/analysis/src
+  wdr=/scratch/julietcohen/covid_movement
+  srcr=$wd/human_mobility_wildlife/src
+  # wdr=/home/sy522/project/covid-19_movement
+  # srcr=$wdr/analysis/src
   
   # Go to working directory
-  cd $wdr
+  # cd $wdr
   
 ####
 
@@ -62,14 +67,14 @@
   ##-- Working DB --##
 
     # Make a copy of db to be modified
-    cp $wd/raw_data/mosey.db $wd/processed_data/mosey_mod_2023.db
+    cp $wd/raw_data/mosey.db $wd/processed_data/mosey_mod.db
     # cp $wd/raw_data/mosey_swap.db $wd/processed_data/mosey_swap_mod.db
   
   ##
   
   ##-- Trim Data to Time/Area of Interest --##
   
-  Rscript $src/workflow/trim_data.r --db $wd/processed_data/mosey_mod_2023.db
+  Rscript $src/workflow/trim_data.r --db $wd/processed_data/mosey_mod.db
 
 
 ####----  Annotate Data ----####
