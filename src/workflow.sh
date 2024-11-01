@@ -43,8 +43,8 @@
 ####----  Initialization  ----####
   
   # define working directory
-  wd=/home/sy522/project/covid-19_movement
-  src=$wd/analysis/src
+  wd=/scratch/julietcohen/covid_movement
+  src=$wd/human_mobility_wildlife/src
   
   # Go to working directory
   cd $wd
