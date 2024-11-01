@@ -11,7 +11,7 @@
 # # 
 # wd=/Users/scottyanco/Documents/covid-19_movement/out/anno
 # # dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db
-dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db
+dbr=/scratch/julietcohen/covid_movement/human_mobility_wildlife/processed_data/mosey_mod.db
 # 
 # cd $wd
 
@@ -29,12 +29,12 @@ dbr=/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db
 #----
 
 
-wd=/Users/scottyanco/Documents/covid-19_movement
-src=$wd/analysis/src
+wd=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife
+src=$wd/src
 # db=$wd/processed_data/mosey_mod.db
-db=$wd/processed_data/mosey_mod_2023.db
+db=$wd/processed_data/mosey_mod.db
 
-export MOSEYENV_SRC=/Users/scottyanco/Documents/covid-19_movement/analysis/src/mosey #for mosey_anno_gee.sh
+export MOSEYENV_SRC=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/src/mosey #for mosey_anno_gee.sh
 
 cd $wd
 
@@ -48,7 +48,7 @@ sql="select study_id, 1 as run
 from study_trim
 order by study_id"
 
-sqlite3 -header -csv $db "$sql;" > analysis/ctfs/study.csv
+sqlite3 -header -csv $db "$sql;" > ctfs/study.csv
 
 #--
 #-- Set up variables

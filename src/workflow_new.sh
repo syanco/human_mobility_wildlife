@@ -41,8 +41,7 @@
 
 ####----  Initialization  ----####
   
-  # define local working directory as dir for project (data and workflow repo)
-  # and local dir for workflow scripts in repo
+  # define local working directory
   wd=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife
   src=$wd/src
   # wd=/Users/scottyanco/Documents/covid-19_movement

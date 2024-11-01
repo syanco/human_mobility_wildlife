@@ -45,7 +45,7 @@ gcsURL=${argv[2]} # The gcs url to the folder that will hold csvs for import to 
 outP=${argv[3]} # The path to the folder that will hold csvs for import to gcs
 
 #Set defaults for optional paramters
-[[ -z "$db" ]] && db=processed_data/mosey_mod_2023.db
+[[ -z "$db" ]] && db=processed_data/mosey_mod.db
 # [[ -z "$db" ]] && db=processed_data/mosey_mod.db
 
 # Local parameters
@@ -60,7 +60,7 @@ mkdir -p $outP
 # earthengine create folder -p $geePtsP
 
 # entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
-entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id analysis/ctfs/$entity.csv | tail -n +2))
+entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/$entity.csv | tail -n +2))
 
 n=${#entIds[@]}
 
