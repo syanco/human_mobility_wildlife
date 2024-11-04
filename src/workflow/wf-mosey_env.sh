@@ -34,12 +34,13 @@ src=$wd/src
 # db=$wd/processed_data/mosey_mod.db
 db=$wd/processed_data/mosey_mod.db
 
+# define filepath to lcoal repo's GEE scripts
 export MOSEYENV_SRC=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/src/mosey #for mosey_anno_gee.sh
 
 cd $wd
 
 #--
-#-- Create study.csv file since I don't have one
+#-- Create study.csv file from the trimmed table in processed_data/mosey_mod.db
 #--
 
 # mkdir ctfs
@@ -54,16 +55,16 @@ sqlite3 -header -csv $db "$sql;" > ctfs/study.csv
 #-- Set up variables
 #--
 
-geePtsP=users/syanco/covid-mvmnt/tracks_2023 #folder holding the gee point datasets
+geePtsP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/processed_data #folder holding the gee point datasets
 # geePtsP=project/covid-mvmnt/assets/tracks #folder holding the gee point datasets
-gcsBucket=covid-mvmnt-bucket
-gcsInP=ingest_gee #This holds the csvs that will be imported to gee
-gcsOutP=annotated #This is the output folder for annotated csvs (excluding bucket)
-csvP=out/anno/individual-files #local folder that holds the csv files to be ingested into gee
+gcsBucket=covid-mvmnt-2024
+gcsInP=ingest_gee #This holds the CSVs that will be imported into GEE
+gcsOutP=annotated #This is the output folder for annotated csvs (excluding bucket) in GCS
+csvP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/csvs_for_gee_ingest #local folder that holds the csv files to be ingested into gee
 annoP=data/anno/annotated #local folder that holds the annotated csv files
 envP=analysis/ctfs/env.csv
 
-#TODO: don't require sesid
+#TODO: don't require sesid (session ID)
 #sesid=full_wf
 
 gcsInURL=gs://${gcsBucket}/${gcsInP} #This is the url to the gee ingest folder
@@ -89,37 +90,36 @@ gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (in
 # See db/edit_structure.sql
 
 #----
-#---- Import studies into GEE
+#---- Import studies locally, modify, then send to bucket & GEE
 #----
-
 
 ## analysis/ - let ths be passed by arg
-$MOSEYENV_SRC/gee_ingest.sh re_anno $geePtsP $gcsInURL $csvP #$sesid
+$MOSEYENV_SRC/gee_ingest.sh trial_1 $geePtsP $gcsInURL $csvP #$sesid
 
-#----
-#---- Annotate 
-#----
-
-#Don't run this until all import tasks have finished
-#https://code.earthengine.google.com/tasks
-
-$MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP #$envP #"${envs[*]}"
-
-#----
-#---- Import into mosey ----#
-#----
-
-# add columns to db to receive annos
-sqlite3 $db "alter table event_trim add column tmax REAL;"
-# sqlite3 $db "alter table event_clean add column tmin REAL;"
-# sqlite3 $db "alter table event_clean add column lst REAL;"
-sqlite3 $db "alter table event_trim add column ndvi REAL;"
-sqlite3 $db "alter table event_trim add column elev REAL;"
-# sqlite3 $db "alter table event_clean add column dist2road REAL;"
-
-#points and annotations are stored in event_clean
-#for testing, see db/anno_test.sql for ddl to create event_test
-$MOSEYENV_SRC/import_anno.sh $gcsOutURL $annoP $db --table event_trim
-
-# Send db back to HPC
-scp $db grace:$dbr
+# #----
+# #---- Annotate 
+# #----
+# 
+# #Don't run this until all import tasks have finished
+# #https://code.earthengine.google.com/tasks
+# 
+# $MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP #$envP #"${envs[*]}"
+# 
+# #----
+# #---- Import into mosey ----#
+# #----
+# 
+# # add columns to db to receive annos
+# sqlite3 $db "alter table event_trim add column tmax REAL;"
+# # sqlite3 $db "alter table event_clean add column tmin REAL;"
+# # sqlite3 $db "alter table event_clean add column lst REAL;"
+# sqlite3 $db "alter table event_trim add column ndvi REAL;"
+# sqlite3 $db "alter table event_trim add column elev REAL;"
+# # sqlite3 $db "alter table event_clean add column dist2road REAL;"
+# 
+# #points and annotations are stored in event_clean
+# #for testing, see db/anno_test.sql for ddl to create event_test
+# $MOSEYENV_SRC/import_anno.sh $gcsOutURL $annoP $db --table event_trim
+# 
+# # Send db back to HPC
+# scp $db grace:$dbr

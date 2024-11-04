@@ -1,12 +1,15 @@
 #!/bin/bash
 
-# For each study in study.csv
-#   extract and format event data. rows in event_forage, but need to join to event table to get lat, lon, timestamp
-#    - see if this is performant
-#   save to csv
-#   upload to gcs
-#   upload to gee
-#
+# Overall Script Function:
+# 1. evaluates the command run in wf-mosey_env.sh with args for where to find the db,
+#     where to output the CSV's to, and where to send them within GEE
+# 2. downloads trimmed event data from the processed_data dir in this repo to local CSVs, with some processing:
+#       - renames event_id to anno_id
+#       - formats the time stamp
+#       - creates group numbers based on groupSize because of the limitation of GEE to authenticate a certain amount of data at once
+# 3. if CSV has data, it is uploaded to GCS
+# 4. uploads from GCS to GEE
+
 #   Need to have gee environment activated
 
 #TODO: could pass in optional parameters for upload gcs, import gee, delete csv
@@ -56,7 +59,7 @@ entity=study #Pass in as optional argument
 #Get the session id
 # sesid=$(sqlite3 $db "select ses_id from session where ses_name = '$sesnm' and table_name = 'study'")
 
-mkdir -p $outP
+mkdir -p $outP # should this be "gcsOutP" instead?
 # earthengine create folder -p $geePtsP
 
 # entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
@@ -135,7 +138,7 @@ do
   earthengine upload table  --asset_id $geePts $gcsCSV --x_column lon --y_column lat --force
 
   #---- Cleanup
-  echo rm -f $csv
+  rm -f $csv
 done
 
 echo "Script complete"
