@@ -145,7 +145,7 @@ mod2 <- mod %>%
 mod2_sf <- st_as_sf(mod2, coords = c("lon", "lat"), crs = 4326)
 
 us <- ne_countries(scale = "medium", returnclass = "sf") %>%
-  filter(name == "United States")
+  filter(name == "United States of America")
 
 # Find cells that overlap land in Canada and US
 keep_fixes <- apply(st_intersects(mod2_sf, us, sparse = F),

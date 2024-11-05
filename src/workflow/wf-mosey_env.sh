@@ -55,20 +55,30 @@ sqlite3 -header -csv $db "$sql;" > ctfs/study.csv
 #-- Set up variables
 #--
 
-geePtsP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/processed_data #folder holding the gee point datasets
+# -- LOCAL DIRS --
+# name of GEE project to hold 
+export geePtsP=projects/covid-mvmnt-2024-440720/assets/tracks
+# local folder that holds the csv files to be ingested into gee
+export csvP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/gee_data/csvs_gee_ingest
+# communicates which environmental data to annotate with in GEE
+export envP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/ctfs/env.csv
+# local folder that holds the annotated CSV files after GEE step is complete
+export annoP=/Users/juliet/Documents/gee_data/annotated 
+
+##= -- GCS & GEE DIRS --
 # geePtsP=project/covid-mvmnt/assets/tracks #folder holding the gee point datasets
-gcsBucket=covid-mvmnt-2024
-gcsInP=ingest_gee #This holds the CSVs that will be imported into GEE
-gcsOutP=annotated #This is the output folder for annotated csvs (excluding bucket) in GCS
-csvP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/csvs_for_gee_ingest #local folder that holds the csv files to be ingested into gee
-annoP=data/anno/annotated #local folder that holds the annotated csv files
-envP=analysis/ctfs/env.csv
+export gcsBucket=covid-mvmnt-2024
+# dir for CSVs in GCS that will be imported GEE
+export gcsInP=ingest_gee
+# output folder for annotated CSVs (excluding bucket name) in GCS
+export gcsOutP=annotated
+
+# -- GEE URLs --
+export gcsInURL=gs://${gcsBucket}/${gcsInP} #This is the url to the gee ingest folder
+export gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (includes bucket)
 
 #TODO: don't require sesid (session ID)
 #sesid=full_wf
-
-gcsInURL=gs://${gcsBucket}/${gcsInP} #This is the url to the gee ingest folder
-gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (includes bucket)
 
 #NASA/ORNL/DAYMET_V4; Tmax: band 4. (daymet_tmax). Daily with start/end date
 #NASA/ORNL/DAYMET_V4; Tmin: band 5. (daymet_tmin). Daily with start/end date

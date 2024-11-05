@@ -41,4 +41,4 @@ vignettes/*.pdf
 # data dirs
 raw_data/*
 processed_data/*
-csvs_for_gee_ingest/*
+gee_data/*

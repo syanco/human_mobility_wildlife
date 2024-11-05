@@ -42,10 +42,14 @@ EOF
 # db=~/projects/ms2/analysis/main/data/mosey.db
 # outP=data/anno/ingest
 
-sesnm=${argv[0]}  # The name of the session
-geePtsP=${argv[1]} # The path to the gee folder that will hold the point assets
-gcsURL=${argv[2]} # The gcs url to the folder that will hold csvs for import to gee
-outP=${argv[3]} # The path to the folder that will hold csvs for import to gcs
+# sesnm=${argv[0]}  # The name of the session
+# geePtsP=${argv[1]} # The path to the gee folder that will hold the point assets
+# gcsURL=${argv[2]} # The gcs url to the folder that will hold csvs for import to gee
+# outP=${argv[3]} # The path to the folder that will hold csvs for import to gcs
+sesnm=$1  # The name of the session
+geePtsP=$2 # The path to the gee folder that will hold the point assets
+gcsURL=$3 # The gcs url to the folder that will hold csvs for import to gee
+outP=$4 # The path to the folder that will hold csvs for import to gcs
 
 #Set defaults for optional paramters
 [[ -z "$db" ]] && db=processed_data/mosey_mod.db
@@ -83,9 +87,11 @@ do
   echo "Start processing ($entity id: $entId)"
   echo "*******"
   
-  csv=$outP/${entId}.csv
-  gcsCSV=$gcsURL/${entId}.csv
-  geePts=$geePtsP/$entId
+  csv=${outP}/${entId}.csv
+  export csv=${outP}/${entId}.csv
+  export gcsCSV=${gcsURL}/${entId}.csv
+  export geePts=${geePtsP}/${entId}
+
   
   #Earthengine can't do annotation with tasks greater than 1e6 points
   #So need to break them up. row_number returns 1..n. Subtract 1 so that the
@@ -102,6 +108,7 @@ do
         inner join event e
     on f.event_id = e.event_id
     where f.study_id = ${entId}"
+    
 #     inner join event e on f.event_id = e.event_id
 # 	  inner join study study_id on seg.pop_id = pop.pop_id
 #     where pop.pop_id = $entId and pop.ses_id = $sesid
@@ -137,6 +144,7 @@ do
   echo Starting GEE import task...
   earthengine upload table  --asset_id $geePts $gcsCSV --x_column lon --y_column lat --force
 
+  echo "Removing csv. $csv is: $csv"
   #---- Cleanup
   rm -f $csv
 done
