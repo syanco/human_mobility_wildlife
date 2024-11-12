@@ -42,3 +42,4 @@ vignettes/*.pdf
 raw_data/*
 processed_data/*
 gee_data/*
+logs/*

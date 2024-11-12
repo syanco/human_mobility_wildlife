@@ -38,17 +38,21 @@ Options:
 #---- Input Parameters ----#
 if(interactive()) {
 
-  .pd <- '~/projects/ms2'
-  .wd <- file.path(.pd,'analysis/poc/mosey_env/mosey_env1')
+  .pd <- '/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife'
+  .wd <- file.path(.pd,'')
   .seed <- NULL
   rd <- here::here
+  .col_name <- "column"
+  .env_id <- "NASA/ORNL/DAYMET_V4"
+  .band <- 4
+  .std <- "481458"
   
   #Required parameters
   #.envPF <- 'projects/map-of-life/diegoes/dist2road_USA_full' # 'NASA/ORNL/DAYMET_V4'
   #.envPF <- 'projects/map-of-life/benc/projects/ms2/dist2urban'
-  .datP <- 'users/benscarlson/projects/ms2/poc/mosey_env/mosey_env1'
+  .datP <- 'projects/covid-mvmnt-2024-440720/assets/tracks/481458'
   #.outPF <- 'benc/projects/ms2/poc/mosey_env/mosey_env1/anno/east_portugal_dist2urban'
-  .outP <- 'benc/projects/ms2/poc/mosey_env/mosey_env1/anno'
+  .outP <- 'annotated/481458_column'
   #.outPF <- 'benc/projects/mosey_env/annotated/76367850_dist2water_month_test'
   
   #Optional parameters
@@ -111,10 +115,10 @@ list.files('src/funs/auto',full.names=TRUE) %>% walk(source)
 # I didn't have to do this before
 # UPDATE: after installing gcloud via brew, I don't have to do this anymore
 #reticulate::use_python("/Users/benc/.pyenv/versions/gee/bin/python", required = TRUE)
-#reticulate::use_virtualenv('/Users/benc/.pyenv/versions/gee',required=TRUE)
-
-reticulate::use_condaenv("GEE_hmw", required = TRUE)
+# reticulate::use_virtualenv('/Users/juliet/.virtualenvs/r-reticulate',required=TRUE)
+reticulate::use_condaenv("hmw_py3-9", required = TRUE)
 message("Current Python Path: ", Sys.getenv("PYTHONPATH"))
+
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -122,8 +126,13 @@ suppressWarnings(
   }))
 
 #Initialize gee
-suppressMessages(ee_check(quiet=TRUE))
-ee_Initialize(quiet=TRUE)
+# ee_check(quiet=FALSE)
+ee_Initialize(user = "jscohen@ucsb.edu",
+              quiet = FALSE,
+              auth_mode = "notebook",
+              auth_quiet = TRUE,
+              drive = FALSE,
+              gcs = TRUE)
   
 #TODO: do a check to make sure rgee initialized correctly
 
@@ -165,7 +174,7 @@ entities <- read_csv(file.path(.wd,'ctfs',glue('{.entity}.csv'))) %>% filter(run
   #   # j <- 1
   #   env <- envs[j,]
     
-    message(glue('Setting up annotation tasks for {.col_name}'))
+   message(glue('Setting up annotation tasks for {.col_name}'))
     
     #Check if the layer is a computed layer. If so load it.
     #Otherwise load gee asset

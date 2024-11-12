@@ -27,6 +27,8 @@ EOF
 # change syntax for bash instead of zsh
 geePtsP=$1
 gcsOutP=$2
+# geePtsp=$geePtsP
+# gcsOutP=$gcsOutP
 #TODO: make this an optional argument. If passed in, don't read envs.csv
 #TODO: don't allow passing in multiple, to keep it simple. multiple, use envs.csv
 #envs=(${argv[2]}) 
@@ -94,7 +96,7 @@ do
     
     echo Annotating "env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
     # $MOSEYENV_SRC/gee_anno.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}
-    $MOSEYENV_SRC/gee_anno.r $points $out $studyId ${envs[$i]} ${colnames[$i]} ${bands[$i]} &> logs/GEE_anno.log
+    $MOSEYENV_SRC/gee_anno.r $points $out $studyId ${envs[$i]} ${colnames[$i]} ${bands[$i]} #&> logs/GEE_anno.log
   done
 
 done
