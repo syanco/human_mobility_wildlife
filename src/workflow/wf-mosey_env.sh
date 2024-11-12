@@ -28,7 +28,6 @@ dbr=/scratch/julietcohen/covid_movement/human_mobility_wildlife/processed_data/m
 #---- mosey_env
 #----
 
-
 wd=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife
 src=$wd/src
 # db=$wd/processed_data/mosey_mod.db
@@ -56,6 +55,7 @@ sqlite3 -header -csv $db "$sql;" > ctfs/study.csv
 #--
 
 # -- LOCAL DIRS --
+
 # name of GEE project to hold 
 export geePtsP=projects/covid-mvmnt-2024-440720/assets/tracks
 # local folder that holds the csv files to be ingested into gee
@@ -65,8 +65,8 @@ export envP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mob
 # local folder that holds the annotated CSV files after GEE step is complete
 export annoP=/Users/juliet/Documents/gee_data/annotated 
 
-##= -- GCS & GEE DIRS --
-# geePtsP=project/covid-mvmnt/assets/tracks #folder holding the gee point datasets
+# -- GCS & GEE DIRS --
+
 export gcsBucket=covid-mvmnt-2024
 # dir for CSVs in GCS that will be imported GEE
 export gcsInP=ingest_gee
@@ -106,15 +106,15 @@ export gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output fol
 ## analysis/ - let ths be passed by arg
 $MOSEYENV_SRC/gee_ingest.sh trial_1 $geePtsP $gcsInURL $csvP #$sesid
 
-# #----
-# #---- Annotate 
-# #----
-# 
-# #Don't run this until all import tasks have finished
-# #https://code.earthengine.google.com/tasks
-# 
-# $MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP #$envP #"${envs[*]}"
-# 
+#----
+#---- Annotate
+#----
+
+#Don't run this until all import tasks have finished
+#https://code.earthengine.google.com/tasks
+
+$MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP #$envP #"${envs[*]}"
+
 # #----
 # #---- Import into mosey ----#
 # #----

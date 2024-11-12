@@ -24,8 +24,8 @@ Control files:
 Parameters:
   dat: folder containing feature collections to annotate
   out: path to output directory and file on gcs. do not include file extension, url info or bucket
-  study: the focal study id
-  env_id: gge id
+  ent: the focal study id
+  env_id: gee id
   colname: what to call the var
   band: band form the gee image
   
@@ -71,7 +71,7 @@ if(interactive()) {
   .seed <- ag$seed
   # rd <- is_rstudio_project$make_fix_file(.script)
   
-  source('analysis/src/funs/input_parse.r')
+  source('src/funs/input_parse.r')
   
   #Required parameters
   #.envPF <- ag$env
@@ -101,10 +101,10 @@ if(!is.null(.seed)) {message(paste('Random seed set to',.seed)); set.seed(as.num
 
 t0 <- Sys.time()
 
-source('analysis/src/startup.r')
+source('src/startup.r')
 
 #Source all files in the auto load funs directory
-list.files('analysis/src/funs/auto',full.names=TRUE) %>% walk(source)
+list.files('src/funs/auto',full.names=TRUE) %>% walk(source)
 #source(rd('src/main/dist2water_month.r'))
 
 #For some reason I need to set these before I load rgee
@@ -112,6 +112,9 @@ list.files('analysis/src/funs/auto',full.names=TRUE) %>% walk(source)
 # UPDATE: after installing gcloud via brew, I don't have to do this anymore
 #reticulate::use_python("/Users/benc/.pyenv/versions/gee/bin/python", required = TRUE)
 #reticulate::use_virtualenv('/Users/benc/.pyenv/versions/gee',required=TRUE)
+
+reticulate::use_condaenv("GEE_hmw", required = TRUE)
+message("Current Python Path: ", Sys.getenv("PYTHONPATH"))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -132,7 +135,7 @@ ee_Initialize(quiet=TRUE)
 .colMillis <- 'millis'
 .colTimestamp <- 'timestamp'
 .colGrp <- 'grp'
-.bucket <- 'covid-mvmnt-bucket'
+.bucket <- 'covid-mvmnt-2024'
 #.groupSize <- 500e3
 #datN <- basename(.datPF)
 #assetType <- ee$data$getAsset(.envPF)$type

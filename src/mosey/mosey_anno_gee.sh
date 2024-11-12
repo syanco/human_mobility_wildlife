@@ -22,8 +22,11 @@ EOF
 
 #How to pass array to bash script
 #https://stackoverflow.com/questions/17232526/how-to-pass-an-array-argument-to-the-bash-script
-geePtsP=${argv[0]}
-gcsOutP=${argv[1]}
+# geePtsP=${argv[0]}
+# gcsOutP=${argv[1]}
+# change syntax for bash instead of zsh
+geePtsP=$1
+gcsOutP=$2
 #TODO: make this an optional argument. If passed in, don't read envs.csv
 #TODO: don't allow passing in multiple, to keep it simple. multiple, use envs.csv
 #envs=(${argv[2]}) 
@@ -91,7 +94,7 @@ do
     
     echo Annotating "env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
     # $MOSEYENV_SRC/gee_anno.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}
-    $MOSEYENV_SRC/gee_anno.r $points $out $studyId ${envs[$i]} ${colnames[$i]} ${bands[$i]}
+    $MOSEYENV_SRC/gee_anno.r $points $out $studyId ${envs[$i]} ${colnames[$i]} ${bands[$i]} &> logs/GEE_anno.log
   done
 
 done

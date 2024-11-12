@@ -46,6 +46,7 @@ EOF
 # geePtsP=${argv[1]} # The path to the gee folder that will hold the point assets
 # gcsURL=${argv[2]} # The gcs url to the folder that will hold csvs for import to gee
 # outP=${argv[3]} # The path to the folder that will hold csvs for import to gcs
+# change syntax for bash instead of zsh
 sesnm=$1  # The name of the session
 geePtsP=$2 # The path to the gee folder that will hold the point assets
 gcsURL=$3 # The gcs url to the folder that will hold csvs for import to gee
@@ -75,7 +76,7 @@ echo Loading $n $entity.
 
 
 # use for loop to read all values and indexes
-for (( i=0; i<=${n}; i++ ));
+for (( i=0; i<${n}; i++ ));
 do
   #entId=30
   #entName=east_portugal
@@ -144,7 +145,6 @@ do
   echo Starting GEE import task...
   earthengine upload table  --asset_id $geePts $gcsCSV --x_column lon --y_column lat --force
 
-  echo "Removing csv. $csv is: $csv"
   #---- Cleanup
   rm -f $csv
 done
