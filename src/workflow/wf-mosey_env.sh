@@ -115,21 +115,21 @@ $MOSEYENV_SRC/gee_ingest.sh trial_1 $geePtsP $gcsInURL $csvP #$sesid
 
 $MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP #$envP #"${envs[*]}"
 
-# #----
-# #---- Import into mosey ----#
-# #----
-# 
-# # add columns to db to receive annos
-# sqlite3 $db "alter table event_trim add column tmax REAL;"
-# # sqlite3 $db "alter table event_clean add column tmin REAL;"
-# # sqlite3 $db "alter table event_clean add column lst REAL;"
-# sqlite3 $db "alter table event_trim add column ndvi REAL;"
-# sqlite3 $db "alter table event_trim add column elev REAL;"
-# # sqlite3 $db "alter table event_clean add column dist2road REAL;"
-# 
-# #points and annotations are stored in event_clean
-# #for testing, see db/anno_test.sql for ddl to create event_test
-# $MOSEYENV_SRC/import_anno.sh $gcsOutURL $annoP $db --table event_trim
-# 
-# # Send db back to HPC
-# scp $db grace:$dbr
+#----
+#---- Import into mosey ----#
+#----
+
+# add columns to db to receive annos
+sqlite3 $db "alter table event_trim add column tmax REAL;"
+sqlite3 $db "alter table event_trim add column ndvi REAL;"
+sqlite3 $db "alter table event_trim add column elev REAL;"
+# sqlite3 $db "alter table event_clean add column tmin REAL;"
+# sqlite3 $db "alter table event_clean add column lst REAL;"
+# sqlite3 $db "alter table event_clean add column dist2road REAL;"
+
+#points and annotations are stored in event_clean
+#for testing, see db/anno_test.sql for ddl to create event_test
+$MOSEYENV_SRC/import_anno.sh $gcsOutURL $annoP $db --table event_trim
+
+# Send db back to HPC
+scp $db grace:$dbr

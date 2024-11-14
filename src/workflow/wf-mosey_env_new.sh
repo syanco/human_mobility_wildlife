@@ -21,7 +21,7 @@ export csvP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mob
 # communicates which environmental data to annotate with in GEE
 export envP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/ctfs/env.csv
 # local folder that holds the annotated CSV files after GEE step is complete
-export annoP=/Users/juliet/Documents/gee_data/annotated 
+export annoP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/gee_data/annotated
 
 ##= -- GCS & GEE DIRS --
 # geePtsP=project/covid-mvmnt/assets/tracks #folder holding the gee point datasets
@@ -35,5 +35,17 @@ export gcsOutP=annotated
 export gcsInURL=gs://${gcsBucket}/${gcsInP} #This is the url to the gee ingest folder
 export gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (includes bucket)
 
+# send files to GCS & GEE
 $MOSEYENV_SRC/gee_ingest.sh trial_1 $geePtsP $gcsInURL $csvP
+# generate annotations in GEE
 $MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP 
+# import annotated data into mosey DB:
+# first add table and columns to db to receive annos for 3 env layers
+# (simply creating the database infrastructure to be populated)
+sqlite3 $db "alter table event_trim add column tmax REAL;"
+sqlite3 $db "alter table event_trim add column ndvi REAL;"
+sqlite3 $db "alter table event_trim add column elev REAL;"
+# populate the database with the data:
+# points and annotations are stored in event_clean
+# for testing, see db/anno_test.sql for ddl to create event_test
+$MOSEYENV_SRC/import_anno.sh $gcsOutURL $annoP $db --table event_trim
