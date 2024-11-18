@@ -42,7 +42,7 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd, 'src/funs/input_parse.r'))
   
   .dbPF <- makePath(ag$db)
   .wkmin <- ag$wkmin
@@ -55,7 +55,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -68,13 +68,13 @@ suppressWarnings(
   }))
 
 #Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
+list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
 `%notin%` <- Negate(`%in%`)
 
 #---- Load control files ----#
-periods <- read_csv(file.path(.wd,'analysis/ctfs/dates.csv'),
+periods <- read_csv(file.path(.wd,'ctfs/dates.csv'),
                     col_types=list("date" = col_date(format = "%m/%d/%Y"))) 
 
 #---- Initialize database ----#
@@ -103,7 +103,7 @@ std_cln <- tbl(db, "study_trim") %>%  collect()
 
 # -- Remove incomplete cases
 
-message(glue("Removing weeks wihtout complete env annotations"))
+message(glue("Removing weeks without complete env annotations"))
 
 evt_out2 <- evt_cln %>% 
   mutate(timestamp2 = ymd_hms(timestamp),
@@ -152,7 +152,7 @@ evt_fix <- evt_sp %>%
 message("Writing event table back to database...")
 
 # write table back to db
-dbWriteTable(conn = db, name = "event_final2", value = evt_fix, append = FALSE, overwrite = T)
+dbWriteTable(conn = db, name = "event_final", value = evt_fix, append = FALSE, overwrite = T)
 
 #-- Sync up study and individual tables
 

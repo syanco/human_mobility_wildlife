@@ -50,14 +50,14 @@ if(interactive()) {
   .wd <- getwd()
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
-  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db'
+  .dbPF <- '/scratch/julietcohen/covid_movement/human_mobility_wildlife/processed_data/mosey_mod.db'
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'out/')
   .outPF <- file.path(.wd,'out/')
 }
 
 message("start safegraph annotation")
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -92,7 +92,7 @@ area <- fread(paste0(.datPF,"event-annotation/cbg-area.csv"), colClasses = "char
   select(cbg_2010, cbg_area_m2)
 
 message("reading in event table...")
-evt_df <- dbGetQuery(db,'SELECT event_id from event_final2')
+evt_df <- dbGetQuery(db,'SELECT event_id from event_final')
 
 message("joining event table with cbg info..")
 evt_cbg <- evt_df %>%

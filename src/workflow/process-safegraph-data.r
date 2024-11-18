@@ -61,7 +61,7 @@ if(interactive()) {
 
 #---- Initialize Environment ----#
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # #Source all files in the auto load funs directory
 # list.files(rd('src/funs/auto'),full.names=TRUE) %>%

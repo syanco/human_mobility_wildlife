@@ -89,10 +89,12 @@ indtb <- tbl(db,'individual') %>%  # Load a tibble with all individual animals
   collect()
 
 # Load the entire event table:
-evt0 <- tbl(db, "event_clean")%>%
+# evt0 <- tbl(db, "event_clean")%>%
+#   collect()
+evt0 <- tbl(db, "event_trim")%>%
   collect()
 
-message("Disconnecting from databse...")
+message("Disconnecting from database...")
 dbDisconnect(db)
 
 ind <- indtb %>% 

@@ -80,7 +80,7 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
 invisible(assert_that(length(dbListTables(db))>0))
 
-evt <- tbl(db,'event')  # %>%  collect()
+evt <- tbl(db,'event') %>% collect()
 
 #---- Perform analysis ----#
 
@@ -94,9 +94,11 @@ stdtb <- tbl(db, "study") %>% collect()
 
 # extract only relevant time periods
 mod <- evt %>%
+  # mutate(timestamp = as.POSIXct(timestamp, format="%Y-%m-%d %H:%M:%OS3", tz = "UTC")) # %>% # results in all NA values for timestamp
+  mutate(timestamp = as.POSIXct(timestamp, format="%Y-%m-%d %H:%M:%S", tz = "UTC")) %>% # succeeds
   filter((timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2019"] &
             timestamp < !!periods$date[periods$cutpoint == "stop_2019"])
-         | (timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2020"] &
+          | (timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2020"] &
               timestamp < !!periods$date[periods$cutpoint == "stop_2020"])) %>%
   mutate(yr = strftime(timestamp, '%Y'),
          trt = case_when(

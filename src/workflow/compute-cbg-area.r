@@ -55,11 +55,12 @@ if(interactive()) {
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
+  # census block group data is stored in the raw_data dir
   .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,'out/event-annotation/')
 }
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({

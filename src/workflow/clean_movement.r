@@ -39,7 +39,7 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd, 'src/funs/input_parse.r'))
   
   .dbPF <- makePath(ag$db)
   
@@ -51,7 +51,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -63,13 +63,13 @@ suppressWarnings(
   }))
 
 #Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
+list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
 `%notin%` <- Negate(`%in%`)
 
 #---- Load control files ----#
-periods <- read_csv(file.path(.wd,'analysis/ctfs/dates.csv'),
+periods <- read_csv(file.path(.wd,'ctfs/dates.csv'),
                     col_types=list("date" = col_date(format = "%m/%d/%Y"))) 
 
 #---- Initialize database ----#
@@ -87,7 +87,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 #-- Clean Outliers
 
-evt_trm <- tbl(db,'event_final2') %>%  collect()
+evt_trm <- tbl(db,'event_final') %>%  collect()
 ind <- tbl(db, "individual") %>%  collect()
 std <- tbl(db, "study") %>%  collect()
 # beepr::beep()

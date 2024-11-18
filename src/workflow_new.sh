@@ -26,7 +26,7 @@
 
 # CONDA ENVIRONMENTS
 # 
-# Much of this code is meant to be executed within coda environments. The 
+# Much of this code is meant to be executed within conda environments. The 
 # directory /analysis/src/conda_envs contains .yml files from which the 
 # requisite conda environments can be built. See readme for details on building 
 # conda environments

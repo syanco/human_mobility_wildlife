@@ -1,3 +1,6 @@
+# Prepare a job list for parallel processing based on the 
+# total number of events in 'event_final' table of the database
+
 if(interactive()) {
   rm(list=ls())
   library(here)
@@ -19,13 +22,13 @@ if(interactive()) {
   .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
-  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db'
+  .dbPF <- '/scratch/julietcohen/covid_movement/human_mobility_wildlife/processed_data/mosey_mod.db'
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
-  .datPF <- file.path(.wd,'analysis/src/workflow/')
-  .outPF <- file.path(.wd,"analysis/src/workflow/")
+  .datPF <- file.path(.wd,'src/workflow/')
+  .outPF <- file.path(.wd,"src/workflow/")
 }
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -40,7 +43,7 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
 invisible(assert_that(length(dbListTables(db))>0))
 
-n_total <- 'select count(*) as num from event_final2' %>%
+n_total <- 'select count(*) as num from event_final' %>%
   dbGetQuery(db,.)
 
 
