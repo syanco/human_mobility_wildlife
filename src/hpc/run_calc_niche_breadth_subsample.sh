@@ -8,9 +8,9 @@
 #SBATCH --mem-per-cpu 10G
 #SBATCH -J calc_niche_subsample
 
-# Load conda env
-module load miniconda
-conda activate covid
+# Load conda env if needed on HPC
+# module load miniconda
+# conda activate covid
 
 # Declare WD
 wd=~/project/covid-19_movement
@@ -31,5 +31,5 @@ number_vector=(50 40 30 20 10)  # Add your desired numbers here
 for v in "${number_vector[@]}"; do
   # Execute calc size script/
   # Rscript $src/calc-niche-breadth-subsample.r ./processed_data/mosey_mod.db ./out/niche_determinant_anthropause_subsample.csv 24 $v
-  Rscript $src/calc-niche-breadth-subsample.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause_subsample.csv 24 $v
+  Rscript $src/workflow/calc-niche-breadth-subsample.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause.csv 24 $v
 done

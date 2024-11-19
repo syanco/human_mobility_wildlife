@@ -84,7 +84,7 @@
     # Outputs: db:event_clean (annotated)
     
     # INTERACTIVE - RUN LOCAL (script must be run interactively; pulls db from hpc then puts it back)
-    $src/workflow/wf-mosey_env.sh
+    $src/workflow/wf-mosey_env_new.sh
   
   ##
   
@@ -94,11 +94,12 @@
   
    ##- MVNH Breadth Subsampling -#
       
-      # Create csv to store results
-      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year, n" > ./out/niche_determinant_anthropause_subsample.csv
+      # Create csv to store results with column names specified beforehand
+      # (this will overwrite the existing CSV if it already exists)
+      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year, n" > ./out/niche_determinant_anthropause.csv
 
       # Make log file to track successful outputs
-      echo "studyid, individual, scientificname, year, status, week" > out/niche_log_subsample.csv
+      echo "studyid, individual, scientificname, year, status, week" > out/niche_log.csv
   
       # Inputs: db:event_clean  + out filepath + no. cores
       # Outputs: csv 

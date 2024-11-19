@@ -149,7 +149,7 @@ do
   rm -f $csv
 done
 
-echo "Script complete"
+echo "Script complete; GEE ingest job has launched."
 
 
 #---- OLD CODE ----#

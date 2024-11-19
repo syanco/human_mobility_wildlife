@@ -1,6 +1,9 @@
 # New version of wf-mosey_env for second run of the workflow with new species
 
-dbr=/scratch/julietcohen/covid_movement/human_mobility_wildlife/processed_data/mosey_mod.db
+# only need remote db filepath when switch to HPC
+# dbr=/scratch/julietcohen/covid_movement/human_mobility_wildlife/processed_data/mosey_mod.db
+
+# already defined wd in the workflow_new.sh script
 wd=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife
 src=$wd/src
 db=$wd/processed_data/mosey_mod.db
@@ -35,10 +38,12 @@ export gcsOutP=annotated
 export gcsInURL=gs://${gcsBucket}/${gcsInP} #This is the url to the gee ingest folder
 export gcsOutURL=gs://${gcsBucket}/${gcsOutP} #This is the url to the output folder (includes bucket)
 
-# send files to GCS & GEE
+# send csv files to GCS & GEE ingest_GEE dir (launches 1 job per species dataset)
 $MOSEYENV_SRC/gee_ingest.sh trial_1 $geePtsP $gcsInURL $csvP
-# generate annotations in GEE
+
+# generate annotations in GEE (launches 3 jobs per species dataset)
 $MOSEYENV_SRC/mosey_anno_gee.sh $geePtsP $gcsOutP 
+
 # import annotated data into mosey DB:
 # first add table and columns to db to receive annos for 3 env layers
 # (simply creating the database infrastructure to be populated)
