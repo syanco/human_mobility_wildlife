@@ -94,8 +94,7 @@ stdtb <- tbl(db, "study") %>% collect()
 
 # extract only relevant time periods
 mod <- evt %>%
-  # mutate(timestamp = as.POSIXct(timestamp, format="%Y-%m-%d %H:%M:%OS3", tz = "UTC")) # %>% # results in all NA values for timestamp
-  mutate(timestamp = as.POSIXct(timestamp, format="%Y-%m-%d %H:%M:%S", tz = "UTC")) %>% # succeeds
+  mutate(timestamp = as.POSIXct(timestamp, format="%Y-%m-%d %H:%M:%S", tz = "UTC")) %>%
   filter((timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2019"] &
             timestamp < !!periods$date[periods$cutpoint == "stop_2019"])
           | (timestamp > !!periods$date[periods$cutpoint == "start_pre-ld_2020"] &
@@ -159,6 +158,10 @@ keep_fixes <- apply(st_intersects(mod2_sf, us, sparse = F),
 
 # Filter grid to only cells on land
 mod3 <- mod2[keep_fixes,]
+
+# convert the timestamp class of POSIXct back to character bc SQLite cannot handle class POSIXct
+mod3 <- mod3 %>%
+  mutate(timestamp = format(timestamp, "%Y-%m-%d %H:%M:%S"))
 
 # write results back to db
 dbWriteTable(conn = db, name = "event_trim", value = mod3, append = F, overwrite = T)
