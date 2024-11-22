@@ -12,11 +12,11 @@ module load R
 # conda activate spatial
 
 # Declare WD
-wd=~/project/covid-19_movement
-src=$wd/analysis/src/workflow
+wd=/scratch/julietcohen/covid_movement
+src=$wd/human_mobility_wildlife/src/workflow
 
 # Move to WD
 cd $wd
 
 # Execute cleaning script (non parallel)
-Rscript $src/filter_data_mins.R --db $wd/processed_data/mosey_mod_2023.db 30 5
+Rscript $src/filter_data_mins.R --db $wd/processed_data/mosey_mod.db 30 5

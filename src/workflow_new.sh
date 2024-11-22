@@ -125,8 +125,13 @@
 
       # DSQ: (Yale-specific)
       # module load R/4.1.0-foss-2020b
-      conda activate covid
-      module load dSQ
+      # conda activate covid
+      # module load dSQ
+      
+      # UCSB HPC "pod":
+      # specify R version that matches Juliet's laptop version: 4.2
+      # and specifically the HPC has available 4.2.3
+      module load R/4.2.3
       
       # run script to produce file src/workflow/joblist.txt
       Rscript $srcr/workflow/create_intersection_joblist.r
