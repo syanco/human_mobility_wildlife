@@ -2,7 +2,7 @@
 #       COVID-19 Animal Movement                                                                               #
 ################################################################################################################
 
-# This script generates individual n-dimensional hypervolumes (Lu et al. 2020).
+# This script generates individual n-dimensional hypervolumes (Lu et al. 2021).
 
 # ==== Setup ====
 
@@ -31,7 +31,7 @@ if(interactive()) {
   .wd <- getwd()
   
   .outPF <- file.path(.wd,'out/niche_determinant_anthropause.csv')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   
   .nc <- 2
   
@@ -41,7 +41,7 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd, 'src/funs/input_parse.r'))
   
   .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
@@ -54,7 +54,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -67,10 +67,11 @@ suppressWarnings(
     library(doMC)
     library(foreach)
     require(MVNH)
+    library(tidyverse)
   }))
 
 #Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
+list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
 #---- Initialize database ----#
@@ -79,14 +80,14 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual_clean') %>%  # Load a tibble with all individual animals
+indtb <- tbl(db,'individual') %>%  # Load a tibble with all individual animals
   collect()
 
 # Load the entire event table:
-evt0 <- tbl(db, "event_clean")%>%
+evt0 <- tbl(db, "event_trim")%>%
   collect()
 
-message("Disconnecting from databse...")
+message("Disconnecting from database...")
 dbDisconnect(db)
 
 ind <- indtb %>% 

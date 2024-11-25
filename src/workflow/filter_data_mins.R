@@ -2,7 +2,7 @@
 
 # DESCRIPTION #
 # 
-# This script checks for data completeness and trims data absed on minimum data requirements
+# This script checks for data completeness and trims data based on minimum data requirements
 
 
 '
@@ -28,9 +28,9 @@ if(interactive()) {
   library(here)
   
   # .wd <- '~/project/covid-19_movement'
-  .wd <- '~/Documents/covid-19_movement/'
+  .wd <- getwd()
   
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   .wkmin <- 30
   .minsp <- 5
   
@@ -67,10 +67,11 @@ suppressWarnings(
     library(lubridate)
   }))
 
-#Source all files in the auto load funs directory
+# Source all files in the auto load funs directory
 list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
+# create operator that is opposite of %in%
 `%notin%` <- Negate(`%in%`)
 
 #---- Load control files ----#
@@ -105,11 +106,11 @@ std_cln <- tbl(db, "study_trim") %>%  collect()
 
 message(glue("Removing weeks without complete env annotations"))
 
-evt_out2 <- evt_cln %>% 
+evt_out2 <- evt_cln %>%
   mutate(timestamp2 = ymd_hms(timestamp),
          # timestamp_char <- as.character(timestamp2)
-         wk = week(timestamp2)) %>% 
-  drop_na(tmax, ndvi, elev)
+         wk = week(timestamp2)) %>% # add column for week component of timestamp
+  drop_na(tmax, ndvi, elev) # drop any rows with NA values for annotation cols
 
 
 # evt_comp <- evt_fix %>%
@@ -122,12 +123,14 @@ evt_out2 <- evt_cln %>%
 #-- Remove species with too few individuals
 
 message(glue("Removing species below theshold of {.minsp} individuals..."))
+
 # get ind count per species
 sp_sum <- evt_out2 %>%
   group_by(species) %>%
   summarize(nind = length(unique(ind_f))) %>%
   filter(nind >= .minsp) #require a minimum# of individuals
 
+# retain events only for species that have the minimum number of individuals
 evt_sp <- evt_out2 %>% 
   semi_join(sp_sum, by = "species")
 
@@ -136,11 +139,13 @@ evt_sp <- evt_out2 %>%
 
 message(glue("Removing weeks below threshold of {.wkmin} fixes per individual"))
 
+# get fix count per week
 fix_sum <- evt_sp %>% 
   group_by(ind_f, yr, wk) %>% 
   summarize(n= n()) %>% 
   filter((n >= .wkmin))
 
+# retain events only for weeks that have the minimum number of fixes
 evt_fix <- evt_sp %>% 
   semi_join(fix_sum, by = "ind_f")
 
@@ -175,7 +180,7 @@ std_out <- std_cln %>%
 dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, overwrite = T)
 
 
-#-- Generate Sample Size Sumaries
+#-- Generate Sample Size Summaries
 
 # No of species
 (no_sp <- evt_fix %>% pull(species) %>% unique() %>% length())
@@ -188,7 +193,7 @@ dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, o
 # Fixes per species
 (fix_p_sp <- evt_cln %>% group_by(species) %>%
     summarize(n = n()) %>%
-    janitor::adorn_totals("row") )
+    janitor::adorn_totals("row"))
 
 # No of individuals
 (no_inds <- evt_fix %>% pull(ind_f) %>% unique() %>% length())
@@ -198,6 +203,7 @@ dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, o
     group_by(species) %>%
     summarize(n = n_distinct(study_id)) %>%
     janitor::adorn_totals("row") )
+
 #-- Write our sample size summaries
 
 message("Writing out sample size report...")

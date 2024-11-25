@@ -5,14 +5,14 @@ if(interactive()) {
   rm(list=ls())
   library(here)
   
-  .wd <- '~/projects/covid-19_movement'
+  .wd <- getwd()
   .test <- TRUE
   # rd <- here::here
   
-  .dbPF <- '~/projects/covid-19_movement/processed_data/mosey_mod.db'
+  .dbPF <- file.path(.wd, 'processed_data/mosey_mod.db')
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
-  .datPF <- file.path(.wd,'analysis/src/workflow/')
-  .outPF <- file.path(.wd,"analysis/src/workflow/")
+  .datPF <- file.path(.wd,'src/workflow/')
+  .outPF <- file.path(.wd,"src/workflow/")
   
 } else {
   library(docopt)
@@ -43,6 +43,7 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 
 invisible(assert_that(length(dbListTables(db))>0))
 
+# create variable for the number of events in the database
 n_total <- 'select count(*) as num from event_final' %>%
   dbGetQuery(db,.)
 
@@ -55,8 +56,8 @@ end_ix <- seq(from = n_events, to = n_total$num, by = n_events)
 
 
 # joblist <- data.frame("string" = rep(paste0(" module load R/4.1.0-foss-2020b; Rscript ",.datPF,"intersect-events-cbg.r "), times = n),
-joblist <- data.frame("string" = rep(paste0(" module load R/4.1.0-foss-2020b; 
-                                            conda activate covid; Rscript ",.datPF,"intersect-events-cbg.r "), times = n),
+joblist <- data.frame("string" = rep(paste0(" module load R/4.2.3; 
+                                             Rscript ",.datPF,"intersect-events-cbg.r "), times = n),
                       "arg1" = start_ix,
                       "arg2" = end_ix,
                       "arg3" = seq(from = 1, to = n, by = 1))

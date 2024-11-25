@@ -104,7 +104,8 @@
       # Inputs: db:event_clean  + out filepath + no. cores
       # Outputs: csv 
       
-      sbatch $srcr/hpc/run_calc_niche_breadth_subsample.sh
+      # sbatch $srcr/hpc/run_calc_niche_breadth_subsample.sh
+      sbatch $srcr/hpc/run_calc_niche_breadth.sh
 
   ##
 
@@ -124,11 +125,18 @@
 
       # DSQ: (Yale-specific)
       # module load R/4.1.0-foss-2020b
-      conda activate covid
-      module load dSQ
+      # conda activate covid
+      # module load dSQ
       
+      # UCSB HPC "pod":
+      # specify R version that matches Juliet's laptop version: 4.2
+      # and specifically the HPC has available 4.2.3
+      module load R/4.2.3
+      
+      # run script to produce file src/workflow/joblist.txt
       Rscript $srcr/workflow/create_intersection_joblist.r
 
+      # launch job that runs script src/workflow/intersect-events-cbg.r
       dsq --job-file $srcr/workflow/joblist.txt --mem-per-cpu 40g -t 02:00:00
 
       # The step above generates a .sh file to submit the job to the Slurm manager
