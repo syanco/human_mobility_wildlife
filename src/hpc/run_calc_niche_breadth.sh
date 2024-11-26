@@ -1,28 +1,23 @@
 #!/bin/bash
 
-#SBATCH -t 2:00:00
-#SBATCH --mail-type ALL
-#SBATCH --mail-user scott.yanco@yale.edu
-#SBATCH --partition day
-#SBATCH -c 24
-#SBATCH --mem-per-cpu 10G
+#SBATCH -t 2:00:00                    # max time for job
+#SBATCH --mail-type ALL               # email all job events
+#SBATCH --mail-user jscohen@ucsb.edu
+##SBATCH --partition day              # partition "day" may only exist on Yale HPC
+#SBATCH -c 24                         # number of CPU's for job
+##SBATCH --mem-per-cpu 10G            # can add this back in if need to specify memory
 #SBATCH -J calc_niches
 
-# Load conda env
-module load miniconda
-conda activate covid
-
 # Declare WD
-wd=~/project/covid-19_movement
-src=$wd/analysis/src/workflow
+wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+src=$wd/src/workflow
 
-# Move to WD
 cd $wd
 
 #copy db to tmp
-cp $wd/processed_data/mosey_mod_2023.db /tmp/
+cp $wd/processed_data/mosey_mod.db /tmp/
 
 
-# Execute calc size script/
-Rscript $src/calc-niche-breadth.r /tmp/mosey_mod_2023.db ./out/niche_determinant_anthropause.csv 24
+# Execute calc size script
+Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause.csv 24
 

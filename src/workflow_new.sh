@@ -46,16 +46,16 @@
   src=$wd/src
   # wd=/Users/scottyanco/Documents/covid-19_movement
   # src=$wd/analysis/src
-  cd $wd
+  # cd $wd
     
   # define remote (HPC working directory)
-  wdr=/scratch/julietcohen/covid_movement
-  srcr=$wd/human_mobility_wildlife/src
+  wdr=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+  srcr=$wd/src
   # wdr=/home/sy522/project/covid-19_movement
   # srcr=$wdr/analysis/src
   
   # Go to working directory
-  # cd $wdr
+  cd $wdr
   
 ####
 
@@ -96,7 +96,7 @@
       
       # Create csv to store results with column names specified beforehand
       # (this will overwrite the existing CSV if it already exists)
-      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year, n" > ./out/niche_determinant_anthropause.csv
+      echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, year, n" > out/niche_determinant_anthropause.csv
 
       # Make log file to track successful outputs
       echo "studyid, individual, scientificname, year, status, week" > out/niche_log.csv
@@ -134,10 +134,10 @@
       module load R/4.2.3
       
       # run script to produce file src/workflow/joblist.txt
-      Rscript $srcr/workflow/create_intersection_joblist.r
+      # Rscript $srcr/workflow/create_intersection_joblist.r
 
       # launch job that runs script src/workflow/intersect-events-cbg.r
-      dsq --job-file $srcr/workflow/joblist.txt --mem-per-cpu 40g -t 02:00:00
+      # dsq --job-file $srcr/workflow/joblist.txt --mem-per-cpu 40g -t 02:00:00
 
       # The step above generates a .sh file to submit the job to the Slurm manager
       # Thus, after running the previous line, the file referenced below will be 
