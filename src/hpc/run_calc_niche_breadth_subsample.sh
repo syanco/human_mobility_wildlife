@@ -1,26 +1,20 @@
 #!/bin/bash
 
-#SBATCH -t 1:00:00
-#SBATCH --mail-type ALL
+#SBATCH -t 2:00:00                    # max time for job
+#SBATCH --mail-type ALL               # email all job events
 #SBATCH --mail-user jscohen@ucsb.edu
-#SBATCH --partition day
-#SBATCH -c 24
-#SBATCH --mem-per-cpu 10G
-#SBATCH -J calc_niche_subsample
-
-# Load conda env if needed on HPC
-# module load miniconda
-# conda activate covid
+##SBATCH --partition day              # partition "day" may only exist on Yale HPC
+#SBATCH -c 24                         # number of CPU's for job
+##SBATCH --mem-per-cpu 10G            # can add this back in if need to specify memory
+#SBATCH -J calc_niche_subsample       # job name 
 
 # Declare WD
-wd=~/project/covid-19_movement
-# wd=/Users/scottyanco/Documents/covid-19_movement
-src=$wd/analysis/src/workflow
+wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+src=$wd/src/workflow
 
-# Move to WD
 cd $wd
 
-#copy db to tmp
+# copy db to tmp
 cp $wd/processed_data/mosey_mod.db /tmp/
 
 
