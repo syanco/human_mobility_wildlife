@@ -62,8 +62,8 @@ suppressWarnings(
     library(DBI)
     library(RSQLite)
     library(lubridate)
-    library(raster)
-    library(move)
+    # library(raster) # not used in this script
+    # library(move) # not used in this script
     library(doMC)
     library(foreach)
     require(MVNH)
