@@ -132,7 +132,13 @@
       # UCSB HPC "pod":
       # specify R version that is closer to Juliet's laptop version 
       # and can install "sf" on pod: 4.1.3, plus other spatial modules on pod
+      export wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+      export src=$wd/src/workflow
+      cd $wd
       module load R/4.1.3 gdal/2.2.3 proj/5.2
+      # avoid using DSQ, simply run the inersect-events-cbg.r
+      # todo: create shell script to launch a SLURM job for this? with module load R/4.1.3 gdal/2.2.3 proj/5.2 and variables set first like other SLURM scripts before
+      Rscript $src/intersect-events-cbg.r
       
       # run script to produce file src/workflow/joblist.txt
       # Rscript $srcr/workflow/create_intersection_joblist.r
@@ -144,7 +150,7 @@
       # Thus, after running the previous line, the file referenced below will be 
       # created (and update the date to match the day it was generated).
       # sbatch dsq-joblist-2022-07-22.sh
-      sbatch dsq-joblist-2024-04-16.sh
+      # sbatch dsq-joblist-2024-04-16.sh
 
 
     #

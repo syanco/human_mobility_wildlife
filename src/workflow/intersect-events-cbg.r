@@ -56,9 +56,9 @@ if(interactive()) {
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
-  .dbPF <- file.path(.wd, 'processed_data/mosey_mod.db')
+  .dbPF <- file.path('/tmp/mosey_mod.db')
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
-  .datPF <- file.path(.wd,'raw_data/covid_movement_full_repo/raw_data')
+  .datPF <- file.path(.wd,'raw_data/covid_movement_full_repo/raw_data/')
   .outPF <- file.path(.wd,'out/event-cbg-intersection/')
 }
 
@@ -101,8 +101,8 @@ evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_final') %>%
 #  collect() %>%
 #  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
-
-evt_sf <- evt_sf[start_ix:end_ix,]
+# no need for the following line, since not using DSQ package
+# evt_sf <- evt_sf[start_ix:end_ix,]
 
 # intersect event table with census block group geometries
 message("intersecting events with census block groups...")
@@ -111,6 +111,7 @@ evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
   st_drop_geometry()
 
 # write out new table with annotations
+# TODO: add step where it checks if the out/even-cbg-intersection subdir exists, and creates it first if not 
 message("writing out csv...")
 fwrite(evt_cbg, paste0(.outPF,"event-cbg-intersection-",n,".csv"))
 
