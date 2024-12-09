@@ -45,8 +45,8 @@ if(interactive()) {
   source(file.path(.wd, 'src/funs/input_parse.r'))
   
   .dbPF <- makePath(ag$db)
-  .wkmin <- ag$wkmin
-  .minsp <- ag$minsp
+  .wkmin <- as.numeric(ag$wkmin)
+  .minsp <- as.numeric(ag$minsp)
 }
 
 #---- Initialize Environment ----#
@@ -65,6 +65,7 @@ suppressWarnings(
     library(sf)
     library(geosphere)
     library(lubridate)
+    library(tidyverse)
   }))
 
 # Source all files in the auto load funs directory
@@ -112,7 +113,6 @@ evt_out2 <- evt_cln %>%
          wk = week(timestamp2)) %>% # add column for week component of timestamp
   drop_na(tmax, ndvi, elev) # drop any rows with NA values for annotation cols
 
-
 # evt_comp <- evt_fix %>%
 #   select(species, ind_f, tmax, ndvi, elev) %>%
 #   filter(complete.cases(.))
@@ -125,15 +125,15 @@ evt_out2 <- evt_cln %>%
 message(glue("Removing species below theshold of {.minsp} individuals..."))
 
 # get ind count per species
+# remove species that have less than the minimum # of individuals
 sp_sum <- evt_out2 %>%
   group_by(species) %>%
   summarize(nind = length(unique(ind_f))) %>%
-  filter(nind >= .minsp) #require a minimum# of individuals
+  filter(nind >= .minsp)
 
-# retain events only for species that have the minimum number of individuals
+# retain events only for species that have the minimum # of individuals
 evt_sp <- evt_out2 %>% 
   semi_join(sp_sum, by = "species")
-
 
 #-- Remove weeks with too few fixes per week
 
@@ -225,6 +225,8 @@ print(glue("\n \n Total number of fixes in data: {sum(fix_p_sp$n)}"))
 print(glue("\n \n Fixes per species: \n {fix_p_sp}"))
 
 sink()
+
+dbDisconnect(db)
 
 message("Script Complete!")
 

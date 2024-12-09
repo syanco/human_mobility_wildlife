@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 04:00:00                    # max time for job
+#SBATCH -t 07:00:00                    # max time for job
 #SBATCH --mail-type ALL               # email all job events
 #SBATCH --mail-user jscohen@ucsb.edu
 ##SBATCH --partition day              # partition "day" may only exist on Yale HPC
@@ -10,8 +10,14 @@
 #SBATCH --nodes 1
 
 # Declare WD
-wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
-src=$wd/src/workflow
+export wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+export src=$wd/src/workflow
+
+# change dir so that filepaths in R script are prefixed correctly, like for startup.r
+# NOTE FOR FUTURE GENERALIZATION: alternative appraoch would be to use the exported variable wd (defined 
+# above in this sh script) inside the R script as the start of the filepath instead of prefixing the filepath with getwd() 
+cd $wd
+module load R/4.1.3 gdal/2.2.3 proj/5.2
 
 # Create csv to store results with column names specified beforehand
 # (this will overwrite the existing CSV if it already exists)

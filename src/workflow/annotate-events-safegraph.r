@@ -50,17 +50,16 @@ if(interactive()) {
   .wd <- getwd()
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
-  
-  # UPDATE VERSION!!!
-  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db'
+  .dbPF <- '/tmp/mosey_mod.db'
+  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db'
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'out/')
-  .pdPF  <- file.path(.wd,'processed_data/')
+  .pdPF  <- file.path(.wd,'raw_data/covid-movement_full_repo/processed_data/')
   .outPF <- file.path(.wd,'out/')
 }
 
 message("start safegraph annotation")
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -77,7 +76,7 @@ db <- dbConnect(RSQLite::SQLite(), .dbPF)
 invisible(assert_that(length(dbListTables(db))>0))
 
 message("reading in event table...")
-evt_df <- dbGetQuery(db,'SELECT event_id,timestamp from event_final2') %>%
+evt_df <- dbGetQuery(db,'SELECT event_id,timestamp from event_final') %>%
   separate(timestamp, c("date",NA), sep = " ", remove = FALSE) %>%
   mutate("date_hour" = str_trunc(timestamp,13,"right","")) %>%
   collect()

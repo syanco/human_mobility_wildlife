@@ -55,9 +55,9 @@ if(interactive()) {
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
-  .dbPF <- '/scratch/julietcohen/covid_project/human_mobility_wildlife/processed_data/mosey_mod.db'
+  .dbPF <- '/tmp/mosey_mod.db'
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
-  .datPF <- file.path(.wd,'raw_data/')
+  .datPF <- file.path(.wd,'raw_data/covid-movement_full_repo/raw_data/')
   .outPF <- file.path(.wd,'out/')
 }
 
@@ -85,7 +85,7 @@ ghm <- raster(paste0(.datPF,"gHM/gHM.tif"))
 
 # read in event table
 message("reading in event table...")
-evt_sf <- dbGetQuery(db,'SELECT event_id,lon,lat from event_final2') %>%
+evt_sf <- dbGetQuery(db,'SELECT event_id,lon,lat from event_final') %>%
   collect() %>%
   st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
