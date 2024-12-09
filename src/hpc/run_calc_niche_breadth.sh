@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 04:00:00                    # max time for job
+#SBATCH -t 07:00:00                    # max time for job
 #SBATCH --mail-type ALL               # email all job events
 #SBATCH --mail-user jscohen@ucsb.edu
 ##SBATCH --partition day              # partition "day" may only exist on Yale HPC

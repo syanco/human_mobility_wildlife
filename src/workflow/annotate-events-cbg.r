@@ -50,7 +50,7 @@ if(interactive()) {
   .wd <- getwd()
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
-  .dbPF <- '/scratch/julietcohen/covid_movement/human_mobility_wildlife/processed_data/mosey_mod.db'
+  .dbPF <- '/tmp/mosey_mod.db'
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'out/')
   .outPF <- file.path(.wd,'out/')

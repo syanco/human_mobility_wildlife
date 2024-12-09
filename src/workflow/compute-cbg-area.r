@@ -56,7 +56,7 @@ if(interactive()) {
   # rd <- is_rstudio_project$make_fix_file(.script)
   
   # census block group data is stored in the raw_data dir
-  .datPF <- file.path(.wd,'raw_data/')
+  .datPF <- file.path(.wd,'raw_data/covid_movement_full_repo/raw_data/')
   .outPF <- file.path(.wd,'out/event-annotation/')
 }
 
