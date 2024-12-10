@@ -98,10 +98,6 @@ evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_final') %>%
 
 # intersect event table with census block group geometries
 message("intersecting events with census block groups...")
-evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
-  rename(cbg_2010 = CensusBlockGroup) %>%
-  st_drop_geometry()
-
 evt_cbg <- st_join(evt_sf, 
                    cbg_sf, 
                    join = st_intersects, 
