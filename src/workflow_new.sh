@@ -411,7 +411,7 @@ scp -r grace:$wdr/out/single_species_models/niche_interactive $wd/out/single_spe
     
       #Get standardized effect sizes
       # Run interactively:
-      select_niche_model_effetcs.r
+      select_niche_model_effects.r
     #  
     
     #- Area "meta-analysis"

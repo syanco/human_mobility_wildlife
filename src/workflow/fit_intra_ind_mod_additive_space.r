@@ -46,7 +46,7 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd, 'src/funs/input_parse.r'))
   
   .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
@@ -59,7 +59,7 @@ if(interactive()) {
   .iter  <- ag$iter
   .thin <- ag$thin
   
-  source(file.path(.wd,'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd,'src/funs/input_parse.r'))
   
   .datPF <- makePath(ag$dat)
   .outP <- makePath(ag$out)
@@ -71,7 +71,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -97,7 +97,7 @@ conflict_prefer("has_name", "tibble")
 .thin <- ifelse(is.null(.thin), 4, as.numeric(.thin))
 
 #Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
+list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
 #---- Load Data ----#
@@ -105,7 +105,7 @@ list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
 message("Loading data...")
 
 # Load trsait data
-traits <- read_csv("raw_data/anthropause_data_sheet.csv")
+traits <- read_csv("raw_data/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
 
 # load size data
 size <- read_csv("out/dbbmm_size.csv") %>%

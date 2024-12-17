@@ -18,4 +18,4 @@ wd=~/project/covid-19_movement
 cd $wd
 
 # Execute model script 
-Rscript $wd/analysis/src/workflow/refit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_additive 8
+Rscript $wd/analysis/src/workflow/refit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_interactive 8
