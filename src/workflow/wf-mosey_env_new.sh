@@ -3,7 +3,6 @@
 # only need remote db filepath when switch to HPC
 # dbr=/scratch/julietcohen/covid_movement/human_mobility_wildlife/processed_data/mosey_mod.db
 
-# already defined wd in the workflow_new.sh script
 wd=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife
 src=$wd/src
 db=$wd/processed_data/mosey_mod.db

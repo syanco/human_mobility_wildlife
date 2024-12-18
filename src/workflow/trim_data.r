@@ -90,7 +90,10 @@ evt <- tbl(db,'event') %>% collect()
 indtb <- tbl(db, "individual") %>%  collect()
 
 # Collect study table
-stdtb <- tbl(db, "study") %>% collect()
+stdtb <- tbl(db, "study") %>% 
+         collect() %>% 
+         mutate(study_id = as.factor(study_id))
+
 
 # extract only relevant time periods
 mod <- evt %>%
@@ -173,6 +176,10 @@ ind_out <- indtb %>%
 # write table back to db
 dbWriteTable(conn = db, name = "individual_trim", value = ind_out, append = FALSE, overwrite = T)
 
+# convert the study_id class so it can join with stdtb study_id class
+# make the class factor instead of numeric, because the study_id values can be
+# too large of integers for R to handle
+ind_out$study_id <- as.factor(ind_out$study_id)
 
 # Correct the study table
 std_out <- stdtb %>%
