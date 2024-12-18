@@ -44,7 +44,7 @@ if(interactive()) {
   .iter  <- ag$iter
   .thin <- ag$thin
   
-  source(file.path(.wd,'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd,'src/funs/input_parse.r'))
   
   .datPF <- makePath(ag$nichedat)
   .varPF <- makePath(ag$vardat)
@@ -58,7 +58,7 @@ if(interactive()) {
 
 t0 <- Sys.time()
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -83,7 +83,7 @@ conflict_prefer("pack", "tidyr")
 conflict_prefer("unpack", "tidyr")
 
 # load breezy functions
-source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
+source(file.path(.wd,'src/funs/auto/breezy_funs.r'))
 
 # check arg inputs
 .minsp <- ifelse(is.null(.minsp), 10, as.numeric(.minsp))

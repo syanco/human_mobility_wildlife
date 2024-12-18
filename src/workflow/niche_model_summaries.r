@@ -20,12 +20,13 @@ if(interactive()) {
   .wd <- getwd()
   
   
-  source('analysis/src/funs/input_parse.r')
+  source('src/funs/input_parse.r')
   
   #.list <- trimws(unlist(strsplit(ag$list,',')))
   # .datP <- makePath(ag$dat)
+  .datP <- file.path(.wd,'out/single_species_models')
   # .outPF <- makePath(ag$out)
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
   # vector of probabilities foer conditional estimates
   prob_vec <- c(0.2,0.8)
 }
@@ -34,7 +35,7 @@ if(interactive()) {
 #---- Initialize Environment ----#
 t0 <- Sys.time()
 
-source('analysis/src/startup.r')
+source('src/startup.r')
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -53,10 +54,11 @@ suppressWarnings(
     library(sf)
     library(ggsflabel)
     library(janitor)
+    library(glue)
   }))
 
 #Source all files in the auto load funs directory
-list.files('analysis/src/funs/auto',full.names=TRUE) %>%
+list.files('src/funs/auto',full.names=TRUE) %>%
   walk(source)
 
 palnew <- c("#F98177", "#8895BF")
@@ -91,7 +93,8 @@ int_sp == add_sp
 # add_modlist_full <- append(add_modlist_full, "NULL", after = 24)
 
 # Get US Background
-us <- ne_states(country = "United States of America", returnclass = "sf")
+us <- ne_states(country = "United States of America", returnclass = "sf") %>%
+        st_set_crs(4326)
 
 
 #---- Initialize database ----#
@@ -271,8 +274,11 @@ for(i in 1:length(int_modlist_full)){
                     study_name = study_name[1]) %>% 
           st_centroid()
         
-        # Get bouding box of centroids to set plot lims
+        # Get bounding box of centroids to set plot lims
         stdbb <- st_bbox(std_sf)
+
+        message(glue("Are the CRS the same? {st_crs(us) == st_crs(std_sf)}"))
+        message(glue("crs of std_sf is {st_crs(std_sf)}\ncrs of us is {st_crs(us)}}"))
         
         # make plot
         study_plot <- ggplot()+
@@ -706,5 +712,5 @@ for(i in 1:length(int_modlist_full)){
 }# i 
 
 dbDisconnect(db)
-beepr::beep()
+#beepr::beep()
 message("all done....")

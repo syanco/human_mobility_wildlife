@@ -70,14 +70,9 @@ suppressWarnings(
     library(RSQLite)
     library(data.table)
     library(sf)
+    library(assertthat)
+    library(dplyr)
   }))
-
-#---- Collect arguments ----#
-# args = commandArgs(trailingOnly = TRUE)
-
-# start_ix <- as.numeric(args[1])
-# end_ix <- as.numeric(args[2])
-# n <- as.numeric(args[3])
 
 #---- Initialize database ----#
 
@@ -101,20 +96,23 @@ evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_final') %>%
 #  collect() %>%
 #  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
-# no need for the following line, since not using DSQ package
-# evt_sf <- evt_sf[start_ix:end_ix,]
-
 # intersect event table with census block group geometries
 message("intersecting events with census block groups...")
-evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
-  rename(cbg_2010 = CensusBlockGroup) %>%
-  st_drop_geometry()
+evt_cbg <- st_join(evt_sf, 
+                   cbg_sf, 
+                   join = st_intersects, 
+                   left = FALSE) %>% # do not retain points that do not intersect any CBG
+          rename(cbg_2010 = CensusBlockGroup) %>%
+          st_drop_geometry() %>%
+          # if a point falls within multiple cbg polygons, keep the first observation
+          group_by(event_id) %>%
+          slice(1) %>%
+          ungroup()
 
 # write out new table with annotations
 # TODO: add step where it checks if the out/even-cbg-intersection subdir exists, and creates it first if not 
 message("writing out csv...")
 fwrite(evt_cbg, paste0(.outPF,"event-cbg-intersection.csv"))
-# fwrite(evt_cbg, paste0(.outPF,"event-cbg-intersection-",n,".csv"))
 
 dbDisconnect(db)
 

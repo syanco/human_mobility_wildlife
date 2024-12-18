@@ -29,7 +29,7 @@ if(interactive()) {
   .wd <- getwd()
   
   .datP <- file.path(.wd,'out/single_species_models')
-  .traitPF <- file.path(.wd, 'raw_data/anthropause_data_sheet.csv')
+  .traitPF <- file.path(.wd, 'raw_data/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv')
   .outPF <- file.path(.wd,'figs/area_fig.png')
   
 } else {
@@ -40,7 +40,7 @@ if(interactive()) {
   .wd <- getwd()
   
   
-  source('analysis/src/funs/input_parse.r')
+  source('src/funs/input_parse.r')
   
   #.list <- trimws(unlist(strsplit(ag$list,',')))
   .datP <- makePath(ag$dat)
@@ -51,7 +51,7 @@ if(interactive()) {
 #---- Initialize Environment ----#
 t0 <- Sys.time()
 
-source('analysis/src/startup.r')
+source('src/startup.r')
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -71,7 +71,7 @@ call_fun <- function(f,x,...) {
 }
 
 #Source all files in the auto load funs directory
-list.files('analysis/src/funs/auto',full.names=TRUE) %>%
+list.files('src/funs/auto',full.names=TRUE) %>%
   walk(source)
 
 # theme_set(theme_eda)

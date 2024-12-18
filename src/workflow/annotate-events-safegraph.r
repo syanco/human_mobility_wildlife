@@ -54,7 +54,7 @@ if(interactive()) {
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db'
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'out/')
-  .pdPF  <- file.path(.wd,'raw_data/covid-movement_full_repo/processed_data/')
+  .pdPF  <- file.path(.wd,'raw_data/covid_movement_full_repo/processed_data/')
   .outPF <- file.path(.wd,'out/')
 }
 

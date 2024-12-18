@@ -160,7 +160,7 @@ dbWriteTable(conn = db, name = "study_clean", value = std_out, append = FALSE, o
 
 
 
-#-- Generate Sample Size Sumaries
+#-- Generate Sample Size Summaries
 
 # No of species
 (no_sp <- evt_out %>% pull(species) %>% unique() %>% length())

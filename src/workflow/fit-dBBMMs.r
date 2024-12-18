@@ -73,6 +73,7 @@ suppressWarnings(
     library(move)
     library(doMC)
     library(foreach)
+    library(glue)
   }))
 
 #Source all files in the auto load funs directory
@@ -90,7 +91,7 @@ indtb <- tbl(db,'individual_clean') %>%
 
 indtb <- indtb[!duplicated(indtb),]
 
-message("Disconnecting from databse...")
+message("Disconnecting from database...")
 dbDisconnect(db)
 
 ind <- indtb %>% 
