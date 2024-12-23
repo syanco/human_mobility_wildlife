@@ -92,7 +92,7 @@ do
 
   #NOTE zsh starts at 1! updated the loop, test
   # use for loop to read all values and indexes
-  for (( i=0; i<=${n}; i++ ));
+  for (( i=0; i<${n}; i++ ));
   do
 
 		#Note zsh arrays start at 1!

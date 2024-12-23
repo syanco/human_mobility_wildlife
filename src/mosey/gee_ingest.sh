@@ -52,7 +52,7 @@ geePtsP=$2 # The path to the gee folder that will hold the point assets
 gcsURL=$3 # The gcs url to the folder that will hold csvs for import to gee
 outP=$4 # The path to the folder that will hold csvs for import to gcs
 
-#Set defaults for optional paramters
+#Set defaults for optional parameters
 [[ -z "$db" ]] && db=processed_data/mosey_mod.db
 # [[ -z "$db" ]] && db=processed_data/mosey_mod.db
 
@@ -69,6 +69,9 @@ mkdir -p $outP # should this be "gcsOutP" instead?
 
 # entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
 entIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/$entity.csv | tail -n +2))
+
+echo "Extracted study IDs:"
+printf '%s\n' "${entIds[@]}"
 
 n=${#entIds[@]}
 

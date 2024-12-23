@@ -1,4 +1,0 @@
-Running startup script...
-Error in library(assertthat) : there is no package called ‘assertthat’
-Calls: source -> withVisible -> eval -> eval
-Execution halted
