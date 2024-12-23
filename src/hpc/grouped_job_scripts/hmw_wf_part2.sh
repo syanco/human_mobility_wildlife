@@ -28,18 +28,23 @@ echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" >
 # Make big mem log file to track ind-year combos saved for the big mem parition
 echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > $wd/out/dbbmm_bigmem_log.csv
 
+echo "STARTING SCRIPT: fit-dBBMMs.r"
+
 Rscript $src/fit-dBBMMs.r /tmp/mosey_mod.db $wd/out 2
 
-echo "fit-dBBMMs.r complete. Archiving database in /scratch."
+echo "SCRIPT COMPLETE: fit-dBBMMs.r. Archiving database in /scratch."
 
 
 # ------------ HPC step 9: Calculate Responses - Space Use - Calculate dBBMM areas and collate environment ------------
 
 echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, ndvi, tmax, n, a_bb, fixmed, m_error" > $wd/out/dbbmm_size.csv
 
+echo "STARTING SCRIPT: calc-space-use.r"
+
 Rscript $src/calc-space-use.r $wd/out /tmp/mosey_mod.db $wd/out/dbbmm_log.csv 4 -c
 
-echo "calc-space-use.r complete."
+echo "SCRIPT COMPLETE: calc-space-use.r."
+
 
 # ------------ HPC step 10: Calculate Responses - Niche Breadth - Calculate MVNH Breadth ------------
 
@@ -49,30 +54,48 @@ echo "total, tmax, ndvi, elev, cor, week, individual, scientificname, studyid, y
 # Make log file to track successful outputs
 echo "studyid, individual, scientificname, year, status, week" > $wd/out/niche_log.csv
 
+echo "STARTING SCRIPT: calc-niche-breadth.r"
+
 # Execute calc size script
 Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause.csv 4
 
-echo "calc-niche-breadth.r complete."
+echo "SCRIPT COMPLETE: calc-niche-breadth.r."
+
 
 # ------------ HPC step 11: Inferential Models - Fit space use models part 1 ------------
+
+echo "STARTING SCRIPT: fit-space-use-dot-models.r"
 
 # the skeleton for output dbbmm_size.csv was created prior to a previous step (Calculate dBBMM areas and collate environment)
 Rscript $src/fit-space-use-dot-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_dot 4 5 10000 5
 
-echo "fit-space-use-dot-models.r complete."
+echo "SCRIPT COMPLETE: fit-space-use-dot-models.r."
+
 
 # ------------ HPC step 12: Inferential Models - Fit space use models part 2 ------------
 
+echo "STARTING SCRIPT: fit-space-use-interactive-models.r"
+
 Rscript $src/fit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_interactive 4 5 10000 5
 
-echo "fit-space-use-interactive-models.r complete."
+echo "SCRIPT COMPLETE: fit-space-use-interactive-models.r."
+
 
 # ------------ HPC step 13: Inferential Models - Fit space use models part 3 ------------
 
+echo "STARTING SCRIPT: fit-space-use-additive-models.r"
+
 Rscript $src/fit-space-use-additive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_additive 4 5 10000 5
 
-echo "fit-space-use-additive-models.r complete."
-
-echo "SCRIPT COMPLETE: hmw_sf_part2"
+echo "SCRIPT COMPLETE: fit-space-use-additive-models.r."
 
 
+# ------------ HPC step 14: Visualize model outputs from space use models ------------
+
+echo "STARTING SCRIPT: area_model_summaries.r"
+
+Rscript $src/area_model_summaries.r
+
+echo "SCRIPT COMPLETE: area_model_summaries.r."
+
+echo "JOB COMPLETE: hmw_sf_part2"

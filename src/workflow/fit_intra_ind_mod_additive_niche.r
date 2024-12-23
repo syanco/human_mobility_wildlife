@@ -8,6 +8,11 @@
 # TODO:  The dBBMM paramaters (e.g., window size, margin, error, etc.) are 
 # currently hardcoded.  Could be passed in as options to the script.
 # TODO: verify the volume/probability problem for write out.
+# TODO: remove the db parameter from the documentation if it is not applicable to this script
+#       considering that we use CSVs as input only
+# TODO: change the hard coded CSV filepaths for "size", "traits", and "breadth" variables
+#       to be passed as arguments instead of hard coded, currently these paths are passed via the command
+#       in the SLURM job script, but they are not used in this script beyond being defined
 # 
 # ==== Setup ====
 
@@ -48,19 +53,9 @@ if(interactive()) {
   
   source(file.path(.wd, 'src/funs/input_parse.r'))
   
-  .outPF <- makePath(ag$out)
-  .dbPF <- makePath(ag$db)
-  # .nc <- ag$nc
-  
-  # ag <- docopt(doc, version = '0.1\n')
-  
-  .wd <- getwd()
   .cores <- ag$cores
   .iter  <- ag$iter
   .thin <- ag$thin
-  
-  source(file.path(.wd,'src/funs/input_parse.r'))
-  
   .datPF <- makePath(ag$dat)
   .outP <- makePath(ag$out)
   
