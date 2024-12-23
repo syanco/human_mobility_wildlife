@@ -90,7 +90,9 @@ evt <- tbl(db,'event') %>% collect()
 indtb <- tbl(db, "individual") %>%  collect()
 
 # Collect study table
-stdtb <- tbl(db, "study") %>% collect()
+stdtb <- tbl(db, "study") %>% 
+         collect() 
+
 
 # extract only relevant time periods
 mod <- evt %>%
