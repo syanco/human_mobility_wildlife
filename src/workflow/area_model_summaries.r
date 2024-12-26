@@ -89,8 +89,8 @@ int_sp == add_sp
 # GDAL and PROJ on pod server do not permit a true transformation, so setting !
 # the CRS metadata to be the same so ggplots output does not error, and
 # the CRS of both "us" and event data are both 4326 anyway
-us <- ne_states(country = "United States of America", returnclass = "sf") %>%
-        st_set_crs(4326)
+us <- ne_states(country = "United States of America", returnclass = "sf") #%>%
+        #st_set_crs(4326)
 
 
 #---- Initialize database ----#
@@ -268,12 +268,16 @@ for(i in 1:length(int_modlist_full)){
           st_centroid()
         
         # Get bounding box of centroids to set plot lims
-        stdbb <- st_bbox(std_sf)
-        
-        #message(glue("Are the CRS the same? {st_crs(us) == st_crs(std_sf)}"))
-        message(glue("crs of std_sf is {st_crs(std_sf)}\ncrs of us is {st_crs(us)}}"))
-        # message(glue("Transforming US polygons"))
-        # us <- st_transform(us, st_crs(std_sf)) 
+        stdbb <- st_bbox(std_sf) 
+
+        # ensure CRS match before plotting
+        CRS_same <- st_crs(us) == st_crs(std_sf)
+        if (CRS_same) {
+          message("CRS of std_sf and us is the same.")
+        } else {
+          us <- st_transform(us, st_crs(std_sf))
+          message("Transformed CRS of us polygons to CRS of std_sf")
+        }
         
         # make plot
         study_plot <- ggplot()+
