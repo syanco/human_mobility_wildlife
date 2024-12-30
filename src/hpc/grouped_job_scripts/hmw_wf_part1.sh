@@ -42,9 +42,9 @@ make --version
 
 echo "STARTING SCRIPT: filter_data_mins.R" 
 
-Rscript $src/filter_data_mins.R --db /tmp/mosey_mod.db 30 5
+Rscript $src/filter_data_mins.R --db /tmp/mosey_mod.db 30 3
 
-echo "SCRIPT COMPLETE: filer_data_mins.R. Archiving database in /scratch."
+echo "SCRIPT COMPLETE: filter_data_mins.R. Archiving database in /scratch."
 
 # copy intermediate version of modified database to perisistent storage
 cp /tmp/mosey_mod.db $wd/processed_data/intermediate_db_copies/mosey_mod_filter-data-mins_complete.db

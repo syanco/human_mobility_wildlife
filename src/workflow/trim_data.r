@@ -7,6 +7,11 @@
 
 '
 Trim data for the COVID-19 Animal Movement Project
+- within the United States of America
+- from specified periods within 2019-2020
+- remove specific studies
+- correct certain species names
+
 See project documentation for details about anticipated directory structure.
 Expects db to be of format mosey_db, with a table named "event"
 
@@ -150,7 +155,7 @@ mod2_sf <- st_as_sf(mod2, coords = c("lon", "lat"), crs = 4326)
 us <- ne_countries(scale = "medium", returnclass = "sf") %>%
   filter(name == "United States of America")
 
-# Find cells that overlap land in Canada and US
+# Find cells that overlap land in US
 keep_fixes <- apply(st_intersects(mod2_sf, us, sparse = F),
                     1,
                     function(x){

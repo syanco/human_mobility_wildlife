@@ -8,7 +8,8 @@
 '
 Prep and clean data for the COVID-19 Animal Movement Project
 See project documentation for details about anticipated directory structure.
-Expects db to be of format mosey_db, with a table named "event"
+Expects db to be of format mosey_db, with a table named "event_final" that was 
+written to db by filter_data_mins.R
 
 Usage:
 clean_movement.r [--db=<db>] 
@@ -88,8 +89,8 @@ invisible(assert_that(length(dbListTables(db))>0))
 #-- Clean Outliers
 
 evt_trm <- tbl(db,'event_final') %>%  collect()
-ind <- tbl(db, "individual") %>%  collect()
-std <- tbl(db, "study") %>%  collect()
+ind <- tbl(db, "individual_final") %>%  collect()
+std <- tbl(db, "study_final") %>%  collect()
 # beepr::beep()
 
 cnt <- evt_trm %>% 

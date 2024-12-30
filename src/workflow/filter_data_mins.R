@@ -6,7 +6,8 @@
 
 
 '
-Filters data to minimums, reports out sample sizes
+Filters data to minimums for sample sizes per week and number of individuals 
+per species, reports out sample sizes
 
 Usage:
 filter_data_mins.r [--db=<db>] <wkmin> <minsp>
