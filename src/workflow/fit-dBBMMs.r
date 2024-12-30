@@ -189,6 +189,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
           fixmed <- median(timeLag(x=evt_mv, units="mins"))
           evt_burst <- burst(evt_mv, burstid)
           evt_mv_t <- spTransform(evt_burst, center = T)
+          # remove variance of the segments corresponding to large time gaps
           dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
                                                   location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
                                                     rep(5, n.locs(evt_mv_t))}else{

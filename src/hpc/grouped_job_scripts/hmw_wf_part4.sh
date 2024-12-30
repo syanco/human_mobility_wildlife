@@ -13,9 +13,27 @@
 export wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
 export src=$wd/src/workflow
 cd $wd
+ 
+module load R/4.3.1
 
-# load R and spatial modules 
-module load R/4.1.3 gdal/2.2.3 proj/5.2
+# set paths for PROJ, GDAL, and compiler installations in my conda env
+source /home/julietcohen/miniconda3/etc/profile.d/conda.sh
+conda activate r_spatial2
+export LD_LIBRARY_PATH=/home/julietcohen/miniconda3/envs/r_spatial2/lib:$LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=/home/julietcohen/miniconda3/envs/r_spatial2/lib/pkgconfig:$PKG_CONFIG_PATH
+export CXX=/home/julietcohen/miniconda3/envs/r_spatial2/bin/g++
+export CC=/home/julietcohen/miniconda3/envs/r_spatial2/bin/gcc
+
+# add logging to ensure the new shell is using the intended software
+echo "GDAL version:"
+gdal-config --version
+echo "PROJ version:"
+proj
+echo "C++ compiler version:"
+$CXX --version
+echo "Make version:"
+make --version
+
 
 # ------------ HPC step 19: Intra-Individual Analysis - Area part 1 ------------
 

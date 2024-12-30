@@ -161,7 +161,7 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
   sp <- sp_sum$scientificname[i]
   
   
-  message(glue("Strating model for {sp}..."))
+  message(glue("Starting model for {sp}..."))
   
   dat <- breadth %>%
     filter(scientificname == sp,
