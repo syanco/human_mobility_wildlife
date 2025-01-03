@@ -140,7 +140,7 @@ evt_sp <- evt_out2 %>%
 
 message(glue("Removing weeks below threshold of {.wkmin} fixes per individual"))
 
-# get fix count per week
+# remove individuals with fewer than min number fixes per week
 fix_sum <- evt_sp %>% 
   group_by(ind_f, yr, wk) %>% 
   summarize(n= n()) %>% 

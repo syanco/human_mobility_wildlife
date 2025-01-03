@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 48:00:00
+#SBATCH -t 05:00:00
 #SBATCH --job-name hmw_wf_part1
 #SBATCH -c 27
 ##SBATCH --mem 500GB  

@@ -7,7 +7,6 @@
 ##SBATCH --mem-per-cpu 100G
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
-#SBATCH --error=slurm-%j.err
 
 
 # set up paths

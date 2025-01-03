@@ -100,7 +100,8 @@ list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
 message("Loading data...")
 
 # Load trsait data
-traits <- read_csv("raw_data/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
+# traits <- read_csv("raw_data/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
+traits <- read_csv("/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
 
 # load size data
 size <- read_csv("out/dbbmm_size.csv") %>%

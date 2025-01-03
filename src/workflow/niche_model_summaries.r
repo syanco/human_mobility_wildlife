@@ -113,7 +113,7 @@ invisible(assert_that(length(dbListTables(db))>0))
 evt0 <- tbl(db, 'event_clean') %>% collect()
 std0 <- tbl(db, 'study_clean') %>% 
   collect() 
-beepr::beep()
+# beepr::beep()
 
 # Init lists to store results
 pred_out <- list()
