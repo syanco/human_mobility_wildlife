@@ -29,8 +29,8 @@ if(interactive()) {
   .wd <- getwd()
   
   .datP <- file.path(.wd,'out/single_species_models')
-  .traitPF <- file.path(.wd, 'raw_data/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv')
-  .outPF <- file.path(.wd,'figs/area_fig.png')
+  .outPF <- file.path(.wd,'out/figs')
+  .traitPF <- file.path(.wd, 'raw_data/anthropause_data_sheet.csv')
   
 } else {
   library(docopt)
@@ -82,8 +82,16 @@ list.files('src/funs/auto',full.names=TRUE) %>%
 
 #---- Load data ----#
 message("Loading trait data...")
-traits <- read_csv(.traitPF)
-
+traits <- read_csv(.traitPF) %>%
+          add_row(Species = "Procyon lotor",
+                  class = "mammal",
+                  migratory = "non-migratory") %>% 
+          add_row(Species = "Spilogale putorius",
+                  class = "mammal",
+                  migratory = "non-migratory") %>% 
+          add_row(Species = "Sus scrofa",
+                  class = "mammal",
+                  migratory = "non-migratory")
 
 
 # #-- Interaction Models --#

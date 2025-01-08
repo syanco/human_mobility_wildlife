@@ -82,7 +82,16 @@ list.files('src/funs/auto',full.names=TRUE) %>%
 
 #---- Load data ----#
 message("Loading trait data...")
-traits <- read_csv(.traitPF)
+traits <- read_csv(.traitPF) %>%
+  add_row(Species = "Procyon lotor",
+          class = "mammal",
+          migratory = "non-migratory") %>% 
+  add_row(Species = "Spilogale putorius",
+          class = "mammal",
+          migratory = "non-migratory") %>% 
+  add_row(Species = "Sus scrofa",
+          class = "mammal",
+          migratory = "non-migratory")
 
 
 
