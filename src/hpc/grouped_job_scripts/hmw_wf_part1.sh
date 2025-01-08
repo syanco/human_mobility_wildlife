@@ -74,9 +74,7 @@ echo "STARTING SCRIPT: annotate-events-cbg.r"
 
 Rscript $src/annotate-events-cbg.r
 
-echo "SCRIPT COMPLETE: annotate-events-cbg.r. Archiving database in /scratch."
-
-cp /tmp/mosey_mod.db $wd/processed_data/intermediate_db_copies/mosey_mod_annotate-events-cbg_complete.db
+echo "SCRIPT COMPLETE: annotate-events-cbg.r."
 
 
 # ------------ HPC step 5: Annotate events with SafeGraph ------------
@@ -85,9 +83,7 @@ echo "STARTING SCRIPT: annotate-events-safegraph.r"
 
 Rscript $src/annotate-events-safegraph.r
 
-echo "SCRIPT COMPLETE: annotate-events-safegraph.r. Archiving database in /scratch."
-
-cp /tmp/mosey_mod.db $wd/processed_data/intermediate_db_copies/mosey_mod_annotate-events-safegraph_complete.db
+echo "SCRIPT COMPLETE: annotate-events-safegraph.r."
 
 
 # ------------ HPC step 6: Annotate Events with Human Modification ------------
@@ -96,9 +92,7 @@ echo "STARTING SCRIPT: annotate-events-ghm.r"
 
 Rscript $src/annotate-events-ghm.r
 
-echo "SCRIPT COMPLETE: annotate-events-ghm.r. Archiving database in /scratch."
-
-cp /tmp/mosey_mod.db $wd/processed_data/intermediate_db_copies/mosey_mod_annotate-events-ghm_complete.db
+echo "SCRIPT COMPLETE: annotate-events-ghm.r."
 
 
 # ------------ HPC step 7: Clean Data ------------

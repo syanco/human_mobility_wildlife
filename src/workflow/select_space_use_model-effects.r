@@ -44,8 +44,8 @@ if(interactive()) {
   
   #.list <- trimws(unlist(strsplit(ag$list,',')))
   .datP <- makePath(ag$dat)
-  .traitPF <- makePath(ag$trait)
   .outPF <- makePath(ag$out)
+  .traitPF <- makePath(ag$trait)
 }
 
 #---- Initialize Environment ----#
@@ -452,13 +452,13 @@ for(i in 1:length(int_modlist_full)){
 
 # combine dfs
 res_out_df <- do.call("bind_rows", res_out)
-write_csv(x = res_out_df, file = glue("out/area_mod_summary_{Sys.Date()}.csv"))
+write_csv(x = res_out_df, file = file.path(.outPF, glue("area_mod_summary_{Sys.Date()}.csv")))
 
 sg_es_df <- do.call("bind_rows", sg_effects_out)
-write_csv(x = sg_es_df, file = glue("out/area_sg_effects_{Sys.Date()}.csv"))
+write_csv(x = sg_es_df, file = file.path(.outPF, glue("area_sg_effects_{Sys.Date()}.csv")))
 
 ghm_es_df <- do.call("bind_rows", ghm_effects_out)
-write_csv(x = ghm_es_df, file = glue("out/area_ghm_effects_{Sys.Date()}.csv"))
+write_csv(x = ghm_es_df, file = file.path(.outPF, glue("area_ghm_effects_{Sys.Date()}.csv")))
 
 #---- Standardized Effects plot ----#
 
@@ -525,7 +525,7 @@ sg_es_df <- do.call("bind_rows", sg_effects_out) %>%
           axis.ticks.y = element_blank(),
           strip.text = element_text(size = 5),
           NULL))
-ggsave(sg_coef_plot_facet, file = "out/facet_test.png", width = 4, height = 12)
+ggsave(sg_coef_plot_facet, file = file.path(.outPF, "facet_test.png"), width = 4, height = 12)
 # GHM
 
 ghm_es_df <- do.call("bind_rows", ghm_effects_out)
@@ -562,5 +562,5 @@ ghm_es_df <- do.call("bind_rows", ghm_effects_out)
 (coef_comb <- sg_coef_plot + ghm_coef_plot + plot_layout(guides = "collect"))
 (coef_zoom_comb <- sg_coef_plot_zoom + ghm_coef_plot_zoom + plot_layout(guides = "collect"))
 
-ggsave(coef_comb, file = "out/space_use_coef.png", width = 10, height = 6)
-ggsave(coef_zoom_comb, file = "out/space_use_coef_zoom.png", width = 10, height = 6)
+ggsave(coef_comb, file = file.path(.outPF, "space_use_coef.png"), width = 10, height = 6)
+ggsave(coef_zoom_comb, file = file.path(.outPF, "space_use_coef_zoom.png"), width = 10, height = 6)

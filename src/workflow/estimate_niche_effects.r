@@ -342,14 +342,14 @@ for(i in 1:length(int_modlist_full)){
 
 #-- Predicted Effects --#
 pred_out_df <- do.call("bind_rows", pred_out)
-write_csv(x = pred_out_df, file = glue("out/niche_change_prediction_{Sys.Date()}.csv"))
-save(pred_out, file = "out/area_change_predictions.rdata")
+write_csv(x = pred_out_df, file = file.path(.outPF, glue("niche_change_prediction_{Sys.Date()}.csv")))
+save(pred_out, file = file.path(.outPF, "area_change_predictions.rdata"))
 
 #-- Marginal Effects of SG --#
 sg_es_df <- do.call("bind_rows", sg_effects_out)
-write_csv(x = sg_es_df, file = glue("out/niche_sg_marginal_{Sys.Date()}.csv"))
+write_csv(x = sg_es_df, file = file.path(.outPF, glue("niche_sg_marginal_{Sys.Date()}.csv")))
 
 #--Marginal Effects of GHM --#
 ghm_es_df <- do.call("bind_rows", ghm_effects_out)
-write_csv(x = ghm_es_df, file = glue("out/niche_ghm_marginal_{Sys.Date()}.csv"))
+write_csv(x = ghm_es_df, file = file.path(.outPF, glue("niche_ghm_marginal_{Sys.Date()}.csv")))
 

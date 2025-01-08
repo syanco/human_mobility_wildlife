@@ -44,8 +44,8 @@ if(interactive()) {
   
   #.list <- trimws(unlist(strsplit(ag$list,',')))
   .datP <- makePath(ag$dat)
-  .traitPF <- makePath(ag$trait)
   .outPF <- makePath(ag$out)
+  .traitPF <- makePath(ag$trait)
 }
 
 #---- Initialize Environment ----#
@@ -500,19 +500,19 @@ for(i in 1:length(int_modlist_full)){
 
 # combine dfs
 res_out_df <- do.call("bind_rows", res_out)
-write_csv(x = res_out_df, file = glue("out/niche_mod_summary_{Sys.Date()}.csv"))
+write_csv(x = res_out_df, file = file.path(.outPF, glue("niche_mod_summary_{Sys.Date()}.csv")))
 
 sg_es_df <- do.call("bind_rows", sg_effects_out) %>% 
   left_join(traits, by = c("species" = "Species")) 
-write_csv(x = sg_es_df, file = glue("out/niche_sg_effects_{Sys.Date()}.csv"))
+write_csv(x = sg_es_df, file = file.path(.outPF, glue("niche_sg_effects_{Sys.Date()}.csv")))
 
 ghm_es_df <- do.call("bind_rows", ghm_effects_out)%>% 
   left_join(traits, by = c("species" = "Species"))
-write_csv(x = ghm_es_df, file = glue("out/niche_ghm_effects_{Sys.Date()}.csv"))
+write_csv(x = ghm_es_df, file = file.path(.outPF, glue("niche_ghm_effects_{Sys.Date()}.csv")))
 
 area_es_df <- do.call("bind_rows", area_effects_out)%>% 
   left_join(traits, by = c("species" = "Species"))
-write_csv(x = area_es_df, file = glue("out/niche_area_effects_{Sys.Date()}.csv"))
+write_csv(x = area_es_df, file = file.path(.outPF, glue("niche_area_effects_{Sys.Date()}.csv")))
 
 
 # #---- Standardized Effects plot ----#

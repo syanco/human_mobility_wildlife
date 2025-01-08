@@ -152,8 +152,9 @@ for(i in 1:length(int_modlist_full)){
         data_sum_tbl <- out_add$data %>% 
           group_by(studyid) %>% 
           summarize(num_inds = n_distinct(ind_f),
-                    num_weeks = n()) %>%
-          mutate(obs_per_ind = num_weeks/num_inds) %>% 
+                    num_weeks = n_distinct(wk),
+                    num_obs = n()) %>%
+          mutate(obs_per_ind = num_obs/num_inds) %>% 
           adorn_totals() %>% 
           tableGrob()
         
@@ -347,8 +348,9 @@ for(i in 1:length(int_modlist_full)){
       data_sum_tbl <- out_int$data %>% 
         group_by(studyid) %>% 
         summarize(num_inds = n_distinct(ind_f),
-                  num_weeks = n()) %>%
-        mutate(obs_per_ind = num_weeks/num_inds) %>% 
+                  num_weeks = n_distinct(wk),
+                  num_obs = n()) %>%
+        mutate(obs_per_ind = num_obs/num_inds) %>% 
         adorn_totals() %>% 
         tableGrob()
       
@@ -543,8 +545,9 @@ for(i in 1:length(int_modlist_full)){
       data_sum_tbl <- out_add$data %>% 
         group_by(studyid) %>% 
         summarize(num_inds = n_distinct(ind_f),
-                  num_weeks = n()) %>%
-        mutate(obs_per_ind = num_weeks/num_inds) %>% 
+                  num_weeks = n_distinct(wk),
+                  num_obs = n()) %>%
+        mutate(obs_per_ind = num_obs/num_inds) %>% 
         adorn_totals() %>% 
         tableGrob()
       
