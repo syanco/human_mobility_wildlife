@@ -533,6 +533,9 @@ sg_es_df <- do.call("bind_rows", sg_effects_out) %>%
           axis.ticks.y = element_blank(),
           strip.text = element_text(size = 5),
           NULL))
+
+# change the defalt setting for saving PNGs to avoid the requirement for having a display
+options(bitmapType = "cairo")
 ggsave(sg_coef_plot_facet, file = file.path(.outPF, "facet_test.png"), width = 4, height = 12)
 # GHM
 

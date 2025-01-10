@@ -43,9 +43,13 @@ if(interactive()) {
   source('src/funs/input_parse.r')
   
   #.list <- trimws(unlist(strsplit(ag$list,',')))
-  .datP <- makePath(ag$dat)
-  .outPF <- makePath(ag$out)
-  .traitPF <- makePath(ag$trait)
+  # .datP <- makePath(ag$dat)
+  # .outPF <- makePath(ag$out)
+  # .traitPF <- makePath(ag$trait)
+
+  .datP <- file.path(.wd, "out/single_species_models")
+  .outPF <- file.path(.wd, "out/figs")
+  .traitPF <- file.path("/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
 }
 
 #---- Initialize Environment ----#

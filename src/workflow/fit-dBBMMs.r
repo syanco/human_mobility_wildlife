@@ -50,8 +50,8 @@ if(interactive()) {
   
   source(file.path(.wd, 'src/funs/input_parse.r'))
   
-  .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
+  .outPF <- makePath(ag$out)
   .nc <- ag$nc
   
 }

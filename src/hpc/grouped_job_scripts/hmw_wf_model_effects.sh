@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH -t 02:00:00
+#SBATCH -t 00:30:00
 #SBATCH --job-name hmw_wf_model_effects
-#SBATCH -c 5
+#SBATCH -c 2
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 
@@ -58,7 +58,7 @@ echo "SCRIPT COMPLETE: estimate_area_effects.r"
 
 echo "STARTING SCRIPT: select_niche_model_effects.r" 
 
-Rscript $src/select_niche_model-effects.r $wd/out/single_species_models /home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv $wd/out/figs
+Rscript $src/select_niche_model-effects.r $wd/out/single_species_models $wd/out/figs /home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv
 
 echo "SCRIPT COMPLETE: select_niche_model_effects.r"
 
