@@ -45,6 +45,9 @@ echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" >
 # Make big mem log file to track ind-year combos saved for the big mem parition
 echo "species, ind_id, study_id, year, out_type, filename, produced, out_date" > $wd/out/dbbmm_bigmem_log.csv
 
+# Make log file to track how many individual and year pairs do not exist in the event data
+echo "study_id, individual_id, year" > $wd/out/no_ind_yr_pairs.csv
+
 echo "STARTING SCRIPT: fit-dBBMMs.r"
 
 Rscript $src/fit-dBBMMs.r /tmp/mosey_mod.db $wd/out 24
