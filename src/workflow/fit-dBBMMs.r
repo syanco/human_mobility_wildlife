@@ -170,6 +170,8 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                     row.names = F, 
                     col.names = F, 
                     sep = ",")
+
+        message(glue("No paired data available for ind {ind[j]}, yr {yearvec[i]}; no dBBMM available."))
         
         # move onto the next iteration of ind and year, no use in trying to fit the dMMBB
         return(NULL)
@@ -202,13 +204,18 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
             evt_tmp <- evt_mod %>% 
               select(lon, lat, timestamp, wk)
             
-            evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, trt = evt_tmp$trt,
+            evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp,
                            proj=CRS("+proj=longlat"))
             burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
             #id "intended fix rate"
             fixmed <- median(timeLag(x=evt_mv, units="mins"))
             evt_burst <- burst(evt_mv, burstid)
-            evt_mv_t <- spTransform(evt_burst, center = T)
+
+            # transform for spTransform's default CRS, equidistant
+            # evt_mv_t <- spTransform(evt_burst, center = T)
+            # transform to an equal area CRS (Mollweide), as is advised by documentation for dbbmm documentation
+            evt_mv_t <- spTransform(evt_burst, CRSobj="+proj=moll +ellps=WGS84")
+
             # remove variance of the segments corresponding to large time gaps
             dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
                                                     location.error = if(any(is.na(evt_mod$horizontal_accuracy))){

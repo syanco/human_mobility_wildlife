@@ -170,8 +170,10 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
         # plot(UDr)
         for(j in 1:nlayers(UDr)){
           
-          # Get UD area
+          # Get UD area:
+          # 1. create a binary raster with threshold at 95%
           ud95 <- UDr[[j]]<=.95
+          # 2. calculate total area in square meters (UD units are already meters)
           a <- sum(values(ud95))*res(ud95)[1]*res(ud95)[1]
           
           # get week number
