@@ -44,3 +44,4 @@ processed_data/*
 gee_data/*
 logs/*
 out/*
+old_slurm_output/*

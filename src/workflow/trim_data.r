@@ -126,11 +126,6 @@ mod <- evt %>%
 mod2 <- mod %>%
   left_join(indtb %>% select(-study_id), # drop study_id col in ind data before joining
             by = "individual_id") %>%
-  # remove particular studies
-  filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) %>%
-  filter(study_id != 1891172051) %>%
-  filter(study_id != 1891403240) %>%
   mutate(ind_f = as.factor(individual_id),
          species = taxon_canonical_name)%>%  # create factor version of ind for REs)
   mutate(species = case_when( # correct species names
