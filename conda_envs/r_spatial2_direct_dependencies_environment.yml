@@ -1,0 +1,14 @@
+name: r_spatial2
+channels:
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - gdal
+  - libspatialite
+  - proj
+  - udunits2
+  - gxx_linux-64
+  - make
+  - gcc
+  - gxx
+prefix: /home/julietcohen/miniconda3/envs/r_spatial2
