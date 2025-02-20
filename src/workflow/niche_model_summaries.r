@@ -26,7 +26,7 @@ if(interactive()) {
   # .datP <- makePath(ag$dat)
   .datP <- file.path(.wd,'out/single_species_models')
   # .outPF <- makePath(ag$out)
-  .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
+  .dbPF <- '/tmp/mosey_mod.db'
   # vector of probabilities foer conditional estimates
   prob_vec <- c(0.2,0.8)
 }

@@ -5,12 +5,17 @@ library(glue)
 library(emmeans)
 library(bayestestR)
 
-load("out/intra_ind_models/size_intra_ind_add_mod_2024-12-16.rdata")
+.wd <- getwd()
+
+add_mod_fp <- list.files(path = file.path(.wd, "out/intra_ind_models"), pattern = "^size_intra_ind_add_mod_.*\\.rdata$", full.names = TRUE)
+load(add_mod_fp)
 add_mod <- out$mod
-add_mod
-load("out/intra_ind_models/size_intra_ind_int_mod_2024-12-16.rdata")
+message(glue("add_mod: {add_mod}"))
+
+int_mod_fp <- list.files(path = file.path(.wd, "out/intra_ind_models"), pattern = "^size_intra_ind_int_mod_.*\\.rdata$", full.names = TRUE)
+load(int_mod_fp)
 int_mod <- out$mod
-int_mod
+message(glue("int_mod: {int_mod}"))
 
 # loo(add_mod, int_mod)
 # waic(add_mod, int_mod, compare = T)
@@ -195,7 +200,7 @@ ce_int <- conditional_effects(x=int_mod,
           text = element_text(family = "Arial", color = "#4a4e4d")) +
     labs(x = "Change in human mobility", y = "Change in area size")
 )
-ggsave(filename = glue("out/area_intra_ind_int.png"), int_ce_plot, width = 5, height = 5)
+ggsave(filename = file.path(.wd, "out/area_intra_ind_int.png"), int_ce_plot, width = 5, height = 5)
 
 
 ####---- Get Marginal Effects at Median ----####
@@ -218,4 +223,6 @@ area_med_ghm <- median(int_mod$data$ghm_diff, na.rm = T)
            "LCL" = "lower.HPD",
            "HCL" = "upper.HPD") )
 
-parameters::parameters(int_mod)
+param_int_mod <- parameters::parameters(int_mod)
+
+message(glue("Parameters of int_mod: {param_int_mod}"))

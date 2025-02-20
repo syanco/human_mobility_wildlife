@@ -179,7 +179,7 @@ dbWriteTable(conn = db, name = "study_clean", value = std_out, append = FALSE, o
 
 message("Writing out sample size report...")
 
-sink("out/sample_report_after_data_clean.txt")
+sink("out/sample_report_after_clean_movement.txt")
 print(glue("Description of sample sizes after all data cleaning, prior to estimating dBBMMs and MVNH Niche Breadths"))
 print(glue("\n ##########################################################"))
 

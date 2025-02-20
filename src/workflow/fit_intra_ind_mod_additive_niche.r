@@ -53,11 +53,11 @@ if(interactive()) {
   
   source(file.path(.wd, 'src/funs/input_parse.r'))
   
+  .datPF <- makePath(ag$dat)
+  .outP <- makePath(ag$out)
   .cores <- ag$cores
   .iter  <- ag$iter
   .thin <- ag$thin
-  .datPF <- makePath(ag$dat)
-  .outP <- makePath(ag$out)
   
 }
 
@@ -104,7 +104,7 @@ message("Loading data...")
 traits <- read_csv("/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
 
 # load size data
-size <- read_csv("out/dbbmm_size.csv") %>%
+size <- read_csv(file.path(.datPF)) %>%
   filter(study_id != 351564596) %>%
   filter(study_id != 1891587670) %>% 
   mutate(ind_f = as.factor(ind_id))%>%  # create factor version of ind for REs)
@@ -243,9 +243,9 @@ mod <- brm(
   data = breadth_wide,
   family = student(),
   inits = 0,
-  cores = 4,
-  iter = 10000,
-  thin = 5
+  cores = .cores,
+  iter = .iter,
+  thin = .thin
 )
 
 #stash results into named list

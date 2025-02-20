@@ -231,7 +231,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                                           rep(5, n.locs(evt_mv_t))}else{
                                             evt_mod$horizontal_accuracy} ,
                                         time.step = (fixmed/15),
-                                        dimSize = 1000,
+                                        raster = 100,
                                         ext = 10,
                                         margin = 11, window.size = 31)
           }, error = function(e){cat(glue("ERROR: unspecified error in fitting dBBMM for ind {ind[j]}, yr {yearvec[i]}", 
@@ -258,7 +258,11 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
               save(tmp_out,
                    file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
               )
-              
+
+              # remove large object from memory
+              rm(tmp_out)
+              gc()
+
               # Make entry in log file
               outlog <- data.frame("species" = scientificname, 
                                    "ind_id" = ind[j], 

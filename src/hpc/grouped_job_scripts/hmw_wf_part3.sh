@@ -3,14 +3,14 @@
 #SBATCH -t 48:00:00
 #SBATCH --job-name hmw_wf_part3
 #SBATCH -c 27
-##SBATCH --mem 500GB  
+#SBATCH --mem 500GB  
 ##SBATCH --mem-per-cpu 100G
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 
 
 # set up paths
-export wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+export wd=/home/julietcohen/repositories/human_mobility_wildlife
 export src=$wd/src/workflow
 cd $wd
 

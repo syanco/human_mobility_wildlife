@@ -27,7 +27,7 @@ if(interactive()) {
   .datP <- file.path(.wd,'out/single_species_models')
   # .outPF <- makePath(ag$out)
   # .outPF <- file.path(.wd,'figs/area_fig.png')
-  .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
+  .dbPF <- '/tmp/mosey_mod.db'
   # vector of probabilities foer conditional estimates
   prob_vec <- c(0.2,0.8)
 }
@@ -85,10 +85,6 @@ add_sp <- word(add_modlist, 1, sep = "_")
 int_sp == add_sp
 
 # Get US Background
-# set CRS even though this does not do a true transformation because the verions of 
-# GDAL and PROJ on pod server do not permit a true transformation, so setting !
-# the CRS metadata to be the same so ggplots output does not error, and
-# the CRS of both "us" and event data are both 4326 anyway
 us <- ne_states(country = "United States of America", returnclass = "sf") #%>%
         #st_set_crs(4326)
 

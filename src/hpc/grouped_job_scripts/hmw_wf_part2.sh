@@ -1,15 +1,17 @@
 #!/bin/bash
 
-#SBATCH -t 48:00:00
+#SBATCH -t 24:00:00
 #SBATCH --job-name hmw_wf_part2
-#SBATCH -c 27
-##SBATCH --mem 500GB  
+#SBATCH --nodelist=node53
+#SBATCH --partition=largemem
+#SBATCH -c 13
+#SBATCH --mem=819G #request ~80% of the 1TB of memory for node53  
 ##SBATCH --mem-per-cpu 100G
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 
 # set up paths
-export wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+export wd=/home/julietcohen/repositories/human_mobility_wildlife
 export src=$wd/src/workflow
 cd $wd
 
@@ -50,7 +52,7 @@ echo "study_id, individual_id, year" > $wd/out/no_ind_yr_pairs.csv
 
 echo "STARTING SCRIPT: fit-dBBMMs.r"
 
-Rscript $src/fit-dBBMMs.r /tmp/mosey_mod.db $wd/out 24
+Rscript $src/fit-dBBMMs.r /tmp/mosey_mod.db $wd/out 10
 
 echo "SCRIPT COMPLETE: fit-dBBMMs.r"
 

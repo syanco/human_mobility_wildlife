@@ -44,8 +44,8 @@ if(interactive()) {
   
   source(file.path(.wd, 'src/funs/input_parse.r'))
   
-  .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
+  .outPF <- makePath(ag$out)
   .nc <- ag$nc
   
 }
@@ -63,8 +63,6 @@ suppressWarnings(
     library(DBI)
     library(RSQLite)
     library(lubridate)
-    # library(raster) # not used in this script
-    # library(move) # not used in this script
     library(doMC)
     library(foreach)
     require(MVNH)

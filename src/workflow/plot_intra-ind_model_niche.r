@@ -5,12 +5,17 @@ library(glue)
 library(emmeans)
 library(bayestestR)
 
-load("out/intra_ind_models/niche_intra_ind_add_mod_2024-12-16.rdata")
+.wd <- getwd()
+
+add_mod_fp <- list.files(path = file.path(.wd, "out/intra_ind_models"), pattern = "^niche_intra_ind_add_mod_.*\\.rdata$", full.names = TRUE)
+load(add_mod_fp)
 add_mod <- out$mod
-add_mod
-load("out/intra_ind_models/niche_intra_ind_int_mod_2024-12-16.rdata")
+message(glue("add_mod: {add_mod}"))
+
+int_mod_fp <- list.files(path = file.path(.wd, "out/intra_ind_models"), pattern = "^niche_intra_ind_int_mod_.*\\.rdata$", full.names = TRUE)
+load(int_mod_fp)
 int_mod <- out$mod
-int_mod
+message(glue("int_mod: {int_mod}"))
 
 # loo(add_mod, int_mod)
 # waic(add_mod, int_mod, compare = T)
@@ -97,7 +102,7 @@ ce_sg <- conditional_effects(x=add_mod,
           aspect.ratio = 1,
           # text = element_text(family = "Roboto", size = 20)
     ))
-ggsave(filename = glue("out/niche_intra_ind_sg.png"), sg_ce_plot,
+ggsave(filename = file.path(.wd, "out/niche_intra_ind_sg.png"), sg_ce_plot,
        width = 6, height = 6)
 
 
@@ -124,7 +129,7 @@ ce_ghm <- conditional_effects(x=add_mod,
           aspect.ratio = 1
           # text = element_text(family = "Roboto", size = 20)
     ))
-ggsave(filename = glue("out/niche_intra_ind_ghm.png"), ghm_ce_plot,
+ggsave(filename = file.path(.wd, "out/niche_intra_ind_ghm.png"), ghm_ce_plot,
        width = 6, height = 6)
 
 #--- INTERACTION MODELS
@@ -168,7 +173,7 @@ ce_int <- conditional_effects(x=int_mod,
           text = element_text(family = "Arial", color = "#4a4e4d")) +
     labs(x = "Change in human mobility", y = "Change in area size")
 )
-ggsave(filename = glue("out/niche_intra_ind_int.png"), int_ce_plot)
+ggsave(filename = file.path(.wd, "out/niche_intra_ind_int.png"), int_ce_plot)
 
 
 ####---- Get Marginal Effects at Median ----####
