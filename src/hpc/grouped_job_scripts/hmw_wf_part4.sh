@@ -3,14 +3,14 @@
 #SBATCH -t 24:00:00
 #SBATCH --job-name hmw_wf_part4
 #SBATCH -c 8
-##SBATCH --mem 500GB  
+#SBATCH --mem 500GB  
 ##SBATCH --mem-per-cpu 100G
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 
 
 # set up paths
-export wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+export wd=/home/julietcohen/repositories/human_mobility_wildlife
 export src=$wd/src/workflow
 cd $wd
  
@@ -69,5 +69,22 @@ echo "STARTING SCRIPT: fit_intra_ind_mod_interactive_niche.r"
 Rscript $src/fit_intra_ind_mod_interactive_niche.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 4 10000 5
 
 echo "SCRIPT COMPLETE: fit_intra_ind_mod_interactive_niche.r"
+
+# ------------ Plot intra-ind models space use ------------
+
+echo "STARTING SCRIPT: plot_intra-ind_model_area.r"
+
+Rscript $src/plot_intra-ind_model_area.r
+
+echo "plot_intra-ind_model_area.r complete."
+
+
+# ------------ Plot intra-ind models niche breadth ------------
+
+echo "STARTING SCRIPT: plot_intra-ind_model_niche.r"
+
+Rscript $src/plot_intra-ind_model_niche.r
+
+echo "plot_intra-ind_model_niche.r complete."
 
 echo "JOB COMPLETE: hmw_sf_part4"
