@@ -2,13 +2,11 @@
 
 #SBATCH -t 00:30:00
 #SBATCH --job-name hmw_wf_model_effects
-#SBATCH -c 2
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 
-
 # set up paths
-export wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+export wd=/home/julietcohen/repositories/human_mobility_wildlife
 export src=$wd/src/workflow
 cd $wd
 
@@ -49,7 +47,7 @@ echo "SCRIPT COMPLETE: select_space_use_model-effects.r"
 
 echo "STARTING SCRIPT: estimate_area_effects.r" 
 
-Rscript $src/estimate_area_effects.r $wd/out/single_species_models $wd/out/figs
+Rscript $src/estimate_area_effects.r $wd/out/single_species_models $wd/out/figs /home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv
 
 echo "SCRIPT COMPLETE: estimate_area_effects.r"
 
@@ -67,27 +65,6 @@ echo "SCRIPT COMPLETE: select_niche_model_effects.r"
 
 echo "STARTING SCRIPT: estimate_niche_effects.r" 
 
-Rscript $src/estimate_niche_effects.r $wd/out/single_species_models $wd/out/figs
+Rscript $src/estimate_niche_effects.r $wd/out/single_species_models $wd/out/figs /home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv
 
 echo "SCRIPT COMPLETE: estimate_niche_effects.r"
-
-
-# ------------ Rerun Area Models Summary ------------
-
-echo "STARTING SCRIPT: area_model_summaries.r"
-
-Rscript $src/area_model_summaries.r
-
-echo "SCRIPT COMPLETE: area_model_summaries.r."
-
-# ------------ Rerun Niche Models Summary ------------
-
-echo "STARTING SCRIPT: niche_model_summaries.r"
-
-Rscript $src/niche_model_summaries.r
-
-echo "SCRIPT COMPLETE: niche_model_summaries.r"
-
-
-echo "JOB COMPLETE: hmw_wf_model_effects"
-

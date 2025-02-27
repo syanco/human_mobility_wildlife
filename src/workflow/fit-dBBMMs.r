@@ -207,6 +207,11 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
             evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp,
                            proj=CRS("+proj=longlat"))
             burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
+
+            # free up memory
+            rm(evt_tmp)
+            gc()
+
             #id "intended fix rate"
             fixmed <- median(timeLag(x=evt_mv, units="mins"))
             evt_burst <- burst(evt_mv, burstid)
@@ -231,9 +236,10 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                                           rep(5, n.locs(evt_mv_t))}else{
                                             evt_mod$horizontal_accuracy} ,
                                         time.step = (fixmed/15),
-                                        raster = 100,
-                                        ext = 10,
-                                        margin = 11, window.size = 31)
+                                        raster = 250,
+                                        ext = 0.3,
+                                        margin = 11, 
+                                        window.size = 31)
           }, error = function(e){cat(glue("ERROR: unspecified error in fitting dBBMM for ind {ind[j]}, yr {yearvec[i]}", 
                                           "\n"))})
           tryCatch({
@@ -252,15 +258,16 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
           
           #-- Save individual output
           
-          message(glue("Writing output for individual {ind[j]} to file..."))
+          message(glue("Writing output for individual {ind[j]} {yearvec[i]} to file..."))
           tryCatch({
             if(exists("tmp_out")){
               save(tmp_out,
-                   file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
-              )
+                   file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata"))
 
-              # remove large object from memory
-              rm(tmp_out)
+              message(glue("Successfully wrote output for individual {ind[j]} {yearvec[i]} to file"))
+
+              # remove large objects from memory
+              rm(list = c("dbbm", "dbb_var", "evt_mod", "evt_tmp", "evt_mv", "tmp_out"))
               gc()
 
               # Make entry in log file
@@ -277,7 +284,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
             } else {
               message(glue("No tmp list in memory, nothing written to file for {ind[j]}, {yearvec[i]}"))
             }
-          }, error = function(e){cat("ERROR: couldnt save tmp_out to file", 
+          }, error = function(e){cat("ERROR: either couldnt save tmp_out to file or couldnt write outlog", 
                                      "\n")})
         } # fi data not too large
       } # fi end the check whether the filtered dataframe has any data
