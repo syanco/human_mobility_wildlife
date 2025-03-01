@@ -94,11 +94,11 @@ evt <- tbl(db,'event') %>% collect()
 # Collect individual table
 indtb <- tbl(db, "individual") %>%
          # correct test studies that have NA or just genus for taxon
-         mutate(species = case_when(
+         mutate(taxon_canonical_name = case_when(
         study_id == 2548691779 ~ "Odocoileus hemionus",
         study_id == 2575515057 ~ "Cervus elaphus",
         study_id == 1044238185 ~ "Alces alces",
-        TRUE ~ species)) %>%
+        TRUE ~ taxon_canonical_name)) %>%
         collect()
 
 # Collect study table
