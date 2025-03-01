@@ -92,7 +92,14 @@ evt <- tbl(db,'event') %>% collect()
 #-- Make a filtered table by study period
 
 # Collect individual table
-indtb <- tbl(db, "individual") %>%  collect()
+indtb <- tbl(db, "individual") %>%
+         # correct test studies that have NA or just genus for taxon
+         mutate(species = case_when(
+        study_id == 2548691779 ~ "Odocoileus hemionus",
+        study_id == 2575515057 ~ "Cervus elaphus",
+        study_id == 1044238185 ~ "Alces alces",
+        TRUE ~ species)) %>%
+        collect()
 
 # Collect study table
 stdtb <- tbl(db, "study") %>% 
