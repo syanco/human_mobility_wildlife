@@ -51,7 +51,7 @@ echo "study_id, individual_id, year" > $wd/out/no_ind_yr_pairs.csv
 
 echo "STARTING SCRIPT: fit-dBBMMs.r"
 
-Rscript $src/fit-dBBMMs.r /tmp/mosey_mod.db $wd/out 10
+Rscript $src/fit-dBBMMs.r /tmp/mosey_mod.db $wd/out 7
 
 echo "SCRIPT COMPLETE: fit-dBBMMs.r"
 
@@ -62,7 +62,7 @@ echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, ndvi, tmax, 
 
 echo "STARTING SCRIPT: calc-space-use.r"
 
-Rscript $src/calc-space-use.r $wd/out /tmp/mosey_mod.db $wd/out/dbbmm_log.csv 10 -c
+Rscript $src/calc-space-use.r $wd/out /tmp/mosey_mod.db $wd/out/dbbmm_log.csv 7 -c
 
 echo "SCRIPT COMPLETE: calc-space-use.r"
 
@@ -78,7 +78,7 @@ echo "studyid, individual, scientificname, year, status, week" > $wd/out/niche_l
 echo "STARTING SCRIPT: calc-niche-breadth.r"
 
 # Execute calc size script
-Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause.csv 10
+Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause.csv 7
 
 echo "SCRIPT COMPLETE: calc-niche-breadth.r"
 
@@ -87,7 +87,7 @@ echo "SCRIPT COMPLETE: calc-niche-breadth.r"
 
 echo "STARTING SCRIPT: fit-space-use-dot-models.r"
 
-Rscript $src/fit-space-use-dot-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_dot 10 3 10000 5
+Rscript $src/fit-space-use-dot-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_dot 7 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-space-use-dot-models.r"
 
@@ -96,7 +96,7 @@ echo "SCRIPT COMPLETE: fit-space-use-dot-models.r"
 
 echo "STARTING SCRIPT: fit-space-use-interactive-models.r"
 
-Rscript $src/fit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_interactive 10 3 10000 5
+Rscript $src/fit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_interactive 7 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-space-use-interactive-models.r"
 
@@ -105,7 +105,7 @@ echo "SCRIPT COMPLETE: fit-space-use-interactive-models.r"
 
 echo "STARTING SCRIPT: fit-space-use-additive-models.r"
 
-Rscript $src/fit-space-use-additive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_additive 10 3 10000 5
+Rscript $src/fit-space-use-additive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_additive 7 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-space-use-additive-models.r"
 

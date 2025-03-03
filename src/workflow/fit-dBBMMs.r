@@ -86,7 +86,14 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual_clean') %>% 
+indtb <- tbl(db,'individual_clean') %>%
+# note that the following species name fixes were also introduced to
+# trimming step, so can remove here when workflow is restarted
+  mutate(taxon_canonical_name = case_when(
+        study_id == 2548691779 ~ "Odocoileus hemionus",
+        study_id == 2575515057 ~ "Cervus elaphus",
+        study_id == 1044238185 ~ "Alces alces",
+        TRUE ~ taxon_canonical_name)) %>%
   collect() 
 
 indtb <- indtb[!duplicated(indtb),]
@@ -236,7 +243,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                                           rep(5, n.locs(evt_mv_t))}else{
                                             evt_mod$horizontal_accuracy} ,
                                         time.step = (fixmed/15),
-                                        raster = 250,
+                                        raster = 500,
                                         ext = 0.3,
                                         margin = 11, 
                                         window.size = 31)

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-#SBATCH -t 48:00:00
+#SBATCH -t 96:00:00
 #SBATCH --job-name hmw_wf_part3
-#SBATCH -c 27
-#SBATCH --mem 500GB  
-##SBATCH --mem-per-cpu 100G
+#SBATCH -c 32
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
-
+#SBATCH --nodelist=node53
+#SBATCH --partition=largemem
+#SBATCH --mem=900G 
 
 # set up paths
 export wd=/home/julietcohen/repositories/human_mobility_wildlife
@@ -39,7 +39,7 @@ make --version
 
 echo "STARTING SCRIPT: fit-niche-breadth-dot-models.r"
 
-Rscript $src/fit-niche-breadth-dot-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_dot 24 3 10000 5
+Rscript $src/fit-niche-breadth-dot-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_dot 7 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-niche-breadth-dot-models.r"
 
@@ -48,7 +48,7 @@ echo "SCRIPT COMPLETE: fit-niche-breadth-dot-models.r"
 
 echo "STARTING SCRIPT: fit-niche-breadth-additive-models.r"
 
-Rscript $src/fit-niche-breadth-additive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_additive 24 3 10000 5
+Rscript $src/fit-niche-breadth-additive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_additive 7 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-niche-breadth-additive-models.r"
 
@@ -57,7 +57,7 @@ echo "SCRIPT COMPLETE: fit-niche-breadth-additive-models.r"
 
 echo "STARTING SCRIPT: fit-niche-breadth-interactive-models.r"
 
-Rscript $src/fit-niche-breadth-interactive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_interactive 24 3 10000 5
+Rscript $src/fit-niche-breadth-interactive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_interactive 7 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-niche-breadth-interactive-models.r"
 
