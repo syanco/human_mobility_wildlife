@@ -148,10 +148,7 @@ fix_sum <- evt_sp %>%
 
 # retain events only for weeks that have the minimum number of fixes
 evt_fix <- evt_sp %>% 
-  semi_join(fix_sum, by = "ind_f")
-
-
-
+  semi_join(fix_sum, by = c("ind_f", "yr", "wk"))
 
 #-- Write out individual table
 

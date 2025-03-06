@@ -96,7 +96,6 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   mutate(ind_f = as.factor(ind_id))%>%  # create factor version of ind for REs)
   mutate(species = case_when( # correct species names
     study_id == 1442516400 ~ "Anser caerulescens",
-    study_id == 1233029719 ~ "Odocoileus virginianus",
     study_id == 1631574074 ~ "Ursus americanus",
     study_id == 1418296656 ~ "Numenius americanus",
     study_id == 474651680  ~ "Odocoileus virginianus",

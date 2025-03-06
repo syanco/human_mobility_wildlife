@@ -96,7 +96,6 @@ message("Loading data...")
 dbbmms <- read_csv(.varPF) %>% 
   mutate(species = case_when( # correct species names
     study_id == 1442516400 ~ "Anser caerulescens",
-    study_id == 1233029719 ~ "Odocoileus virginianus",
     study_id == 1631574074 ~ "Ursus americanus",
     study_id == 1418296656 ~ "Numenius americanus",
     study_id == 474651680  ~ "Odocoileus virginianus",
@@ -112,7 +111,6 @@ dbbmms <- read_csv(.varPF) %>%
 breadth <- read_csv(.datPF) %>%
   mutate(scientificname = case_when( # correct species names
     studyid == 1442516400 ~ "Anser caerulescens",
-    studyid == 1233029719 ~ "Odocoileus virginianus",
     studyid == 1631574074 ~ "Ursus americanus",
     studyid == 1418296656 ~ "Numenius americanus",
     studyid == 474651680  ~ "Odocoileus virginianus",
