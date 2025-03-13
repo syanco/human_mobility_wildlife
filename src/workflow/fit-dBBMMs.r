@@ -225,7 +225,8 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
 
             # transform for spTransform's default CRS, equidistant
             # evt_mv_t <- spTransform(evt_burst, center = T)
-            # transform to an equal area CRS (Mollweide), as is advised by documentation for dbbmm documentation
+
+            # transform to an equal area CRS (Mollweide), as advised by dbbmm documentation
             evt_mv_t <- spTransform(evt_burst, CRSobj="+proj=moll +ellps=WGS84")
 
             # remove variance of the segments corresponding to large time gaps
@@ -247,10 +248,74 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                                         ext = 0.3,
                                         margin = 11, 
                                         window.size = 31)
-          }, error = function(e){cat(glue("ERROR: unspecified error in fitting dBBMM for ind {ind[j]}, yr {yearvec[i]}", 
-                                          "\n"))})
-          tryCatch({
+          }, error = function(e){
             
+            # catch the exact error reported from the move package
+            error_msg <- conditionMessage(e)
+            # log infor for failed sp/ind/yr with error message
+            message(glue("ERROR fitting dBBMM for {scientificname} ind {ind[j]}, yr {yearvec[i]}:\n{error_msg}", 
+                                          "\n"))
+
+            # check if error is about ext arg being too small
+            if (grepl("grid not large enough", error_msg)) {
+              
+              message("Attempting again with larger ext value...\n")
+
+              # try fitting dbbmm again with larger ext value
+              tryCatch({
+
+                # redefine variables leading up to dbbmm
+                # make minimal df for `move`    
+                evt_tmp <- evt_mod %>% 
+                  select(lon, lat, timestamp, wk)
+                
+                evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp,
+                              proj=CRS("+proj=longlat"))
+                burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
+
+                # free up memory
+                rm(evt_tmp)
+                gc()
+
+                #id "intended fix rate"
+                fixmed <- median(timeLag(x=evt_mv, units="mins"))
+                evt_burst <- burst(evt_mv, burstid)
+
+                # transform for spTransform's default CRS, equidistant
+                # evt_mv_t <- spTransform(evt_burst, center = T)
+
+                # transform to an equal area CRS (Mollweide), as advised by dbbmm documentation
+                evt_mv_t <- spTransform(evt_burst, CRSobj="+proj=moll +ellps=WGS84")
+
+                # remove variance of the segments corresponding to large time gaps
+                dbb_var <<- brownian.motion.variance.dyn(object = evt_mv_t, 
+                                                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                                                          rep(5, n.locs(evt_mv_t))}else{
+                                                            evt_mod$horizontal_accuracy},
+                                                        margin = 11, 
+                                                        window.size = 31)
+                # remove any segments with gaps > 3x the intended fix rate
+                dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
+
+                # retry dbbmm with higher variance
+                dbbm <<- brownian.bridge.dyn(dbb_var, 
+                                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                                          rep(5, n.locs(evt_mv_t))}else{
+                                            evt_mod$horizontal_accuracy} ,
+                                        time.step = (fixmed/15),
+                                        raster = 500,
+                                        ext = 5,
+                                        margin = 11, 
+                                        window.size = 31)
+                
+                message(glue("dbbmm produced with larger ext value for {scientificname} ind {ind[j]}, yr {yearvec[i]}"))
+
+                }, error = function(e){
+                  message(glue("ERROR in second attempt: {conditionMessage(e)}", "\n"))})
+                  }})
+
+          tryCatch({
+
             if(exists("dbbm")){
               # write the dbbmm objects to list
               tmp_out <- list("dBBMM Variance" = dbb_var,
@@ -265,13 +330,13 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
           
           #-- Save individual output
           
-          message(glue("Writing output for individual {ind[j]} {yearvec[i]} to file..."))
+          message(glue("Writing output for individual {scientificname} {ind[j]} {yearvec[i]} to file..."))
           tryCatch({
             if(exists("tmp_out")){
               save(tmp_out,
                    file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata"))
 
-              message(glue("Successfully wrote output for individual {ind[j]} {yearvec[i]} to file"))
+              message(glue("Successfully wrote output for {scientificname} individual {ind[j]} {yearvec[i]} to file"))
 
               # remove large objects from memory
               rm(list = c("dbbm", "dbb_var", "evt_mod", "evt_tmp", "evt_mv", "tmp_out"))
@@ -289,7 +354,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
               write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
                           col.names = F, sep = ",")
             } else {
-              message(glue("No tmp list in memory, nothing written to file for {ind[j]}, {yearvec[i]}"))
+              message(glue("No tmp list in memory, nothing written to file for {scientificname} {ind[j]}, {yearvec[i]}"))
             }
           }, error = function(e){cat("ERROR: either couldnt save tmp_out to file or couldnt write outlog", 
                                      "\n")})

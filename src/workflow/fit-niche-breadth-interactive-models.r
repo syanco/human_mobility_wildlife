@@ -104,6 +104,7 @@ dbbmms <- read_csv(.varPF) %>%
   ))%>% 
   mutate(species = case_when(
     species == "Chen caerulescens" ~ "Anser caerulescens",
+    species == "Chen rossii" ~ "Anser rossii",
     TRUE ~ species
   ))
 
@@ -119,6 +120,7 @@ breadth <- read_csv(.datPF) %>%
   ))%>% 
   mutate(scientificname = case_when(
     scientificname == "Chen caerulescens" ~ "Anser caerulescens",
+    scientificname == "Chen rossii" ~ "Anser rossii",
     TRUE ~ scientificname
   )) %>% 
   distinct() %>%

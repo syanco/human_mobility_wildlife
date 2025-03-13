@@ -104,6 +104,7 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   ))%>% 
   mutate(species = case_when(
     species == "Chen caerulescens" ~ "Anser caerulescens",
+    species == "Chen rossii" ~ "Anser rossii",
     TRUE ~ species
   )) %>% 
   distinct()
