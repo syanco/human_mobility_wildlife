@@ -136,18 +136,18 @@ mod2 <- mod %>%
   mutate(ind_f = as.factor(individual_id),
          species = taxon_canonical_name)%>%  # create factor version of ind for REs)
   mutate(species = case_when( # correct species names
-    study_id == 1442516400 ~ "Anser caerulescens",
-    study_id == 1233029719 ~ "Odocoileus virginianus",
-    study_id == 1631574074 ~ "Ursus americanus",
-    study_id == 1418296656 ~ "Numenius americanus",
-    study_id == 474651680  ~ "Odocoileus virginianus",
-    study_id == 1044238185 ~ "Alces alces",
-    study_id == 2548691779 ~ "Odocoileus hemionus",
-    study_id == 2575515057 ~ "Cervus elaphus",
+    study_id == 1442516400 ~ "Anser caerulescens", # correct, keep
+    study_id == 1631574074 ~ "Ursus americanus", # correct, keep
+    study_id == 1418296656 ~ "Numenius americanus", # correct, keep
+    study_id == 474651680  ~ "Odocoileus virginianus", # correct, keep
+    study_id == 1044238185 ~ "Alces alces", # correct, keep
+    study_id == 2548691779 ~ "Odocoileus hemionus", # correct, keep
+    study_id == 2575515057 ~ "Cervus elaphus", # correct, keep
     TRUE ~ species
   ))%>%
   mutate(species = case_when(
-    species == "Chen caerulescens" ~ "Anser caerulescens",
+    species == "Chen caerulescens" ~ "Anser caerulescens", # correct, keep
+    species == "Chen rossii" ~ "Anser rossii", # correct, keep
     TRUE ~ species
   ))
 
