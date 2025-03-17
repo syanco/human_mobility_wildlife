@@ -113,9 +113,7 @@ size <- read_csv("out/dbbmm_size.csv") %>%
 sp_sum <- size %>%
   group_by(species) %>%
   summarize(nind = length(unique(ind_f))) %>%
-  # retain second filter operation for reruns 2025-03-05 only
-  filter(nind >= .minsp,
-         species %in% species_rerun) #require a minimum of 3 individuals
+  filter(nind >= .minsp) #require a minimum of 3 individuals
 
 # ==== Start cluster and register backend ====
 registerDoMC(.cores)

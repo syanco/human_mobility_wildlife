@@ -2,19 +2,21 @@
 #
 #CONDA: covid
 #
-# This script generates individual dynamic brownian bridge models and associated 
-# UDs for migratory  periods.
+# This script models changes in weekly area size as a function of changes in human activities
+# and environmental conditions experienced by each individual with movement data in both 2019 
+# and 2020. Human mobilitly and landscape modification are considered interactive terms. The 
+# model includes a random intercept by individual, nested within species, an autoregressive
+# covariance structure to account for temporal autocorrelation, and NDVI and TMAX as additive 
+# fixed effects.
+ 
+# See manuscript section: Behavioral plasticity of responses
 
-# TODO:  The dBBMM paramaters (e.g., window size, margin, error, etc.) are 
-# currently hardcoded.  Could be passed in as options to the script.
-# TODO: verify the volume/probability problem for write out.
-# 
 # ==== Setup ====
 
 '
 Usage:
-fit_intra_ind_mod_additive_space.r <dat> <out> <cores> [<iter> <thin>]
-fit_intra_ind_mod_additive_space.r (-h | --help)
+fit_intra_ind_mod_interactive_space.r <dat> <out> <cores> [<iter> <thin>]
+fit_intra_ind_mod_interactive_space.r (-h | --help)
 
 Parameters:
   db: path to movement databse. 
@@ -94,8 +96,7 @@ list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
 
 message("Loading data...")
 
-# Load trsait data
-# traits <- read_csv("raw_data/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
+# Load trait data
 traits <- read_csv("/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
 
 # load size data

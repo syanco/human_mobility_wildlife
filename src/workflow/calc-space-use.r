@@ -34,7 +34,6 @@ Options:
 if(interactive()) {
   library(here)
   
-  # .wd <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement'
   .wd <- getwd()
   # rd <- here::here
   
@@ -96,23 +95,9 @@ invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
 
-# evt_sg <- tbl(db, "event_sg") %>% 
-#   collect()
-
-# evt_cen <- tbl(db, "event_census") %>% 
-#   collect()
-
 ind <- tbl(db,'individual_clean') %>% 
   collect() %>% 
   pull(individual_id)
-
-# dbDisconnect(db)
-# 
-# invisible(assert_that(file.exists(.dbPF)))
-# db <- dbConnect(RSQLite::SQLite(), 
-#                 file.path(.wd,'processed_data/mosey_mod_anno.db'), 
-#                 `synchronous` = NULL)
-# invisible(assert_that(length(dbListTables(db))>0))
 
 evt_anno <- tbl(db, "event_clean") %>% 
   collect()
@@ -158,7 +143,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
   
   if(.continue){
     if(nrow(out_check) == 0){
-      message(glue("Starting ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
+      message(glue("Starting {ctf$species[i]} ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
       tryCatch({
         load(glue("{.outPF}/dbbmms/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
         
@@ -246,20 +231,20 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                           m_error),
                         nrow = 1)
           
-          message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, 
+          message(glue("Writing info for {ctf$species[i]} ind {ctf$ind_id[i]}, year {ctf$year[i]}, 
                    week {week}"))
           write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, 
                       row.names = F, col.names = F, sep = ",")
           
         } #j
       }, error = function(e){cat(glue("ERROR: Size calulation failed for individual 
-                                  {ctf$ind_id[i]}, year {ctf$year[i]}", 
+                                  {ctf$species[i]} {ctf$ind_id[i]}, year {ctf$year[i]}", 
                                   "\n"))})
     # if file hasn't been written
       } else {message(glue("Metrics for individual {ctf$ind_id[i]} already calculated and continue is set to T, gotta keep movin' on..."))}
   } else { # if continue is set to false, just do the thing
     # TODO:  this is a lot of duplicated code, should probably just make it a function but lazy...
-    message(glue("Starting ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
+    message(glue("Starting {ctf$species[i]} ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
     tryCatch({
       load(glue("{.outPF}/dbbmms/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
       
@@ -345,14 +330,14 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                         m_error),
                       nrow = 1)
         
-        message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, 
+        message(glue("Writing info for {ctf$species[i]} ind {ctf$ind_id[i]}, year {ctf$year[i]}, 
                    week {week}"))
         write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, 
                     row.names = F, col.names = F, sep = ",")
         
       } #j
     }, error = function(e){cat(glue("ERROR: Size calulation failed for individual 
-                                  {ctf$ind_id[i]}, year {ctf$year[i]}", 
+                                  {ctf$species[i]} {ctf$ind_id[i]}, year {ctf$year[i]}", 
                                   "\n"))})
     # if file hasn't been written
   }
