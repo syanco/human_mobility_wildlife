@@ -100,7 +100,7 @@ message("Loading data...")
 traits <- read_csv("/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
 
 # load size data
-size <- read_csv(file.path(datPF)) %>%
+size <- read_csv(file.path(.datPF)) %>%
   filter(study_id != 351564596) %>%
   filter(study_id != 1891587670) %>% 
   mutate(ind_f = as.factor(ind_id))%>%  # create factor version of ind for REs)

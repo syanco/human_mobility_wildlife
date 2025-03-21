@@ -131,7 +131,7 @@ breadth <- read_csv("out/niche_determinant_anthropause.csv") %>%
   ))%>% 
   mutate(scientificname = case_when(
     scientificname == "Chen caerulescens" ~ "Anser caerulescens",
-    species == "Chen rossii" ~ "Anser rossii",
+    scientificname == "Chen rossii" ~ "Anser rossii",
     TRUE ~ scientificname
   )) %>% 
   distinct() %>%
