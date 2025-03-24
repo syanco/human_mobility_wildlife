@@ -1,7 +1,4 @@
-# New version of wf-mosey_env for second run of the workflow with new species
-
-# only need remote db filepath when switch to HPC
-# dbr=/scratch/julietcohen/covid_movement/human_mobility_wildlife/processed_data/mosey_mod.db
+# New version of wf-mosey_env for run of the workflow with all species
 
 wd=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife
 src=$wd/src
