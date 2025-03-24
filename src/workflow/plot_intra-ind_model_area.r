@@ -223,4 +223,3 @@ area_med_ghm <- median(int_mod$data$ghm_diff, na.rm = T)
 
 param_int_mod <- parameters::parameters(int_mod)
 
-message(glue("Parameters of int_mod: {param_int_mod}"))

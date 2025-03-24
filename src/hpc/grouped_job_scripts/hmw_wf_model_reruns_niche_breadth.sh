@@ -14,7 +14,7 @@
 
 
 # set up paths
-export wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+export wd=/home/julietcohen/repositories/human_mobility_wildlife
 export src=$wd/src/workflow
 cd $wd
 
