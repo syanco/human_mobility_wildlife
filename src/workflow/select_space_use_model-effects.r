@@ -91,7 +91,9 @@ traits <- read_csv(.traitPF) %>%
                   migratory = "non-migratory") %>% 
           add_row(Species = "Sus scrofa",
                   class = "mammal",
-                  migratory = "non-migratory")
+                  migratory = "non-migratory") %>% 
+          mutate(Species = case_when(Species == "Chen rossii" ~ "Anser rossii",
+                                     TRUE ~ Species))
 
 
 # #-- Interaction Models --#
@@ -482,7 +484,8 @@ coeff_pal <- c("ns_add" = "#808080", "sig_add" = "#E66100", "low_int" = "#CEBEDA
 
 sg_es_df <- do.call("bind_rows", sg_effects_out) %>% 
   left_join(traits, by = c("species" = "Species")) %>% 
-  mutate(species_by_class = fct_reorder(species, class))
+  # group by 'mammal' or 'bird' class, which is character, so need .fun = first
+  mutate(species_by_class = fct_reorder(species, class, .fun = first))
 
 (sg_coef_plot <- ggplot(sg_es_df) +
     geom_point(aes(x = Estimate, y = reorder(species, Estimate), 

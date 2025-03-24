@@ -95,7 +95,9 @@ traits <- read_csv(.traitPF) %>%
           migratory = "non-migratory") %>% 
   add_row(Species = "Sus scrofa",
           class = "mammal",
-          migratory = "non-migratory")
+          migratory = "non-migratory") %>% 
+  mutate(Species = case_when(Species == "Chen rossii" ~ "Anser rossii",
+                              TRUE ~ Species))
 
 
 

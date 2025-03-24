@@ -10,12 +10,10 @@ library(bayestestR)
 add_mod_fp <- list.files(path = file.path(.wd, "out/intra_ind_models"), pattern = "^niche_intra_ind_add_mod_.*\\.rdata$", full.names = TRUE)
 load(add_mod_fp)
 add_mod <- out$mod
-message(glue("add_mod: {add_mod}"))
 
 int_mod_fp <- list.files(path = file.path(.wd, "out/intra_ind_models"), pattern = "^niche_intra_ind_int_mod_.*\\.rdata$", full.names = TRUE)
 load(int_mod_fp)
 int_mod <- out$mod
-message(glue("int_mod: {int_mod}"))
 
 # loo(add_mod, int_mod)
 # waic(add_mod, int_mod, compare = T)

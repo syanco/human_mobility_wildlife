@@ -257,9 +257,11 @@ for(i in 1:length(int_modlist_full)){
             geom_sf(data = us)+
             geom_sf(data = evt_daily, inherit.aes = F, aes(color = ind_f))+
             # geom_sf_label_repel(data = std_sf, aes(label = species), force_pull = 0, force = 10) +
-            coord_sf() + 
-            xlim(xrange) +
-            ylim(yrange)+
+            coord_sf(xlim = xrange, 
+                    ylim = yrange, 
+                    lims_method = "geometry_bbox") + 
+            #xlim(xrange) +
+            #ylim(yrange)+
             ggtitle("Individual Daily Positions")+
             theme(legend.position = "none") )
         
@@ -291,11 +293,13 @@ for(i in 1:length(int_modlist_full)){
         study_plot <- ggplot()+
           geom_sf(data = us)+
           geom_sf(data = std_sf, inherit.aes = F)+
-          xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
-          ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
+          #xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
+          #ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
           ggtitle("Study Centroids") +
           geom_sf_label_repel(data = std_sf, aes(label = study_name), force_pull = 0, force = 10) +
-          coord_sf()
+          coord_sf(xlim = c(stdbb['xmin']-1, stdbb['xmax']+1),
+                  ylim = c(stdbb['ymin']-1, stdbb['ymax']+1),
+                  lims_method = "geometry_bbox")
         
         
         #---- Assemble Plots ---#
@@ -458,9 +462,11 @@ for(i in 1:length(int_modlist_full)){
           geom_sf(data = us)+
           geom_sf(data = evt_daily, inherit.aes = F, aes(color = ind_f))+
           # geom_sf_label_repel(data = std_sf, aes(label = species), force_pull = 0, force = 10) +
-          coord_sf() + 
-          xlim(xrange) +
-          ylim(yrange)+
+          coord_sf(xlim = xrange, 
+                    ylim = yrange, 
+                    lims_method = "geometry_bbox") + 
+          #xlim(xrange) +
+          #ylim(yrange)+
           ggtitle("Individual Daily Positions")+
           theme(legend.position = "none") )
       
@@ -483,11 +489,13 @@ for(i in 1:length(int_modlist_full)){
       study_plot <- ggplot()+
         geom_sf(data = us)+
         geom_sf(data = std_sf, inherit.aes = F)+
-        xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
-        ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
+        #xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
+        #ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
         ggtitle("Study Centroids") +
         geom_sf_label_repel(data = std_sf, aes(label = study_name), force_pull = 0, force = 10) +
-        coord_sf()
+        coord_sf(xlim = c(stdbb['xmin']-1, stdbb['xmax']+1),
+                  ylim = c(stdbb['ymin']-1, stdbb['ymax']+1),
+                  lims_method = "geometry_bbox")
       
       
       #---- Assemble Plots ---#
@@ -648,9 +656,11 @@ for(i in 1:length(int_modlist_full)){
           geom_sf(data = us)+
           geom_sf(data = evt_daily, inherit.aes = F, aes(color = ind_f))+
           # geom_sf_label_repel(data = std_sf, aes(label = species), force_pull = 0, force = 10) +
-          coord_sf() + 
-          xlim(xrange) +
-          ylim(yrange)+
+          coord_sf(xlim = xrange, 
+                    ylim = yrange, 
+                    lims_method = "geometry_bbox") + 
+          #xlim(xrange) +
+          #ylim(yrange)+
           ggtitle("Individual Daily Positions")+
           theme(legend.position = "none") )
       
@@ -673,11 +683,13 @@ for(i in 1:length(int_modlist_full)){
       study_plot <- ggplot()+
         geom_sf(data = us)+
         geom_sf(data = std_sf, inherit.aes = F)+
-        xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
-        ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
+        #xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
+        #ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
         ggtitle("Study Centroids") +
         geom_sf_label_repel(data = std_sf, aes(label = study_name), force_pull = 0, force = 10) +
-        coord_sf()
+        coord_sf(xlim = c(stdbb['xmin']-1, stdbb['xmax']+1),
+                  ylim = c(stdbb['ymin']-1, stdbb['ymax']+1),
+                  lims_method = "geometry_bbox")
       
       
       #---- Assemble Plots ---#
