@@ -41,12 +41,13 @@ if(interactive()) {
   library(docopt)
   library(rprojroot)
   
-  ag <- docopt(doc, version = '0.1\n')
+  #ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
   source(file.path(.wd, 'src/funs/input_parse.r'))
   
-  .dbPF <- makePath(ag$db)
+  # .dbPF <- makePath(ag$db)
+  .dbPF <- '/tmp/mosey_mod.db'
   
 }
 
@@ -95,9 +96,9 @@ evt <- tbl(db,'event') %>% collect()
 indtb <- tbl(db, "individual") %>%
          # correct test studies that have NA or just genus for taxon
          mutate(taxon_canonical_name = case_when(
-        study_id == 2548691779 ~ "Odocoileus hemionus",
-        study_id == 2575515057 ~ "Cervus elaphus",
-        study_id == 1044238185 ~ "Alces alces",
+        study_id == 2548691779 ~ "Odocoileus hemionus", # correct, keep
+        study_id == 2575515057 ~ "Cervus elaphus", # correct, keep
+        study_id == 1044238185 ~ "Alces alces", # correct, keep
         TRUE ~ taxon_canonical_name)) %>%
         collect()
 

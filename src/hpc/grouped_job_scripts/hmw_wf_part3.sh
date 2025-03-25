@@ -1,13 +1,13 @@
 #!/bin/bash
 
-#SBATCH -t 96:00:00
+#SBATCH -t 48:00:00
 #SBATCH --job-name hmw_wf_part3
-#SBATCH -c 32
+#SBATCH -c 1
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
-#SBATCH --nodelist=node53
-#SBATCH --partition=largemem
-#SBATCH --mem=900G 
+#SBATCH --mem=500G 
+##SBATCH --nodelist=node53
+##SBATCH --partition=largemem
 
 # set up paths
 export wd=/home/julietcohen/repositories/human_mobility_wildlife

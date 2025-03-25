@@ -1,19 +1,20 @@
 #!/bin/bash
 
-#SBATCH -t 24:00:00
+#SBATCH -t 72:00:00
 #SBATCH --job-name reruns_space_use
-#SBATCH -c 5
-##SBATCH --mem 500GB  
-##SBATCH --mem-per-cpu 100G
+#SBATCH -c 10
+#SBATCH --mem=500G
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
+##SBATCH --nodelist=node53
+##SBATCH --partition=largemem 
 
 # NOTE:
 # These scripts only need to be run if the models from the prior workflow steps
 # need to be rerun, according to the check of outputs from area_model_summaries.r
 
 # set up paths
-export wd=/scratch/julietcohen/covid_movement/human_mobility_wildlife
+export wd=/home/julietcohen/repositories/human_mobility_wildlife
 export src=$wd/src/workflow
 cd $wd
 
@@ -50,7 +51,7 @@ echo "SCRIPT COMPLETE: refit-space-use-additive-models.r"
 
 echo "STARTING SCRIPT: refit-space-use-interactive-models.r"
 
-Rscript $src/refit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_additive 4
+Rscript $src/refit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_interactive 4
 
 echo "SCRIPT COMPLETE: refit-space-use-interactive-models.r"
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH -t 24:00:00
+#SBATCH -t 10:00:00
 #SBATCH --job-name hmw_wf_part1
-#SBATCH --mem 250GB  
+#SBATCH --mem 300G
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 
@@ -103,4 +103,4 @@ echo "SCRIPT COMPLETE: clean_movement.r. Archiving database in /scratch."
 
 cp /tmp/mosey_mod.db $wd/processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db
 
-echo "JOB COMPLETE: hmw_sf_part1"
+echo "JOB COMPLETE: hmw_wf_part1"

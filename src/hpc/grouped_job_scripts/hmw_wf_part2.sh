@@ -1,13 +1,14 @@
 #!/bin/bash
 
-#SBATCH -t 96:00:00
+#SBATCH -t 72:00:00
 #SBATCH --job-name hmw_wf_part2
 #SBATCH -c 32
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 #SBATCH --nodelist=node53
 #SBATCH --partition=largemem
-#SBATCH --mem=900G 
+#SBATCH --mem-per-cpu=112G
+##SBATCH --mem=900G 
 
 # set up paths
 export wd=/home/julietcohen/repositories/human_mobility_wildlife
@@ -62,7 +63,7 @@ echo "species, ind_id, study_id, year, wk, area, sg, ghm, cbg_area, ndvi, tmax, 
 
 echo "STARTING SCRIPT: calc-space-use.r"
 
-Rscript $src/calc-space-use.r $wd/out /tmp/mosey_mod.db $wd/out/dbbmm_log.csv 7 -c
+Rscript $src/calc-space-use.r $wd/out /tmp/mosey_mod.db $wd/out/dbbmm_log.csv 24 -c
 
 echo "SCRIPT COMPLETE: calc-space-use.r"
 
@@ -78,7 +79,7 @@ echo "studyid, individual, scientificname, year, status, week" > $wd/out/niche_l
 echo "STARTING SCRIPT: calc-niche-breadth.r"
 
 # Execute calc size script
-Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause.csv 7
+Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db ./out/niche_determinant_anthropause.csv 24
 
 echo "SCRIPT COMPLETE: calc-niche-breadth.r"
 
