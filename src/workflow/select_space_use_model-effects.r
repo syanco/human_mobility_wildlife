@@ -62,6 +62,7 @@ suppressWarnings(
     library(brms)
     library(grid)
     library(emmeans)
+    library(parameters)
   }))
 
 call_fun <- function(f,x,...) {
@@ -146,10 +147,10 @@ for(i in 1:length(int_modlist_full)){
       mutate(ind = str_extract(grp, "^\\d+"))
     sp <- out$species
     
-    fe <- fixef(intmod) #get fixed effects
+    fe <- parameters(intmod) #get fixed effects
     re <- posterior_summary(intmod, variable = c("sd_grp__Intercept", "sigma"))
     
-    if(fe["sg_norm:ghm_scale", "Q2.5"] < 0 & 0 < fe["sg_norm:ghm_scale", "Q97.5"]){ # if the interacton effect overalps 0...
+    if(fe$pd[fe$Parameter=="b_sg_norm:ghm_scale"] < 0.95 & fe$pd[fe$Parameter=="b_sg_norm:ghm_scale"] > 0.05){ # if the interacton effect is non-sig...
       
       #... load the additive model instead.
       if(add_modlist_full[i] != "NULL"){
@@ -159,37 +160,41 @@ for(i in 1:length(int_modlist_full)){
           mutate(ind = str_extract(grp, "^\\d+"))
         sp <- out$species
         
-        sg_effects_out[[i]] <- fixef(addmod) %>%  #get fixed effects
-          as.data.frame() %>% 
-          rename("LCL" = "Q2.5",
-                 "HCL" = "Q97.5") %>% 
-          mutate(species = sp,
-                 sig_code = case_when(
-                   LCL < 0 & HCL > 0 ~"ns_add",
-                   TRUE ~ "sig_add"
-                 ),
-                 n_weeks = nrow(add_dat),
-                 n_ind_yrs = length(unique(add_dat$grp)),
-                 n_ind = length(unique(add_dat$ind))) %>% 
-          rownames_to_column( var = "variable") %>% 
-          filter(variable == "sg_norm")
+        fe <- parameters(addmod) #get fixed effects
+        re <- posterior_summary(addmod, variable = c("sd_grp__Intercept", "sigma"))
         
-        ghm_effects_out[[i]] <- fixef(addmod) %>%  #get fixed effects
+        # Stash df in out lists
+        ghm_effects_out[[i]] <- emtrends(intmod, ~ "sg_norm", var = "ghm_scale", 
+                                         at = list("sg_norm" = sgq))  %>% 
           as.data.frame() %>% 
-          rename("LCL" = "Q2.5",
-                 "HCL" = "Q97.5") %>% 
           mutate(species = sp,
+                 ghm_cond = c("Low", "High"),
                  sig_code = case_when(
-                   LCL < 0 & HCL > 0 ~"ns_add",
-                   TRUE ~ "sig_add"
+                   ghm_cond == "Low" ~"low_int",
+                   ghm_cond == "High" ~ "high_int"
                  ),
-                 n_weeks = nrow(add_dat),
-                 n_ind_yrs = length(unique(add_dat$grp)),
-                 n_ind = length(unique(add_dat$ind))) %>% 
-          rownames_to_column( var = "variable") %>% 
-          filter(variable == "ghm_scale")
-        # re <- posterior_summary(addmod, variable = c("sd_grp__Intercept", "sigma"))
+                 n_weeks = nrow(int_dat),
+                 n_ind_yrs = length(unique(int_dat$grp)),
+                 n_ind = length(unique(int_dat$ind))) %>% 
+          rename("Estimate" = "ghm_scale.trend",
+                 "LCL" = "lower.HPD",
+                 "HCL" = "upper.HPD")
         
+        sg_effects_out[[i]] <- emtrends(intmod, ~ "ghm_scale", var = "sg_norm", 
+                                        at = list("ghm_scale" = ghmq))  %>% 
+          as.data.frame() %>% 
+          mutate(species = sp,
+                 ghm_cond = c("Low", "High"),
+                 sig_code = case_when(
+                   ghm_cond == "Low" ~"low_int",
+                   ghm_cond == "High" ~ "high_int"
+                 ),
+                 n_weeks = nrow(int_dat),
+                 n_ind_yrs = length(unique(int_dat$grp)),
+                 n_ind = length(unique(int_dat$ind))) %>% 
+          rename("Estimate" = "sg_norm.trend",
+                 "LCL" = "lower.HPD",
+                 "HCL" = "upper.HPD")    
         #- Standardized Effects Size -#
         
         # # get median conditions
@@ -201,8 +206,9 @@ for(i in 1:length(int_modlist_full)){
         #                              int_conditions = list("sg_norm" = med_sg))
         # ghm_ce <- conditional_effects(addmod, plot = F, effects = "ghm_scale",
         #                               int_conditions = list("ghm_scale" = med_ghm))
-        
-        
+        # 
+        # 
+        # 
         # # Stash df in out lists
         # sg_effects_out[[i]] <- sg_ce[[1]] %>% 
         #   mutate(species = sp,
@@ -216,33 +222,35 @@ for(i in 1:length(int_modlist_full)){
         #            lower__ < 0 & upper__ > 0 ~"ns_add",
         #            TRUE ~ "sig_add"
         #          ))
+        # 
         
-        #collect estimates  
-        coefdf <- tibble("species"= sp, # grab estimates
-                         "model" = "add",
+        coefdf <- tibble("species" = sp, 
+                         "model" = "int",
                          
                          # SG EFFECTS
-                         "sg_norm"=as.numeric(fe["sg_norm", "Estimate"]),
-                         "sg_norm_lci"=fe["sg_norm", "Q2.5"],
-                         "sg_norm_uci"=fe["sg_norm", "Q97.5"],
+                         "sg_norm"=as.numeric(fe$Median[fe$Parameter == "b_sg_norm"]),
+                         "sg_norm_lci"=fe$CI_low[fe$Parameter == "b_sg_norm"],
+                         "sg_norm_uci"=fe$CI_high[fe$Parameter == "b_sg_norm"],
+                         "sg_norm_pd"=fe$pd[fe$Parameter == "b_sg_norm"],
                          
                          # GHM EFFECTS
-                         "ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
-                         "ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
-                         "ghm_scale_uci"=fe["ghm_scale", "Q97.5"],
+                         "ghm_scale"=as.numeric(fe$Median[fe$Parameter == "b_ghm_scale"]),
+                         "ghm_scale_lci"=fe$CI_low[fe$Parameter == "b_ghm_scale"],
+                         "ghm_scale_uci"=fe$CI_high[fe$Parameter == "b_ghm_scale"],
+                         "ghm_scale_pd"=fe$pd[fe$Parameter == "b_ghm_scale"],
                          
                          # RANDOM EFFECTS
                          resid = re[2,1],
                          group = re[1,1]) %>% 
           mutate(sg_sign = case_when(sg_norm < 0 ~ "n",
                                      sg_norm >= 0 ~ "p"),
-                 sg_sig = case_when((sg_norm_lci < 0 & 0 < sg_norm_uci) ~ "N",
+                 sg_sig = case_when((sg_norm_pd < 0.95 & sg_norm_pd > 0.05) ~ "N",
                                     TRUE ~ "Y"),
                  sg_display = case_when(sg_sig == "Y" ~ sg_norm,
                                         T ~ NA_real_),
                  ghm_sign = case_when(ghm_scale < 0 ~ "n",
                                       ghm_scale >= 0 ~ "p"),
-                 ghm_sig = case_when((ghm_scale_lci < 0 & 0 < ghm_scale_uci) ~ "N",
+                 ghm_sig = case_when((ghm_scale_pd < 0.95 & ghm_scale_pd > 0.05) ~ "N",
                                      TRUE ~ "Y"),
                  ghm_display = case_when(ghm_sig == "Y" ~ ghm_scale,
                                          T ~ NA_real_),
@@ -302,50 +310,51 @@ for(i in 1:length(int_modlist_full)){
                ),
                n_weeks = nrow(int_dat),
                n_ind_yrs = length(unique(int_dat$grp)),
-               n_ind = length(unique(int_dat$ind)))%>% 
+               n_ind = length(unique(int_dat$ind))) %>% 
         rename("Estimate" = "sg_norm.trend",
                "LCL" = "lower.HPD",
                "HCL" = "upper.HPD")
-      
-      
       
       
       coefdf <- tibble("species" = sp, 
                        "model" = "int",
                        
                        # SG EFFECTS
-                       "sg_norm"=as.numeric(fe["sg_norm", "Estimate"]),
-                       "sg_norm_lci"=fe["sg_norm", "Q2.5"],
-                       "sg_norm_uci"=fe["sg_norm", "Q97.5"],
+                       "sg_norm"=as.numeric(fe$Median[fe$Parameter == "b_sg_norm"]),
+                       "sg_norm_lci"=fe$CI_low[fe$Parameter == "b_sg_norm"],
+                       "sg_norm_uci"=fe$CI_high[fe$Parameter == "b_sg_norm"],
+                       "sg_norm_pd"=fe$pd[fe$Parameter == "b_sg_norm"],
                        
                        # GHM EFFECTS
-                       "ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
-                       "ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
-                       "ghm_scale_uci"=fe["ghm_scale", "Q97.5"],
+                       "ghm_scale"=as.numeric(fe$Median[fe$Parameter == "b_ghm_scale"]),
+                       "ghm_scale_lci"=fe$CI_low[fe$Parameter == "b_ghm_scale"],
+                       "ghm_scale_uci"=fe$CI_high[fe$Parameter == "b_ghm_scale"],
+                       "ghm_scale_pd"=fe$pd[fe$Parameter == "b_ghm_scale"],
                        
                        # INTERCATION EFFECTS
-                       "inter" = fe["sg_norm:ghm_scale", "Estimate"],
-                       "inter_lci" = fe["sg_norm:ghm_scale", "Q2.5"],
-                       "inter_uci" = fe["sg_norm:ghm_scale", "Q97.5"],
+                       "inter"=as.numeric(fe$Median[fe$Parameter == "b_sg_norm:ghm_scale"]),
+                       "inter_lci"=fe$CI_low[fe$Parameter == "b_sg_norm:ghm_scale"],
+                       "inter_uci"=fe$CI_high[fe$Parameter == "b_sg_norm:ghm_scale"],
+                       "inter_pd"=fe$pd[fe$Parameter == "b_sg_norm:ghm_scale"],
                        
                        # RANDOM EFFECTS
                        resid = re[2,1],
                        group = re[1,1]) %>% 
         mutate(sg_sign = case_when(sg_norm < 0 ~ "n",
                                    sg_norm >= 0 ~ "p"),
-               sg_sig = case_when((sg_norm_lci < 0 & 0 < sg_norm_uci) ~ "N",
+               sg_sig = case_when((sg_norm_pd < 0.95 & sg_norm_pd > 0.05) ~ "N",
                                   TRUE ~ "Y"),
                sg_display = case_when(sg_sig == "Y" ~ sg_norm,
                                       T ~ NA_real_),
                ghm_sign = case_when(ghm_scale < 0 ~ "n",
                                     ghm_scale >= 0 ~ "p"),
-               ghm_sig = case_when((ghm_scale_lci < 0 & 0 < ghm_scale_uci) ~ "N",
+               ghm_sig = case_when((ghm_scale_pd < 0.95 & ghm_scale_pd > 0.05) ~ "N",
                                    TRUE ~ "Y"),
                ghm_display = case_when(ghm_sig == "Y" ~ ghm_scale,
                                        T ~ NA_real_),
                inter_sign = case_when(inter < 0 ~ "n",
                                       inter >= 0 ~ "p"),
-               inter_sig = case_when((inter_lci < 0 & 0 < inter_uci) ~ "N",
+               inter_sig = case_when((inter_pd < 0.95 & inter_pd > 0.05) ~ "N",
                                      TRUE ~ "Y"),
                inter_display = case_when(inter_sig == "Y" ~ inter,
                                          T ~ NA_real_),
@@ -363,37 +372,53 @@ for(i in 1:length(int_modlist_full)){
         mutate(ind = str_extract(grp, "^\\d+"))
       sp <- out$species
       
-      fe <- fixef(addmod) #get fixed effects
+      fe <- parameters(addmod) #get fixed effects
       re <- posterior_summary(addmod, variable = c("sd_grp__Intercept", "sigma"))
-      sg_effects_out[[i]] <- fixef(addmod) %>%  #get fixed effects
-        as.data.frame() %>% 
-        rename("LCL" = "Q2.5",
-               "HCL" = "Q97.5") %>% 
-        mutate(species = sp,
-               sig_code = case_when(
-                 LCL < 0 & HCL > 0 ~"ns_add",
-                 TRUE ~ "sig_add"
-               ),
-               n_weeks = nrow(add_dat),
-               n_ind_yrs = length(unique(add_dat$grp)),
-               n_ind = length(unique(add_dat$ind))) %>% 
-        rownames_to_column( var = "variable") %>% 
-        filter(variable == "sg_norm")
       
-      ghm_effects_out[[i]] <- fixef(addmod) %>%  #get fixed effects
+      area_effects_out[[i]] <- fe %>%  #get fixed effects
         as.data.frame() %>% 
-        rename("LCL" = "Q2.5",
-               "HCL" = "Q97.5") %>% 
         mutate(species = sp,
                sig_code = case_when(
-                 LCL < 0 & HCL > 0 ~"ns_add",
+                 pd > 0.05 & pd < 0.95 ~"ns_add",
                  TRUE ~ "sig_add"
                ),
-               n_weeks = nrow(add_dat),
-               n_ind_yrs = length(unique(add_dat$grp)),
-               n_ind = length(unique(add_dat$ind))) %>% 
-        rownames_to_column( var = "variable") %>% 
-        filter(variable == "ghm_scale")      
+               n_weeks = nrow(int_dat),
+               n_ind_yrs = length(unique(int_dat$grp)),
+               n_ind = length(unique(int_dat$ind))) %>% 
+        filter(Parameter == "b_log_area_scale")
+      
+      # Stash df in out lists
+      ghm_effects_out[[i]] <- emtrends(intmod, ~ "sg_norm", var = "ghm_scale", 
+                                       at = list("sg_norm" = sgq))  %>% 
+        as.data.frame() %>% 
+        mutate(species = sp,
+               ghm_cond = c("Low", "High"),
+               sig_code = case_when(
+                 ghm_cond == "Low" ~"low_int",
+                 ghm_cond == "High" ~ "high_int"
+               ),
+               n_weeks = nrow(int_dat),
+               n_ind_yrs = length(unique(int_dat$grp)),
+               n_ind = length(unique(int_dat$ind))) %>% 
+        rename("Estimate" = "ghm_scale.trend",
+               "LCL" = "lower.HPD",
+               "HCL" = "upper.HPD")
+      
+      sg_effects_out[[i]] <- emtrends(intmod, ~ "ghm_scale", var = "sg_norm", 
+                                      at = list("ghm_scale" = ghmq))  %>% 
+        as.data.frame() %>% 
+        mutate(species = sp,
+               ghm_cond = c("Low", "High"),
+               sig_code = case_when(
+                 ghm_cond == "Low" ~"low_int",
+                 ghm_cond == "High" ~ "high_int"
+               ),
+               n_weeks = nrow(int_dat),
+               n_ind_yrs = length(unique(int_dat$grp)),
+               n_ind = length(unique(int_dat$ind))) %>% 
+        rename("Estimate" = "sg_norm.trend",
+               "LCL" = "lower.HPD",
+               "HCL" = "upper.HPD")    
       #- Standardized Effects Size -#
       
       # # get median conditions
@@ -423,31 +448,33 @@ for(i in 1:length(int_modlist_full)){
       #          ))
       # 
       
-      coefdf <- tibble("species"= sp, # grab estimates
-                       "model" = "add",
-                       
-                       # SG EFFECTS
-                       "sg_norm"=as.numeric(fe["sg_norm", "Estimate"]),
-                       "sg_norm_lci"=fe["sg_norm", "Q2.5"],
-                       "sg_norm_uci"=fe["sg_norm", "Q97.5"],
-                       
-                       # GHM EFFECTS
-                       "ghm_scale"=as.numeric(fe["ghm_scale", "Estimate"]),
-                       "ghm_scale_lci"=fe["ghm_scale", "Q2.5"],
-                       "ghm_scale_uci"=fe["ghm_scale", "Q97.5"],
-                       
-                       # RANDOM EFFECTS
-                       resid = re[2,1],
-                       group = re[1,1]) %>% 
+      oefdf <- tibble("species" = sp, 
+                      "model" = "int",
+                      
+                      # SG EFFECTS
+                      "sg_norm"=as.numeric(fe$Median[fe$Parameter == "b_sg_norm"]),
+                      "sg_norm_lci"=fe$CI_low[fe$Parameter == "b_sg_norm"],
+                      "sg_norm_uci"=fe$CI_high[fe$Parameter == "b_sg_norm"],
+                      "sg_norm_pd"=fe$pd[fe$Parameter == "b_sg_norm"],
+                      
+                      # GHM EFFECTS
+                      "ghm_scale"=as.numeric(fe$Median[fe$Parameter == "b_ghm_scale"]),
+                      "ghm_scale_lci"=fe$CI_low[fe$Parameter == "b_ghm_scale"],
+                      "ghm_scale_uci"=fe$CI_high[fe$Parameter == "b_ghm_scale"],
+                      "ghm_scale_pd"=fe$pd[fe$Parameter == "b_ghm_scale"],
+                      
+                      # RANDOM EFFECTS
+                      resid = re[2,1],
+                      group = re[1,1]) %>% 
         mutate(sg_sign = case_when(sg_norm < 0 ~ "n",
                                    sg_norm >= 0 ~ "p"),
-               sg_sig = case_when((sg_norm_lci < 0 & 0 < sg_norm_uci) ~ "N",
+               sg_sig = case_when((sg_norm_pd < 0.95 & sg_norm_pd > 0.05) ~ "N",
                                   TRUE ~ "Y"),
                sg_display = case_when(sg_sig == "Y" ~ sg_norm,
                                       T ~ NA_real_),
                ghm_sign = case_when(ghm_scale < 0 ~ "n",
                                     ghm_scale >= 0 ~ "p"),
-               ghm_sig = case_when((ghm_scale_lci < 0 & 0 < ghm_scale_uci) ~ "N",
+               ghm_sig = case_when((ghm_scale_pd < 0.95 & ghm_scale_pd > 0.05) ~ "N",
                                    TRUE ~ "Y"),
                ghm_display = case_when(ghm_sig == "Y" ~ ghm_scale,
                                        T ~ NA_real_),
