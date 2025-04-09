@@ -174,7 +174,10 @@ for(i in 1:length(int_modlist_full)){
                  n_weeks = nrow(add_dat),
                  n_ind_yrs = length(unique(add_dat$grp)),
                  n_ind = length(unique(add_dat$ind))) %>% 
-          filter(Parameter == "b_sg_norm")
+          filter(Parameter == "b_sg_norm")%>% 
+          rename("Estimate" = "Median",
+                 "LCL" = "CI_low",
+                 "HCL" = "CI_high")
         
         ghm_effects_out[[i]] <- parameters(addmod) %>%  #get fixed effects
           as.data.frame() %>% 
@@ -186,7 +189,10 @@ for(i in 1:length(int_modlist_full)){
                  n_weeks = nrow(add_dat),
                  n_ind_yrs = length(unique(add_dat$grp)),
                  n_ind = length(unique(add_dat$ind))) %>% 
-          filter(Parameter == "b_ghm_scale")
+          filter(Parameter == "b_ghm_scale")%>% 
+          rename("Estimate" = "Median",
+                 "LCL" = "CI_low",
+                 "HCL" = "CI_high")
         
         
         coefdf <- tibble("species" = sp, 
@@ -348,7 +354,10 @@ for(i in 1:length(int_modlist_full)){
                n_weeks = nrow(add_dat),
                n_ind_yrs = length(unique(add_dat$grp)),
                n_ind = length(unique(add_dat$ind))) %>% 
-        filter(Parameter == "b_sg_norm")
+        filter(Parameter == "b_sg_norm") %>% 
+        rename("Estimate" = "Median",
+               "LCL" = "CI_low",
+               "HCL" = "CI_high")
       
       ghm_effects_out[[i]] <- parameters(addmod) %>%  #get fixed effects
         as.data.frame() %>% 
@@ -360,7 +369,10 @@ for(i in 1:length(int_modlist_full)){
                n_weeks = nrow(add_dat),
                n_ind_yrs = length(unique(add_dat$grp)),
                n_ind = length(unique(add_dat$ind))) %>% 
-        filter(Parameter == "b_ghm_scale")
+        filter(Parameter == "b_ghm_scale")%>% 
+        rename("Estimate" = "Median",
+               "LCL" = "CI_low",
+               "HCL" = "CI_high")
       
       
       coefdf <- tibble("species" = sp, 
