@@ -24,14 +24,14 @@ Options:
 
 #---- Input Parameters ----#
 if(interactive()) {
-  library(here)
+  #library(here)
   
-  .wd <- getwd()
-  
-  .datP <- file.path(.wd,'out/single_species_models')
-  .outPF <- file.path(.wd,'out/figs')
-  .traitPF <- file.path(.wd, 'raw_data/anthropause_data_sheet.csv')
-  
+  #.wd <- getwd()
+  .wd <- '~/repositories/human_mobility_wildlife'
+  .datP <- file.path(.wd,'out_old/single_species_models')
+  .traitPF <- '/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv'
+  .outPF <- file.path(.wd,'out_old/figs_pd_change/')
+
 } else {
   library(docopt)
   # library(rprojroot)
@@ -63,6 +63,7 @@ suppressWarnings(
     library(grid)
     library(emmeans)
     library(parameters)
+    library(glue)
   }))
 
 call_fun <- function(f,x,...) {
