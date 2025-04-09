@@ -24,13 +24,13 @@ Options:
 
 #---- Input Parameters ----#
 if(interactive()) {
-  library(here)
+  # library(here)
   
-  .wd <- getwd()
-  
-  .datP <- file.path(.wd,'out/single_species_models')
-  .traitPF <- file.path(.wd, 'raw_data/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv')
-  .outPF <- file.path(.wd,'figs/area_fig.png')
+  # .wd <- getwd()
+  .wd <- '~/repositories/human_mobility_wildlife'
+  .datP <- file.path(.wd,'out_old/single_species_models')
+  .traitPF <- '/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv'
+  .outPF <- file.path(.wd,'out_old/figs_pd_change/')
   
 } else {
   library(docopt)
@@ -47,8 +47,8 @@ if(interactive()) {
   # .outPF <- makePath(ag$out)
   # .traitPF <- makePath(ag$trait)
 
-  .datP <- file.path(.wd, "out/single_species_models")
-  .outPF <- file.path(.wd, "out/figs")
+  .datP <- file.path(.wd, "out_old/single_species_models")
+  .outPF <- file.path(.wd, "out_old/figs_pd_change")
   .traitPF <- file.path("/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
 }
 
@@ -67,6 +67,7 @@ suppressWarnings(
     library(grid)
     library(emmeans)
     library(parameters)
+    library(glue)
   }))
 
 call_fun <- function(f,x,...) {
@@ -181,7 +182,11 @@ for(i in 1:length(int_modlist_full)){
                  n_ind_yrs = length(unique(int_dat$grp)),
                  n_ind = length(unique(int_dat$ind))) %>% 
           filter(Parameter == "b_log_area_scale")
-        
+
+        #get interaction quantiled
+        ghmq <- quantile(out$data$ghm_scale, probs = c(0.05, 0.95), na.rm = T)
+        sgq <- quantile(out$data$sg_norm, probs = c(0.05, 0.95), na.rm = T)
+
         # Stash df in out lists
         ghm_effects_out[[i]] <- emtrends(intmod, ~ "sg_norm", var = "ghm_scale", 
                                          at = list("sg_norm" = sgq))  %>% 
