@@ -97,7 +97,18 @@ list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
 message("Loading data...")
 
 # Load trait data
-traits <- read_csv("/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv")
+traits <- read_csv("/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv") %>%
+  add_row(Species = "Procyon lotor",
+          class = "mammal",
+          migratory = "non-migratory") %>% 
+  add_row(Species = "Spilogale putorius",
+          class = "mammal",
+          migratory = "non-migratory") %>% 
+  add_row(Species = "Sus scrofa",
+          class = "mammal",
+          migratory = "non-migratory") %>% 
+  mutate(Species = case_when(Species == "Chen rossii" ~ "Anser rossii",
+                             TRUE ~ Species))
 
 # load size data
 size <- read_csv(file.path(.datPF)) %>%

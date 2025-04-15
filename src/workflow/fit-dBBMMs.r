@@ -224,10 +224,10 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
             evt_burst <- burst(evt_mv, burstid)
 
             # transform for spTransform's default CRS, equidistant
-            # evt_mv_t <- spTransform(evt_burst, center = T)
+            evt_mv_t <- spTransform(evt_burst, center = T)
 
             # transform to an equal area CRS (Mollweide), as advised by dbbmm documentation
-            evt_mv_t <- spTransform(evt_burst, CRSobj="+proj=moll +ellps=WGS84")
+            # evt_mv_t <- spTransform(evt_burst, CRSobj="+proj=moll +ellps=WGS84")
 
             # remove variance of the segments corresponding to large time gaps
             dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
@@ -244,8 +244,10 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
                                           rep(5, n.locs(evt_mv_t))}else{
                                             evt_mod$horizontal_accuracy} ,
                                         time.step = (fixmed/15),
-                                        raster = 500,
-                                        ext = 0.3,
+                                        # raster = 500,
+                                        dimSize = 1000,
+                                        # ext = 0.3,
+                                        ext = 10,
                                         margin = 11, 
                                         window.size = 31)
           }, error = function(e){
@@ -259,56 +261,57 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
             # check if error is about ext arg being too small
             if (grepl("grid not large enough", error_msg)) {
               
-              message("Attempting again with larger ext value...\n")
+              message("Not attempting again with larger ext value\n")
 
               # try fitting dbbmm again with larger ext value
               tryCatch({
 
                 # redefine variables leading up to dbbmm
                 # make minimal df for `move`    
-                evt_tmp <- evt_mod %>% 
-                  select(lon, lat, timestamp, wk)
+                #evt_tmp <- evt_mod %>% 
+                #  select(lon, lat, timestamp, wk)
                 
-                evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp,
-                              proj=CRS("+proj=longlat"))
-                burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
+                #evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp,
+                #              proj=CRS("+proj=longlat"))
+                #burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
 
                 # free up memory
-                rm(evt_tmp)
-                gc()
+                #rm(evt_tmp)
+                #gc()
 
                 #id "intended fix rate"
-                fixmed <- median(timeLag(x=evt_mv, units="mins"))
-                evt_burst <- burst(evt_mv, burstid)
+                #fixmed <- median(timeLag(x=evt_mv, units="mins"))
+                #evt_burst <- burst(evt_mv, burstid)
 
                 # transform for spTransform's default CRS, equidistant
                 # evt_mv_t <- spTransform(evt_burst, center = T)
 
                 # transform to an equal area CRS (Mollweide), as advised by dbbmm documentation
-                evt_mv_t <- spTransform(evt_burst, CRSobj="+proj=moll +ellps=WGS84")
+                #evt_mv_t <- spTransform(evt_burst, CRSobj="+proj=moll +ellps=WGS84")
 
                 # remove variance of the segments corresponding to large time gaps
-                dbb_var <<- brownian.motion.variance.dyn(object = evt_mv_t, 
-                                                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
-                                                          rep(5, n.locs(evt_mv_t))}else{
-                                                            evt_mod$horizontal_accuracy},
-                                                        margin = 11, 
-                                                        window.size = 31)
+                #dbb_var <<- brownian.motion.variance.dyn(object = evt_mv_t, 
+                #                                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                #                                          rep(5, n.locs(evt_mv_t))}else{
+                #                                            evt_mod$horizontal_accuracy},
+                #                                        margin = 11, 
+                #                                        window.size = 31)
                 # remove any segments with gaps > 3x the intended fix rate
-                dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
+                #dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
 
                 # retry dbbmm with higher variance
-                dbbm <<- brownian.bridge.dyn(dbb_var, 
-                                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
-                                          rep(5, n.locs(evt_mv_t))}else{
-                                            evt_mod$horizontal_accuracy} ,
-                                        time.step = (fixmed/15),
-                                        raster = 500,
-                                        ext = 5,
-                                        margin = 11, 
-                                        window.size = 31)
+                #dbbm <<- brownian.bridge.dyn(dbb_var, 
+                #                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                #                          rep(5, n.locs(evt_mv_t))}else{
+                #                            evt_mod$horizontal_accuracy} ,
+                #                        time.step = (fixmed/15),
+                #                        raster = 500,
+                #                        ext = 5,
+                #                        margin = 11, 
+                #                        window.size = 31)
                 
-                message(glue("dbbmm produced with larger ext value for {scientificname} ind {ind[j]}, yr {yearvec[i]}"))
+                # message(glue("dbbmm produced with larger ext value for {scientificname} ind {ind[j]}, yr {yearvec[i]}"))
+                message("Moving on")
 
                 }, error = function(e){
                   message(glue("ERROR in second attempt: {conditionMessage(e)}", "\n"))})
