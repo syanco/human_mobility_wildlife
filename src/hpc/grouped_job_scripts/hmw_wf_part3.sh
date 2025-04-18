@@ -2,10 +2,10 @@
 
 #SBATCH -t 48:00:00
 #SBATCH --job-name hmw_wf_part3
-#SBATCH -c 1
+#SBATCH -c 17
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
-#SBATCH --mem=500G 
+#SBATCH --mem=300G 
 ##SBATCH --nodelist=node53
 ##SBATCH --partition=largemem
 
@@ -13,6 +13,9 @@
 export wd=/home/julietcohen/repositories/human_mobility_wildlife
 export src=$wd/src/workflow
 cd $wd
+
+# copy database to /tmp on worker node
+cp $wd/processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db /tmp/mosey_mod.db
 
 module load R/4.3.1
 
@@ -37,18 +40,18 @@ make --version
 
 # ------------ HPC step 15: Fit niche breadth models part 1 ------------
 
-echo "STARTING SCRIPT: fit-niche-breadth-dot-models.r"
+#echo "STARTING SCRIPT: fit-niche-breadth-dot-models.r"
 
-Rscript $src/fit-niche-breadth-dot-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_dot 7 3 10000 5
+#Rscript $src/fit-niche-breadth-dot-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_dot 14 3 10000 5
 
-echo "SCRIPT COMPLETE: fit-niche-breadth-dot-models.r"
+#echo "SCRIPT COMPLETE: fit-niche-breadth-dot-models.r"
 
 
 # ------------ HPC step 16: Fit niche breadth models part 2 ------------
 
 echo "STARTING SCRIPT: fit-niche-breadth-additive-models.r"
 
-Rscript $src/fit-niche-breadth-additive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_additive 7 3 10000 5
+Rscript $src/fit-niche-breadth-additive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_additive 14 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-niche-breadth-additive-models.r"
 
@@ -57,7 +60,7 @@ echo "SCRIPT COMPLETE: fit-niche-breadth-additive-models.r"
 
 echo "STARTING SCRIPT: fit-niche-breadth-interactive-models.r"
 
-Rscript $src/fit-niche-breadth-interactive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_interactive 7 3 10000 5
+Rscript $src/fit-niche-breadth-interactive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_interactive 14 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-niche-breadth-interactive-models.r"
 

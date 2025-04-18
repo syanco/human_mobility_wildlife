@@ -5,9 +5,9 @@
 #SBATCH -c 10
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
-#SBATCH --nodelist=node53
-#SBATCH --partition=largemem
-#SBATCH --mem=900G
+##SBATCH --nodelist=node53
+##SBATCH --partition=largemem
+#SBATCH --mem=300G
 
 
 # set up paths
@@ -71,21 +71,12 @@ Rscript $src/fit_intra_ind_mod_interactive_niche.r $wd/out/dbbmm_size.csv $wd/ou
 
 echo "SCRIPT COMPLETE: fit_intra_ind_mod_interactive_niche.r"
 
-# ------------ Plot intra-ind models space use ------------
+# ------------ HPC step 22: Intra-Individual Analysis - random slopes ------------
 
-echo "STARTING SCRIPT: plot_intra-ind_model_area.r"
+echo "STARTING SCRIPT: fit_intra_ind_mod_random_slopes.r"
 
-Rscript $src/plot_intra-ind_model_area.r
+Rscript $src/fit_intra_ind_mod_random_slopes.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 7 10000 5
 
-echo "plot_intra-ind_model_area.r complete."
-
-
-# ------------ Plot intra-ind models niche breadth ------------
-
-echo "STARTING SCRIPT: plot_intra-ind_model_niche.r"
-
-Rscript $src/plot_intra-ind_model_niche.r
-
-echo "plot_intra-ind_model_niche.r complete."
+echo "SCRIPT COMPLETE: fit_intra_ind_mod_random_slopes.r"
 
 echo "JOB COMPLETE: hmw_sf_part4"

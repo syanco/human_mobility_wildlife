@@ -13,7 +13,7 @@ export src=$wd/src/workflow
 cd $wd
 
 # copy database to /tmp on worker node
-cp $wd/processed_data/mosey_mod.db /tmp/
+cp $wd/processed_data/mosey_mod.db /tmp/mosey_mod.db
 
 module load R/4.3.1
 
