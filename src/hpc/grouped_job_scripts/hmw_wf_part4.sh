@@ -2,7 +2,7 @@
 
 #SBATCH -t 24:00:00
 #SBATCH --job-name hmw_wf_part4
-#SBATCH -c 10
+#SBATCH -c 14
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 ##SBATCH --nodelist=node53
@@ -40,7 +40,7 @@ make --version
 
 echo "STARTING SCRIPT: fit_intra_ind_mod_additive_space.r"
 
-Rscript $src/fit_intra_ind_mod_additive_space.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 7 10000 5
+Rscript $src/fit_intra_ind_mod_additive_space.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 10 10000 5
 
 echo "SCRIPT COMPLETE: fit_intra_ind_mod_additive_space.r"
 
@@ -49,7 +49,7 @@ echo "SCRIPT COMPLETE: fit_intra_ind_mod_additive_space.r"
 
 echo "STARTING SCRIPT: fit_intra_ind_mod_interactive_space.r"
 
-Rscript $src/fit_intra_ind_mod_interactive_space.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 7 10000 5
+Rscript $src/fit_intra_ind_mod_interactive_space.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 10 10000 5
 
 echo "SCRIPT COMPLETE: fit_intra_ind_mod_interactive_space.r"
 
@@ -58,7 +58,7 @@ echo "SCRIPT COMPLETE: fit_intra_ind_mod_interactive_space.r"
 
 echo "STARTING SCRIPT: fit_intra_ind_mod_additive_niche.r"
 
-Rscript $src/fit_intra_ind_mod_additive_niche.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 7 10000 5
+Rscript $src/fit_intra_ind_mod_additive_niche.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 10 10000 5
 
 echo "SCRIPT COMPLETE: fit_intra_ind_mod_additive_niche.r"
 
@@ -67,16 +67,16 @@ echo "SCRIPT COMPLETE: fit_intra_ind_mod_additive_niche.r"
 
 echo "STARTING SCRIPT: fit_intra_ind_mod_interactive_niche.r"
 
-Rscript $src/fit_intra_ind_mod_interactive_niche.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 7 10000 5
+Rscript $src/fit_intra_ind_mod_interactive_niche.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 10 10000 5
 
 echo "SCRIPT COMPLETE: fit_intra_ind_mod_interactive_niche.r"
 
 # ------------ HPC step 22: Intra-Individual Analysis - random slopes ------------
 
-echo "STARTING SCRIPT: fit_intra_ind_mod_random_slopes.r"
+#echo "STARTING SCRIPT: fit_intra_ind_mod_random_slopes.r"
 
-Rscript $src/fit_intra_ind_mod_random_slopes.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 7 10000 5
+#Rscript $src/fit_intra_ind_mod_random_slopes.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 7 10000 5
 
-echo "SCRIPT COMPLETE: fit_intra_ind_mod_random_slopes.r"
+#echo "SCRIPT COMPLETE: fit_intra_ind_mod_random_slopes.r"
 
 echo "JOB COMPLETE: hmw_sf_part4"

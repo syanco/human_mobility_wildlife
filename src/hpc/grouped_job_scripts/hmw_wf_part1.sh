@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 10:00:00
+#SBATCH -t 05:00:00
 #SBATCH --job-name hmw_wf_part1
 #SBATCH --mem 300G
 #SBATCH --mail-type ALL

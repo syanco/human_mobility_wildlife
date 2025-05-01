@@ -2,7 +2,7 @@
 
 #SBATCH -t 48:00:00
 #SBATCH --job-name hmw_wf_part3
-#SBATCH -c 17
+#SBATCH -c 22
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 #SBATCH --mem=300G 
@@ -51,7 +51,7 @@ make --version
 
 echo "STARTING SCRIPT: fit-niche-breadth-additive-models.r"
 
-Rscript $src/fit-niche-breadth-additive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_additive 14 3 10000 5
+Rscript $src/fit-niche-breadth-additive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_additive 18 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-niche-breadth-additive-models.r"
 
@@ -60,7 +60,7 @@ echo "SCRIPT COMPLETE: fit-niche-breadth-additive-models.r"
 
 echo "STARTING SCRIPT: fit-niche-breadth-interactive-models.r"
 
-Rscript $src/fit-niche-breadth-interactive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_interactive 14 3 10000 5
+Rscript $src/fit-niche-breadth-interactive-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_interactive 18 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-niche-breadth-interactive-models.r"
 

@@ -2,8 +2,8 @@
 #       COVID-19 Animal Movement                                                                               #
 ################################################################################################################
 
-# This script generates individual n-dimensional hypervolumes (Lu et al. 2021)
-# on weekly time scales.
+# This script is a sensitivity analysis for the  individual n-dimensional 
+# hypervolumes (Lu et al. 2021) on weekly time scales.
 
 # ==== Setup ====
 
@@ -47,8 +47,8 @@ if(interactive()) {
   
   source(file.path(.wd, 'src/funs/input_parse.r'))
   
-  .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
+  .outPF <- makePath(ag$out)
   .nc <- ag$nc
   .samp_size <- ag$ss
   
@@ -85,13 +85,11 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual') %>%  # Load a tibble with all individual animals
+indtb <- tbl(db,'individual_clean') %>%  # Load a tibble with all individual animals
   collect()
 
-# Load the entire event table:
-# evt0 <- tbl(db, "event_clean")%>%
-#   collect()
-evt0 <- tbl(db, "event_trim") %>%
+# Load the entire clean event table:
+evt0 <- tbl(db, "event_clean") %>%
   collect()
 
 message("Disconnecting from database...")
@@ -106,7 +104,7 @@ yearvec <- c("2019", "2020")
 
 # Add empty columns study:
 
-# log <- read_csv(glue("{.outPF}/niche_log.csv")) #####
+# log <- read_csv(glue("{.outPF}/niche_subsample_log.csv")) #####
 
 registerDoMC(.nc)
 
@@ -162,7 +160,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
         status = 0)
       
       # logfile_template$studyid <- studyid
-      write.table(tmp_dummy_fail, glue("./out/niche_log.csv"), append = T, 
+      write.table(tmp_dummy_fail, glue("./out/niche_subsample_log.csv"), append = T, 
                   row.names = F, col.names = F, sep = ",")
       
       
@@ -222,7 +220,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
             
             # logfile_template$studyid <- studyid
             write.table(tmp_dummy_success, 
-                        glue("./out/niche_log.csv"), 
+                        glue("./out/niche_subsample_log.csv"), 
                         append = T, 
                         row.names = F, 
                         col.names = F, 
@@ -238,7 +236,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
               week = w)
             
             # logfile_template$studyid <- studyid
-            write.table(tmp_dummy_fail, glue("./out/niche_log.csv"), 
+            write.table(tmp_dummy_fail, glue("./out/niche_subsample_log.csv"), 
                         append = T, row.names = F, 
                         col.names = F, sep = ",")
             

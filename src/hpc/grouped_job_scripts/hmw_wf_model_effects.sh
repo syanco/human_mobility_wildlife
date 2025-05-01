@@ -4,8 +4,6 @@
 #SBATCH --job-name hmw_wf_model_effects
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
-#SBATCH --nodelist=node53
-#SBATCH --partition=largemem
 
 # set up paths
 export wd=/home/julietcohen/repositories/human_mobility_wildlife
@@ -40,7 +38,7 @@ make --version
 
 echo "STARTING SCRIPT: select_space_use_model-effects.r" 
 
-Rscript $src/select_space_use_model-effects.r $wd/out/single_species_models $wd/out/figs /home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv
+Rscript $src/select_space_use_model-effects.r $wd/out/single_species_models $wd/out/figs_pd_change /home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv
 
 echo "SCRIPT COMPLETE: select_space_use_model-effects.r"
 
@@ -58,7 +56,7 @@ echo "SCRIPT COMPLETE: estimate_area_effects.r"
 
 echo "STARTING SCRIPT: select_niche_model_effects.r" 
 
-Rscript $src/select_niche_model-effects.r $wd/out/single_species_models $wd/out/figs /home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv
+Rscript $src/select_niche_model-effects.r $wd/out/single_species_models $wd/out/figs_pd_change /home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv
 
 echo "SCRIPT COMPLETE: select_niche_model_effects.r"
 

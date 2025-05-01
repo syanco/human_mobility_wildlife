@@ -34,15 +34,11 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- getwd()
-  # rd <- here::here
-  
-  .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .wd <- '/home/julietcohen/repositories/human_mobility_wildlife'
+  .outPF <- file.path(.wd,'out_size_test')
+  .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
   .ctf <- file.path(.wd, "out/dbbmm_log.csv")
   .continue = T
-  
-  .nc <- 4
   
 } else {
   library(docopt)
