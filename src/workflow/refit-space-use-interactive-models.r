@@ -82,7 +82,7 @@ source(file.path(.wd,'src/funs/auto/breezy_funs.r'))
 
 #- Load Control File 
 
-mcmc_ctf <- read_csv(file.path(.wd, "ctfs/area_int_rerun_ctf.csv"),
+mcmc_ctf <- read_csv(file.path(.wd, "ctfs/area_rerun_ctf.csv"),
                      col_types = "cnnnn") %>% 
   filter(run == 1)
 
@@ -135,10 +135,10 @@ foreach(i = 1:nrow(mcmc_ctf), .errorhandling = "pass", .inorder = F) %dopar% {
   message(glue("Starting model for {sp}..."))
 
   # Unpack params
-  .iter <- ifelse(is.na(mcmc_ctf$iter[i]), 5000, mcmc_ctf$iter[i])
+  .iter <- ifelse(is.na(mcmc_ctf$iter[i]), 10000, mcmc_ctf$iter[i])
   .thin <- ifelse(is.na(mcmc_ctf$thin[i]), 5, mcmc_ctf$thin[i])
-  .warmup <- ifelse(is.na(mcmc_ctf$warmup[i]), 2000, mcmc_ctf$warmup[i])
-  .adapt_delta <- ifelse(is.na(mcmc_ctf$adapt_delta[i]), 0.8, mcmc_ctf$adapt_delta[i])
+  .warmup <- ifelse(is.na(mcmc_ctf$warmup[i]), 5000, mcmc_ctf$warmup[i])
+  .adapt_delta <- ifelse(is.na(mcmc_ctf$adapt_delta[i]), 0.99, mcmc_ctf$adapt_delta[i])
   
   #filter data
   dat <- size %>%
