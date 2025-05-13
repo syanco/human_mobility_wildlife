@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript 
 #
-# This script models changes in weekly area size as a function of changes in human activities
+# This script models random slopes within species as a function of changes in human activities
 # and environmental conditions experienced by each individual with movement data in both 2019 
-# and 2020. Human mobilitly and landscape modification are considered additive terms. The 
+# and 2020. Human mobility and landscape modification are considered additive terms. The 
 # model includes a random intercept by species, a random intercept by individual, an autoregressive
 # covariance structure to account for temporal autocorrelation, and NDVI and TMAX as additive 
 # fixed effects.
@@ -45,9 +45,9 @@ if(interactive()) {
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
   .outP <- file.path(.wd,'out/intra_ind_models')
   
-  .cores <- 4
+  .cores <- 1
   .iter <- 1000
-  .thin <- 1
+  .thin <- 2
   
 } else {
   library(docopt)
@@ -199,19 +199,11 @@ size_wide <- size_paired %>%
   filter(!is.nan(sg_diff)) %>% 
   filter(!is.na(sg_diff))
 
-# # get sample size per sp
-# size_wide %>% 
-#   group_by(species) %>% 
-#   summarize(nind = n_distinct(ind_id)) %>% 
-#   arrange(-nind)
-
-
 
 #---- Load Data ----#
 
 message("Starting that modeling magic...")
-
-form <- bf(breadth_diff ~ area_diff + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1 + x | species) + (1 | species:ind) + ar(time = wk, gr = ind_f))
+form <- bf(size_diff ~ 1 + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1 + sg_diff + ghm_diff + ndvi_diff + tmax_diff | species) + (1 | species:ind_f) + ar(time = wk, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
@@ -236,7 +228,7 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/size_intra_ind_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/size_rs_intra_ind_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 
