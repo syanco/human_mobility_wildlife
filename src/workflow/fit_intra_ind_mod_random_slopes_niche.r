@@ -17,7 +17,6 @@
 # https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html
 # we will be able to tell from the params output if it did what we think
 # it may struggle to converge, then we fiddle with MCMC (inc iterations)
-# test locally, reduce number of iterations so it can run on my computer first
 
 # ==== Setup ====
 
@@ -51,7 +50,6 @@ if(interactive()) {
   
 } else {
   library(docopt)
-  # library(rprojroot)
   
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
@@ -76,13 +74,8 @@ source(file.path(.wd,'src/startup.r'))
 # Load packages
 suppressWarnings(
   suppressPackageStartupMessages({
-    # library(DBI)
-    # library(RSQLite)
     library(lubridate)
-    # library(raster)
-    # library(move)
     library(doMC)
-    library(foreach)
     library(brms)
   }))
 
@@ -188,8 +181,6 @@ breadth_paired <- breadth %>%
   filter(individual %in% paired_vec) %>% 
   #filter to mammals only
   left_join(traits, by = c("scientificname" = "Species")) %>%
-  #filter(Family == "Cervidae" | Family == "Canidae" | Family == "Ursidae" |
-  #         Family == "Felidae" | Family == "Antilocapridae" | Family == "Bovidae") %>% 
   mutate(diet = case_when(Diet.PlantO >= 50 ~ "Herbivore",
                           Diet.Fruit >= 50 ~ "Frugivore",
                           Diet.Scav >= 50 ~ "Savenger",
@@ -249,10 +240,11 @@ mod <- brm(
   form,
   data = breadth_wide,
   family = student(),
-  inits = 0,
+  init = 0,
   cores = .cores,
   iter = .iter,
-  thin = .thin
+  thin = .thin,
+  control = list(adapt_delta = 0.99)
 )
 
 #stash results into named list

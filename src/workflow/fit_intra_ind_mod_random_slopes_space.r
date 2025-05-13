@@ -215,10 +215,12 @@ mod <- brm(
   form,
   data = size_wide,
   family = student(),
-  inits = 0,
+  init = 0,
   cores = .cores,
   iter = .iter,
-  thin = .thin
+  thin = .thin,
+  warmup = 3000
+  control = list(adapt_delta = 0.99)
 )
 
 #stash results into named list
@@ -228,7 +230,7 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/size_rs_intra_ind_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/size_intra_ind_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 

@@ -2,7 +2,7 @@
 
 #SBATCH -t 24:00:00
 #SBATCH --job-name random_slopes
-#SBATCH -c 32
+#SBATCH -c 15
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 #SBATCH --mem=300G
@@ -34,20 +34,29 @@ echo "Make version:"
 make --version
 
 
-# ------------ HPC step 19: Intra-Individual Analysis - Area part 1 ------------
+# ------------ Intra-Individual Analysis Random Slopes Niche ------------
 
-echo "STARTING SCRIPT: fit_intra_ind_mod_random_slopes.r"
+echo "STARTING SCRIPT: fit_intra_ind_mod_random_slopes_niche.r"
 
-Rscript $src/fit_intra_ind_mod_random_slopes_niche.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 7 10000 5
+Rscript $src/fit_intra_ind_mod_random_slopes_niche.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 10 10000 5
 
-echo "SCRIPT COMPLETE: fit_intra_ind_mod_random_slopes.r"
+echo "SCRIPT COMPLETE: fit_intra_ind_mod_random_slopes_niche.r"
 
-# ------------ HPC step 20: Intra-Individual Analysis - Area part 2 ------------
+# ------------ Intra-Individual Analysis Raondom Slopes Area ------------
 
-echo "STARTING SCRIPT: fit_intra_ind_mod_random_slopes.r"
+echo "STARTING SCRIPT: fit_intra_ind_mod_random_slopes_space.r"
 
-Rscript $src/fit_intra_ind_mod_random_slopes_space.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 7 10000 5
+Rscript $src/fit_intra_ind_mod_random_slopes_space.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 10 20000 2
 
-echo "SCRIPT COMPLETE: fit_intra_ind_mod_random_slopes.r"
+echo "SCRIPT COMPLETE: fit_intra_ind_mod_random_slopes_space.r"
 
 echo "JOB COMPLETE: random_slopes"
+
+# ------------ Intra-Individual Analysis - Niche rerun ------------
+
+echo "STARTING SCRIPT: fit_intra_ind_mod_additive_niche.r"
+
+Rscript $src/fit_intra_ind_mod_additive_niche.r $wd/out/dbbmm_size.csv $wd/out/intra_ind_models 10 10000 5
+
+echo "SCRIPT COMPLETE: fit_intra_ind_mod_additive_niche.r"
+

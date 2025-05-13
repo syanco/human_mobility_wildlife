@@ -187,8 +187,8 @@ breadth_paired <- breadth %>%
   filter(individual %in% paired_vec) %>% 
   #filter to mammals only
   left_join(traits, by = c("scientificname" = "Species")) %>% 
-  filter(Family == "Cervidae" | Family == "Canidae" | Family == "Ursidae" |
-           Family == "Felidae" | Family == "Antilocapridae" | Family == "Bovidae") %>% 
+  #filter(Family == "Cervidae" | Family == "Canidae" | Family == "Ursidae" |
+  #         Family == "Felidae" | Family == "Antilocapridae" | Family == "Bovidae") %>% 
   mutate(diet = case_when(Diet.PlantO >= 50 ~ "Herbivore",
                           Diet.Fruit >= 50 ~ "Frugivore",
                           Diet.Scav >= 50 ~ "Savenger",
