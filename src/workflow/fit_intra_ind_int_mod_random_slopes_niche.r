@@ -85,6 +85,8 @@ conflict_prefer("lag", "stats")
 conflict_prefer("when", "purrr")
 conflict_prefer("has_name", "tibble")
 
+message(glue("brms package version: {packageVersion('brms')}"))
+
 .cores <- ifelse(is.null(.cores), 10, as.numeric(.cores))
 .iter <- ifelse(is.null(.iter), 3000, as.numeric(.iter))
 .thin <- ifelse(is.null(.thin), 4, as.numeric(.thin))
@@ -221,7 +223,9 @@ breadth_wide <- breadth_paired %>%
          ndvi_diff = ndvi_scale_2019-ndvi_scale_2020,
          tmax_diff = tmax_scale_2019-tmax_scale_2020) %>% 
   filter(!is.nan(sg_diff)) %>% 
-  filter(!is.na(sg_diff))
+  filter(!is.na(sg_diff)) %>%
+  # sort data by week within ind within sp 
+  arrange(scientificname, ind_f, week)
 
 
 #---- Load Data ----#
@@ -244,7 +248,7 @@ mod <- brm(
   cores = .cores,
   iter = .iter,
   thin = .thin,
-  control = list(adapt_delta = 0.99)
+  control = list(adapt_delta = 0.95)
 )
 
 #stash results into named list
@@ -254,7 +258,7 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/niche_intra_ind_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/niche_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 

@@ -197,7 +197,9 @@ size_wide <- size_paired %>%
          ndvi_diff = ndvi_scale_2019-ndvi_scale_2020,
          tmax_diff = tmax_scale_2019-tmax_scale_2020) %>% 
   filter(!is.nan(sg_diff)) %>% 
-  filter(!is.na(sg_diff))
+  filter(!is.na(sg_diff)) %>%
+  # sort data by week within ind within sp  
+  arrange(species, ind_f, wk)
 
 
 #---- Load Data ----#
@@ -219,7 +221,6 @@ mod <- brm(
   cores = .cores,
   iter = .iter,
   thin = .thin,
-  # warmup = 3000
   control = list(adapt_delta = 0.95)
 )
 
@@ -230,7 +231,7 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/size_intra_ind_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/size_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 
