@@ -250,10 +250,11 @@ mod <- brm(
   form,
   data = breadth_wide,
   family = student(),
-  inits = 0,
+  init = 0,
   cores = .cores,
   iter = .iter,
-  thin = .thin
+  thin = .thin,
+  control = list(adapt_delta = 0.95)
 )
 
 #stash results into named list
