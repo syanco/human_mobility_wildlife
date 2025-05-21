@@ -30,14 +30,14 @@ Options:
 if(interactive()) {
   # library(here)
   
-  .wd <- getwd()
+  .wd <- "/home/julietcohen/repositories/human_mobility_wildlife"
   
-  .outPF <- file.path(.wd,'out/niche_determinant_anthropause_subsample.csv')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .outPF <- file.path(.wd,'out/niche_subsamples/niche_determinant_anthropause_subsample_20.csv')
+  .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
   
-  .nc <- 2
+  #.nc <- 2
   
-  .samp_size <- 25
+  .samp_size <- 20
   
 } else {
   library(docopt)
@@ -50,7 +50,7 @@ if(interactive()) {
   .dbPF <- makePath(ag$db)
   .outPF <- makePath(ag$out)
   .nc <- ag$nc
-  .samp_size <- ag$ss
+  .samp_size <- as.numeric(ag$ss)
   
 }
 
@@ -73,6 +73,7 @@ suppressWarnings(
     library(foreach)
     library(MVNH)
     library(tidyverse)
+    library(glue)
   }))
 
 #Source all files in the auto load funs directory
@@ -132,7 +133,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
     evt_mod <- evt0 %>% 
       filter(individual_id == ind[j]) %>%
       dplyr::filter(yr == i) %>%
-      mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T"),
+      mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T", tz = 'UTM'),
              week = week(timestamp),
              n_indiv_week_year = paste0(individual_id, '_' , week, '_' , yr),
              tmax_scale = scale(tmax),
@@ -148,7 +149,8 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
     
     wk <- unique(evt_mod$week)
     # wk = wk[complete.cases(wk)]
-    if(length(wk)==0){print(paste0('No data for year ', i, 
+    if(length(wk)==0){print(paste0('No data for ind ,', j,
+                                   ' year ', i, 
                                    ' writing in logfile'))
       
       tmp_dummy_fail = data.frame(
@@ -160,11 +162,11 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
         status = 0)
       
       # logfile_template$studyid <- studyid
-      write.table(tmp_dummy_fail, glue("./out/niche_subsample_log.csv"), append = T, 
+      write.table(tmp_dummy_fail, glue("./out/niche_subsamples/niche_subsample_log_{.samp_size}.csv"), append = T, 
                   row.names = F, col.names = F, sep = ",")
       
       
-    } else { # if no weeks in data
+    } else { # fi no weeks in data
       
       # i <- 10
       for(w in min(wk):max(wk)){
@@ -220,7 +222,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
             
             # logfile_template$studyid <- studyid
             write.table(tmp_dummy_success, 
-                        glue("./out/niche_subsample_log.csv"), 
+                        glue("./out/niche_subsamples/niche_subsample_log_{.samp_size}.csv"), 
                         append = T, 
                         row.names = F, 
                         col.names = F, 
@@ -236,7 +238,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
               week = w)
             
             # logfile_template$studyid <- studyid
-            write.table(tmp_dummy_fail, glue("./out/niche_subsample_log.csv"), 
+            write.table(tmp_dummy_fail, glue("./out/niche_subsamples/niche_subsample_log_{.samp_size}.csv"), 
                         append = T, row.names = F, 
                         col.names = F, sep = ",")
             
@@ -244,8 +246,11 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
                          ' has NA in niche determinant, moving to the next week'))
           } # else
           
-        }, error = function(e){cat(
-          glue("ERROR: unspecified error in fitting niche determinant for ind {ind[j]}, yr {i}", 
+        }, error = function(e){
+          
+          error_msg <- conditionMessage(e)
+          
+          message(glue("ERROR: fitting niche determinant for ind {ind[j]}, yr {i}:\n{error_msg}", 
                                         "\n"))})
         
       } # for w in wks
