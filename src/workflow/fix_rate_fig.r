@@ -126,10 +126,11 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
       pull(study_id)
     
     evt_mod <- evt0 %>% 
-      filter(individual_id == !!ind[j]) %>% 
-      filter(yr == !!yearvec[i]) %>%
+      filter(individual_id == !!ind[j]) %>%
       collect() %>% 
-      mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T")) %>% 
+      mutate(timestamp = base::as.POSIXct(timestamp, format = "%Y-%m-%d %T", tz = "UTC"),
+             year = lubridate::year(timestamp)) %>%
+      filter(year == !!yearvec[i]) %>% 
       distinct() %>% 
       # sort by timestamp
       arrange(timestamp)
@@ -154,9 +155,15 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp,
                         proj=CRS("+proj=longlat"))
 
-        #id "intended fix rate"
-        fix_min <- min(timeLag(x=evt_mv, units="mins"))
-        fix_max <- max(timeLag(x=evt_mv, units="mins"))
+        # calculate time diff between each fix
+        fixrates <- timeLag(x=evt_mv, units="mins")
+        # calculate an excessive lag
+        fix_med_tripled <- (3*median(timeLag(x=evt_mv, units="mins")))
+        # if max fix rate is greater than 3*median for this individual-year,
+        # exclude it as we did when we calculated the dBBMM
+        fixrates_cleaned <- ifelse(fixrates > fix_med_tripled, NA, fixrates)
+        fix_min <- min(fixrates_cleaned, na.rm = T)
+        fix_max <- max(fixrates_cleaned, na.rm = T)
 
         fix_df <- data.frame("study_id" = studyid, 
                               "species" = scientificname,
