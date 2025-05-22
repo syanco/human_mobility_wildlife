@@ -227,6 +227,18 @@ breadth_wide <- breadth_paired %>%
   # sort data by week within ind within sp 
   arrange(scientificname, ind_f, week)
 
+# count number of individuals per species in the paired data
+# filter to 3+
+spp_sufficient_ss <- breadth_wide %>% 
+                    group_by(scientificname) %>% 
+                    summarise(n_ind = n_distinct(ind_f)) %>%
+                    filter(n_ind >= 3) 
+
+# subset paired data to just the species with 3+ individuals
+breadth_wide_sub <- breadth_wide %>% 
+  semi_join(spp_sufficient_ss, by = "scientificname")
+
+
 
 #---- Load Data ----#
 
@@ -242,7 +254,7 @@ message("Starting model...")
 # fit model
 mod <- brm(
   form,
-  data = breadth_wide,
+  data = breadth_wide_sub,
   family = student(),
   init = 0,
   cores = .cores,
@@ -253,12 +265,12 @@ mod <- brm(
 
 #stash results into named list
 out <- list(
-  data = breadth_wide,
+  data = breadth_wide_sub,
   model = mod
 )
 
 #write out results
-save(out, file = glue("{.outP}/niche_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/niche_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 
