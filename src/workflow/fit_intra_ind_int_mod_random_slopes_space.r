@@ -40,7 +40,7 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- getwd()
+  .wd <- "/home/julietcohen/repositories/human_mobility_wildlife"
   
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
   .outP <- file.path(.wd,'out/intra_ind_models')
@@ -201,6 +201,17 @@ size_wide <- size_paired %>%
   # sort data by week within ind within sp  
   arrange(species, ind_f, wk)
 
+# count number of individuals per species in the paired data
+# filter to 3+
+spp_sufficient_ss <- size_wide %>% 
+                    group_by(species) %>% 
+                    summarise(n_ind = n_distinct(ind_f)) %>%
+                    filter(n_ind >= 3) 
+
+# subset paired data to just the species with 3+ individuals
+size_wide_sub <- size_wide %>% 
+  semi_join(spp_sufficient_ss, by = "species")
+
 
 #---- Load Data ----#
 
@@ -215,7 +226,7 @@ message("Starting model...")
 # fit model
 mod <- brm(
   form,
-  data = size_wide,
+  data = size_wide_sub,
   family = student(),
   init = 0,
   cores = .cores,
@@ -226,12 +237,12 @@ mod <- brm(
 
 #stash results into named list
 out <- list(
-  data = size_wide,
+  data = size_wide_sub,
   model = mod
 )
 
 #write out results
-save(out, file = glue("{.outP}/size_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/size_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 
