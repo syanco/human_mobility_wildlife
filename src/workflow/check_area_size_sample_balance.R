@@ -4,8 +4,9 @@ library(tidyverse)
 library(ggplot2)
 library(lme4)
 library(sjPlot)
+library(here)
 
-size_dat <- read_csv("out/dbbmm_size.csv") %>% 
+size_dat <- read_csv(here("out/dbbmm_size.csv")) %>% 
   # filter(area < 20000000000) %>% 
   mutate(ind_f = as.factor(ind_id),
          log_area = log(area), #get log of weekly area use
@@ -33,6 +34,7 @@ size_dat <- read_csv("out/dbbmm_size.csv") %>%
   mutate(scale_n = scale(n),
          log_area_scale = scale(log_area)) %>%
   ungroup()
+
 summary(size_dat$scale_n)
 
 
@@ -46,11 +48,14 @@ summary(mod)
 
 confint(mod)
 
-plot_model(mod, type = "eff")+
+plot_model(mod, type = "eff",
+           terms = "scale_n")+
   theme_classic()+
   ylab("Area Size")+
   xlab("Sample Size (scaled)")+
   ggtitle("")
+
+ggsave(here("out/check_area_sample_size_balance.R")
 
 
 
