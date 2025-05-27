@@ -55,11 +55,16 @@ size_ci <- confint(size_mod)
 
 size_mod_out <- as.data.frame(size_ci)[5:9,] %>% 
   mutate(est = mod_sum$coefficients[,1]) %>% 
-  rownames_to_column(var = "sample")
+  rownames_to_column(var = "sample") %>% 
+  mutate(x_lab = case_when(sample == "subsampleb10" ~ "subsample 10",
+                           sample == "subsampleb20" ~ "subsample 20",
+                           sample == "subsampleb30" ~ "subsample 30",
+                           sample == "subsampleb40" ~ "subsample 40",
+                           sample == "subsampleb50" ~ "subsample 50"))
 
 ggplot(size_mod_out)+
-  geom_point(aes(x = sample, y = est), size = 3) +
-  geom_errorbar(aes(x = sample, ymin = `2.5 %`, ymax = `97.5 %`), width = 0.3, size = 1.5)+
+  geom_point(aes(x = x_lab, y = est), size = 3) +
+  geom_errorbar(aes(x = x_lab, ymin = `2.5 %`, ymax = `97.5 %`), width = 0.3, size = 1.5)+
   ylab("log(niche breadth)")+
   xlab("")+
   theme_classic()
