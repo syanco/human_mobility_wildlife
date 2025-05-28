@@ -4,8 +4,9 @@ library(tidyverse)
 library(ggplot2)
 library(lme4)
 library(sjPlot)
+library(here)
 
-size_dat <- read_csv("out/dbbmm_size.csv") %>% 
+size_dat <- read_csv(here("out/dbbmm_size.csv")) %>% 
   # filter(area < 20000000000) %>% 
   mutate(ind_f = as.factor(ind_id),
          log_area = log(area), #get log of weekly area use
@@ -25,32 +26,38 @@ size_dat <- read_csv("out/dbbmm_size.csv") %>%
          # sp2 = gsub(" ", "_", species),
          wk_n = as.numeric(substring(wk, 2)), # extract week number
          ts = parse_date_time(paste(year, wk, 01, sep = "-"), "%Y-%U-%u"), # make better date format
-         study_f = as.factor(study_id), # make study id factor
-         # scale_n = scale(n)
-  ) %>%
+         study_f = as.factor(study_id),
+         area_km2 = area/1000000) %>% # make study id factor
   distinct()  %>% 
   group_by(ind_f) %>%
   mutate(scale_n = scale(n),
          log_area_scale = scale(log_area)) %>%
   ungroup()
+
 summary(size_dat$scale_n)
 
 
 # ggplot(size_dat)+
 #   geom_point(aes(x = n, y = area))+
 #   facet_wrap(~species)
-mod <- lmer(area ~ scale_n + (1|species/ind_f), data = size_dat)
-mod_log<- lmer(log_area ~ scale_n + (1|species/ind_f), data = size_dat)
+mod <- lmer(area_km2 ~ scale_n + (1|species/ind_f), data = size_dat)
+# mod_log<- lmer(log_area ~ scale_n + (1|species/ind_f), data = size_dat)
+# does not converge, and is not data scale used for previous manuscript version
 
 summary(mod)
 
 confint(mod)
 
-plot_model(mod, type = "eff")+
+plot_model(mod, 
+           type = "eff",
+           terms = "scale_n")+
   theme_classic()+
-  ylab("Area Size")+
+  ylab("Area Size (kilometers²)")+
   xlab("Sample Size (scaled)")+
   ggtitle("")
+
+ggsave(here("out/check_area_sample_size_balance.png"))
+ggsave(here("out/check_area_sample_size_balance_dim9-6.png"), width = 9, height = 6)
 
 
 
