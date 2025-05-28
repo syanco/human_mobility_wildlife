@@ -233,7 +233,7 @@ spp_sufficient_ss <- breadth_wide %>%
                     summarise(n_ind = n_distinct(ind_f)) %>%
                     filter(n_ind >= 5) 
 
-# subset paired data to just the species with 3+ individuals
+# subset paired data to just the species with 5+ individuals
 breadth_wide_sub <- breadth_wide %>% 
   semi_join(spp_sufficient_ss, by = "scientificname")
 
