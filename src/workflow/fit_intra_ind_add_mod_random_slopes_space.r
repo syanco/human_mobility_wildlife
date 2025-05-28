@@ -197,13 +197,26 @@ size_wide <- size_paired %>%
          ndvi_diff = ndvi_scale_2019-ndvi_scale_2020,
          tmax_diff = tmax_scale_2019-tmax_scale_2020) %>% 
   filter(!is.nan(sg_diff)) %>% 
-  filter(!is.na(sg_diff))
+  filter(!is.na(sg_diff)) %>%
+  # sort data by week within ind within sp 
+  arrange(species, ind_f, wk)
+
+# count number of individuals per species in the paired data
+# filter to 5+
+spp_sufficient_ss <- size_wide %>% 
+                    group_by(species) %>% 
+                    summarise(n_ind = n_distinct(ind_f)) %>%
+                    filter(n_ind >= 5) 
+
+# subset paired data to just the species with 3+ individuals
+size_wide_sub <- size_wide %>% 
+  semi_join(spp_sufficient_ss, by = "species")
 
 
 #---- Load Data ----#
 
 message("Starting that modeling magic...")
-form <- bf(size_diff ~ 1 + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1 + sg_diff + ghm_diff + ndvi_diff + tmax_diff | species) + (1 | species:ind_f) + ar(time = wk, gr = ind_f))
+form <- bf(size_diff ~ 1 + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1 + sg_diff + ghm_diff + ndvi_diff + tmax_diff | species) + (1 | species:ind_f)) # + ar(time = wk, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
@@ -213,24 +226,23 @@ message("Starting model...")
 # fit model
 mod <- brm(
   form,
-  data = size_wide,
+  data = size_wide_sub,
   family = student(),
   init = 0,
   cores = .cores,
   iter = .iter,
   thin = .thin,
-  warmup = 3000,
   control = list(adapt_delta = 0.95)
 )
 
 #stash results into named list
 out <- list(
-  data = size_wide,
+  data = size_wide_sub,
   model = mod
 )
 
 #write out results
-save(out, file = glue("{.outP}/size_intra_ind_add_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/min_5/wo_ar_term/size_intra_ind_add_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 

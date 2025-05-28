@@ -202,11 +202,11 @@ size_wide <- size_paired %>%
   arrange(species, ind_f, wk)
 
 # count number of individuals per species in the paired data
-# filter to 3+
+# filter to 5+
 spp_sufficient_ss <- size_wide %>% 
                     group_by(species) %>% 
                     summarise(n_ind = n_distinct(ind_f)) %>%
-                    filter(n_ind >= 3) 
+                    filter(n_ind >= 5) 
 
 # subset paired data to just the species with 3+ individuals
 size_wide_sub <- size_wide %>% 
@@ -216,7 +216,7 @@ size_wide_sub <- size_wide %>%
 #---- Load Data ----#
 
 message("Starting that modeling magic...")
-form <- bf(size_diff ~ 1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff + (1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff | species) + (1 | species:ind_f) + ar(time = wk, gr = ind_f))
+form <- bf(size_diff ~ 1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff + (1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff | species) + (1 | species:ind_f)) # + ar(time = wk, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
@@ -242,7 +242,7 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/size_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/min_5/wo_ar_term/size_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 

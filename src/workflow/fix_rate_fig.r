@@ -158,22 +158,24 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         # calculate time diff between each fix
         fixrates <- timeLag(x=evt_mv, units="mins")
         # calculate an excessive lag
-        fix_med_tripled <- (3*median(timeLag(x=evt_mv, units="mins")))
+        #fix_med_tripled <- (3*median(timeLag(x=evt_mv, units="mins")))
         # if max fix rate is greater than 3*median for this individual-year,
         # exclude it as we did when we calculated the dBBMM
-        fixrates_cleaned <- ifelse(fixrates > fix_med_tripled, NA, fixrates)
-        fix_min <- min(fixrates_cleaned, na.rm = T)
-        fix_max <- max(fixrates_cleaned, na.rm = T)
+        #fixrates_cleaned <- ifelse(fixrates > fix_med_tripled, NA, fixrates)
+        fix_med <- median(fixrates, na.rm = T)
+        fix_min <- min(fixrates, na.rm = T)
+        fix_max <- max(fixrates, na.rm = T)
 
         fix_df <- data.frame("study_id" = studyid, 
                               "species" = scientificname,
                               "individual_id" = ind[j],
                               "year" = yearvec[i],
+                              "fix_rate_med" = fix_med,
                               "fix_rate_min" = fix_min,
                               "fix_rate_max" = fix_max)
 
         write.table(fix_df, 
-                glue("{.outPF}/fixrate_min_max.csv"), 
+                glue("{.outPF}/fixrate_med_min_max.csv"), 
                 append = T, 
                 row.names = F, 
                 col.names = F, 

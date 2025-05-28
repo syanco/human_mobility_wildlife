@@ -228,11 +228,11 @@ breadth_wide <- breadth_paired %>%
   arrange(scientificname, ind_f, week)
 
 # count number of individuals per species in the paired data
-# filter to 3+
+# filter to 5+
 spp_sufficient_ss <- breadth_wide %>% 
                     group_by(scientificname) %>% 
                     summarise(n_ind = n_distinct(ind_f)) %>%
-                    filter(n_ind >= 3) 
+                    filter(n_ind >= 5) 
 
 # subset paired data to just the species with 3+ individuals
 breadth_wide_sub <- breadth_wide %>% 
@@ -244,7 +244,7 @@ breadth_wide_sub <- breadth_wide %>%
 
 message("Starting that modeling magic...")
 
-form <- bf(breadth_diff ~ area_diff + sg_diff*ghm_diff + ndvi_diff + tmax_diff + (1 + area_diff + sg_diff*ghm_diff + ndvi_diff + tmax_diff | scientificname) + (1 | scientificname:ind_f) + ar(time = week, gr = ind_f))
+form <- bf(breadth_diff ~ area_diff + sg_diff*ghm_diff + ndvi_diff + tmax_diff + (1 + area_diff + sg_diff*ghm_diff + ndvi_diff + tmax_diff | scientificname) + (1 | scientificname:ind_f)) # + ar(time = week, gr = ind_f))
 message("Fitting models with formula:")
 print(form)
 
@@ -270,7 +270,7 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/niche_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/min_5/wo_ar_term/niche_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 
