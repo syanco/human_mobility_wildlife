@@ -224,7 +224,20 @@ breadth_wide <- breadth_paired %>%
          ndvi_diff = ndvi_scale_2019-ndvi_scale_2020,
          tmax_diff = tmax_scale_2019-tmax_scale_2020) %>% 
   filter(!is.nan(sg_diff)) %>% 
-  filter(!is.na(sg_diff))
+  filter(!is.na(sg_diff)) %>%
+  # sort data by week within ind within sp  
+  arrange(scientificname, ind_f, week)
+
+# count number of individuals per species in the paired data
+# filter to 5+
+spp_sufficient_ss <- breadth_wide %>% 
+                    group_by(scientificname) %>% 
+                    summarise(n_ind = n_distinct(ind_f)) %>%
+                    filter(n_ind >= 5) 
+
+# subset paired data to just the species with 5+ individuals
+breadth_wide_sub <- breadth_wide %>% 
+  semi_join(spp_sufficient_ss, by = "scientificname")
 
 # # get sample size per sp
 # size_wide %>% 
@@ -248,7 +261,7 @@ message("Starting model...")
 # fit model
 mod <- brm(
   form,
-  data = breadth_wide,
+  data = breadth_wide_sub,
   family = student(),
   init = 0,
   cores = .cores,
@@ -259,12 +272,12 @@ mod <- brm(
 
 #stash results into named list
 out <- list(
-  data = breadth_wide,
+  data = breadth_wide_sub,
   model = mod
 )
 
 #write out results
-save(out, file = glue("{.outP}/niche_intra_ind_int_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/sufficient_ss_presorted/niche_intra_ind_int_mod_{Sys.Date()}.rdata"))
 
 
 #---- Finalize script ----#
