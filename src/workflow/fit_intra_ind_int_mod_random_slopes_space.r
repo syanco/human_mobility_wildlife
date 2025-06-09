@@ -210,13 +210,25 @@ spp_sufficient_ss <- size_wide %>%
 
 # subset paired data to just the species with 5+ individuals
 size_wide_sub <- size_wide %>% 
-  semi_join(spp_sufficient_ss, by = "species")
+  semi_join(spp_sufficient_ss, by = "species") %>%
+  # scale each difference value 
+  ungroup() %>%
+  mutate(size_diff = scale(size_diff, center = F),
+         ghm_diff = scale(ghm_diff, center = F),
+         sg_diff = scale(sg_diff, center = F),
+         ndvi_diff = scale(ndvi_diff, center = F),
+         tmax_diff = scale(tmax_diff, center = F),
+         area_diff = scale(area_diff, center = F)) %>%
+  # filter outliers for safegraph values
+  filter(sg_diff < 2.5 & sg_diff > -2.5)
 
 
 #---- Load Data ----#
 
 message("Starting that modeling magic...")
-form <- bf(size_diff ~ 1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff + (1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff | species) + (1 | species:ind_f)) # + ar(time = wk, gr = ind_f))
+# form <- bf(size_diff ~ 1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff + (1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff | species) + (1 | species:ind_f))
+form <- bf(size_diff ~ 1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff + (1 + sg_diff*ghm_diff + ndvi_diff + tmax_diff || species) + (1 | gr(ind_f, by = species)))
+
 message("Fitting models with formula:")
 print(form)
 
