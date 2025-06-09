@@ -133,11 +133,13 @@ ggsave(filename = file.path(.wd, "out/niche_intra_ind_ghm.png"), ghm_ce_plot,
 #--- INTERACTION MODELS
 
 # get observed quantiles of ghm to set "low" and "high" human mod
-ghmq <- quantile(out$data$ghm_diff, probs = c(0.05, 0.95), na.rm = T)
+ghmq <- quantile(out$data$ghm_diff, probs = c(0.2, 0.8), na.rm = T)
 ce_int <- conditional_effects(x=int_mod,
                               effects = "sg_diff:ghm_diff",
                               int_conditions = list(ghm_diff = ghmq),
-                              re_formula = NA)
+                              re_formula = NA,
+                              prob = 0.9,
+                              method = "posterior_linpred")
 
 (int_ce_plot <-  plot(ce_int, 
                       plot = F,
