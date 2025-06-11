@@ -25,15 +25,12 @@ Options:
 
 #---- Input Parameters ----#
 if(interactive()) {
-  library(here)
   
-  .wd <- getwd()
-  rd <- here::here
+  .wd <- "/home/julietcohen/repositories/human_mobility_wildlife"
+  .dbPF <- file.path(.wd, 'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
+  # .outPF <- file.path(.wd,'out')
   
-  .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path('')
-  
-  .nc <- 2
+  .nc <- 1
   
 } else {
   library(docopt)
@@ -80,13 +77,27 @@ invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
 indtb <- tbl(db,'individual_clean') %>%
-# note that the following species name fixes were also introduced to
-# trimming step, so can remove here when workflow is restarted
   mutate(taxon_canonical_name = case_when(
+        study_id == 1442516400 ~ "Anser caerulescens",
+        study_id == 1631574074 ~ "Ursus americanus",
+        study_id == 1418296656 ~ "Numenius americanus",
         study_id == 2548691779 ~ "Odocoileus hemionus",
-        study_id == 2575515057 ~ "Cervus elaphus",
+        study_id == 2575515057 ~ "Cervus canadensis",
         study_id == 1044238185 ~ "Alces alces",
+        study_id == 474651680  ~ "Odocoileus virginianus",
         TRUE ~ taxon_canonical_name)) %>%
+  mutate(taxon_canonical_name = case_when(
+         taxon_canonical_name == "Chen rossii" ~ "Anser rossii",
+         taxon_canonical_name == "Spilogale putorius" ~ "Spilogale interrupta",
+         taxon_canonical_name == "Cervus elaphus" ~ "Cervus canadensis",
+         taxon_canonical_name == "Accipiter gentilis" ~ "Astur atricapillus",
+         taxon_canonical_name == "Chen caerulescens" ~ "Anser caerulescens",
+         TRUE ~ taxon_canonical_name)) %>%
+  # remove certain skunks per data owners request
+  filter(individual_id != 3418130234, 
+        individual_id != 3418130244, 
+        individual_id != 3418130245, 
+        individual_id != 3418130249) %>%
   collect() 
 
 indtb <- indtb[!duplicated(indtb),]
