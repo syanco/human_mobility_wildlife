@@ -2,8 +2,13 @@
 #       COVID-19 Animal Movement                                                                               #
 ################################################################################################################
 
-# This script is a sensitivity analysis for the  individual n-dimensional 
-# hypervolumes (Lu et al. 2021) on weekly time scales.
+# This script is a sensitivity analysis for the individual n-dimensional 
+# hypervolumes (Lu et al. 2021) on weekly time scales. Subset event data for
+# each individual animal to only weeks that have a minimum number of events. Run 
+# the script 5 times with 10, 20, 30, 40, and 50 as the sample size and output
+# a CSV for each set of  for the multi-variate niche hyperbolume. Plot the results 
+# with graph_niche_subsample.R to determine the minimum value of events per week at 
+# to use as input to filter_data_mins.R
 
 # ==== Setup ====
 
@@ -103,10 +108,6 @@ ind <- ind[ind  %in% unique(evt0$individual_id)]
 
 yearvec <- c("2019", "2020")
 
-# Add empty columns study:
-
-# log <- read_csv(glue("{.outPF}/niche_subsample_log.csv")) #####
-
 registerDoMC(.nc)
 
 foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
@@ -127,9 +128,6 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
     
     message("Filtering and scaling data...")
     
-    # print(i)
-    
-    # i = 2020
     evt_mod <- evt0 %>% 
       filter(individual_id == ind[j]) %>%
       dplyr::filter(yr == i) %>%
@@ -137,7 +135,6 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
              week = week(timestamp),
              n_indiv_week_year = paste0(individual_id, '_' , week, '_' , yr),
              tmax_scale = scale(tmax),
-             # tmin_scale = scale(tmin),
              ndvi_scale = scale(ndvi),
              elev_scale = scale(elev)
              ) %>% 
@@ -148,7 +145,6 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
     message("Estimating Multivariate niches")
     
     wk <- unique(evt_mod$week)
-    # wk = wk[complete.cases(wk)]
     if(length(wk)==0){print(paste0('No data for ind ,', j,
                                    ' year ', i, 
                                    ' writing in logfile'))
@@ -161,16 +157,13 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
         week = NA,
         status = 0)
       
-      # logfile_template$studyid <- studyid
       write.table(tmp_dummy_fail, glue("./out/niche_subsamples/niche_subsample_log_{.samp_size}.csv"), append = T, 
                   row.names = F, col.names = F, sep = ",")
       
       
     } else { # fi no weeks in data
       
-      # i <- 10
       for(w in min(wk):max(wk)){
-        # w <- 26
         
         evt_tmp <- evt_mod %>% 
           filter(week == w) %>%
@@ -220,7 +213,6 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
               status = 1,
               week = w)
             
-            # logfile_template$studyid <- studyid
             write.table(tmp_dummy_success, 
                         glue("./out/niche_subsamples/niche_subsample_log_{.samp_size}.csv"), 
                         append = T, 
@@ -237,7 +229,6 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
               status = 0,
               week = w)
             
-            # logfile_template$studyid <- studyid
             write.table(tmp_dummy_fail, glue("./out/niche_subsamples/niche_subsample_log_{.samp_size}.csv"), 
                         append = T, row.names = F, 
                         col.names = F, sep = ",")
@@ -257,7 +248,6 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
     } # else (if wks > 0)
     #  } # fi end the check whether individual has been previously considered
   } #i (end loop through years) : #j (end loop through individuals)
-
 
 #---- Finalize script ----#
 

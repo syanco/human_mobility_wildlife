@@ -16,19 +16,6 @@
 
 # ==== Breezy setup ====
 
-#'
-#Template
-#Usage:
-#script_template <taxa> <dat> <out> 
-#script_template (-h | --help)
-#Parameters:
-#  dat: path to input csv file. 
-#  out: path to output directory.
-#Options:
-#-h --help     Show this screen.
-#-v --version     Show version.
-#' -> doc
-
 #---- Input Parameters ----#
 if(interactive()) {
   rm(list=ls())
@@ -36,22 +23,14 @@ if(interactive()) {
   
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
   .test <- TRUE
-  # rd <- here::here
-  
   .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
-  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'out/')
   .outPF <- file.path(.wd,'out/')
   
 } else {
-  # library(docopt)
-  # library(rprojroot)
   
   .wd <- getwd()
-  # .script <-  thisfile()
-  # rd <- is_rstudio_project$make_fix_file(.script)
   .dbPF <- '/tmp/mosey_mod.db'
-  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'out/')
   .outPF <- file.path(.wd,'out/')
 }
@@ -102,7 +81,6 @@ evt_cbg <- evt_df %>%
 
 message("writing out new event table...")
 fwrite(evt_cbg, paste0(.outPF, "event-annotation/event_cbg.csv"))
-#dbWriteTable(conn = db, name = "event_cbg", value = evt_cbg, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
 

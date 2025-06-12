@@ -2,7 +2,10 @@
 
 # DESCRIPTION #
 # 
-# This script checks for data completeness and trims data based on minimum data requirements
+# This script checks for data completeness and trims data based on minimum data 
+# requirements, including a minimum number of 3 individuals per species and 
+# 30 fixes per week. The output is 3 updated db tables for event, individual,
+# and study. These will be further cleaned by clean_movement.r
 
 
 '

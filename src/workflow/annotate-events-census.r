@@ -15,19 +15,6 @@
 
 # ==== Breezy setup ====
 
-#'
-#Template
-#Usage:
-#script_template <taxa> <dat> <out> 
-#script_template (-h | --help)
-#Parameters:
-#  dat: path to input csv file. 
-#  out: path to output directory.
-#Options:
-#-h --help     Show this screen.
-#-v --version     Show version.
-#' -> doc
-
 #---- Input Parameters ----#
 if(interactive()) {
   # rm(list=ls())
@@ -35,8 +22,6 @@ if(interactive()) {
   
   .wd <- '/gpfs/ysm/project/jetz/ryo3/projects/covid'
   .test <- TRUE
-  # rd <- here::here
-  
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,"out/")
@@ -47,8 +32,6 @@ if(interactive()) {
   
   .wd <- getwd()
   .script <-  thisfile()
-  # rd <- is_rstudio_project$make_fix_file(.script)
-  
   .dbPF <- '/gpfs/loomis/project/jetz/sy522/covid-19_movement/processed_data/mosey_mod.db'
   .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,"out/")
@@ -89,7 +72,6 @@ evt_census <- left_join(evt_df,acs2019, by = c("cbg_2010" = "cbg_2010"))
 
 message("writing out new event table...")
 fwrite(evt_census, paste0(.outPF, "event-annotation/event_census.csv"))
-#dbWriteTable(conn = db, name = "event_census", value = evt_census, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
 

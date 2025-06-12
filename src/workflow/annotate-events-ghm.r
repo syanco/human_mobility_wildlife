@@ -1,63 +1,33 @@
 #!/usr/bin/env Rscript
 # DESCRIPTION #
 #
-# This script determines the administrative units for records for the COVID-19 Animal Movement Project
+# This script determines the level of global human mofication (GHM) for animal 
+# movement locations for the COVID-19 Animal Movement Project. GHM data is sourced
+# from an existing global map in raster format, which estimates cumulative landscape 
+# modification within 1-km2 pixels from 13 human stressor datasets.
+#
 # See project documentation for details about anticipated directory structure.
-#
-# Major tasks fof this script:
-#   * Annotate event dataset with:
-#     * CensusBlockGroup (12 digit FIPS code)
-#     * BlockGroup (1 digit FIPS code)
-#     * TractCode (6 digit FIPS)
-#     * CountyFIPS (3 digit FIPS)
-#     * StateFIPS (2 digit FIPS)
-#     * County (character string)
-#     * State (2 character code)
-#   *write out table with administrative info
-#
-# This script implements the breezy philosophy: github.com/benscarlson/breezy
-
 
 # ==== Breezy setup ====
 
-#'
-#Template
-#Usage:
-#script_template <taxa> <dat> <out> 
-#script_template (-h | --help)
-#Parameters:
-#  dat: path to input csv file. 
-#  out: path to output directory.
-#Options:
-#-h --help     Show this screen.
-#-v --version     Show version.
-#' -> doc
-
 #---- Input Parameters ----#
 if(interactive()) {
-  # rm(list=ls())
+
   library(here)
   
   .wd <- '/home/sy522/project/covid-19_movement'
   .test <- TRUE
-  # rd <- here::here
-  
   .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod.db'
-  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,'out/')
   
 } else {
+
   library(docopt)
   library(rprojroot)
-  
+
   .wd <- getwd()
-  # .script <-  thisfile()
-  # rd <- is_rstudio_project$make_fix_file(.script)
-  
   .dbPF <- '/tmp/mosey_mod.db'
-  # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
-  # .datPF <- file.path(.wd,'raw_data/covid_movement_full_repo/raw_data/')
   .datPF <- file.path('/home/julietcohen/covid_movement_full_repo/raw_data/')
   .outPF <- file.path(.wd,'out/')
 }
@@ -101,12 +71,9 @@ evt_sf$ghm <- raster::extract(ghm,evt_sf)
 evt_ghm <- evt_sf %>%
   st_drop_geometry()
 
-# head(evt_ghm)
-
 # write out new table with annotations
 message("writing out new event table...")
 fwrite(evt_ghm, paste0(.outPF, "event-annotation/event_ghm.csv"))
-#dbWriteTable(conn = db, name = "event_ghm", value = evt_ghm, append = FALSE, overwrite = T)
 
 dbDisconnect(db)
 

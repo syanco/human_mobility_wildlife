@@ -2,8 +2,9 @@
 
 # DESCRIPTION #
 # 
-# This script cleans data for the COVID-19 Animal Movement Project
-
+# This script cleans data for the COVID-19 Animal Movement Project 
+# including excluding values that exceeded the 95th quantile for 
+# turn angle, bearing, and velocity.
 
 '
 Prep and clean data for the COVID-19 Animal Movement Project
