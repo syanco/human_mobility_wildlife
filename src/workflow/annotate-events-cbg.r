@@ -6,13 +6,13 @@
 # Event table is spatially intersected with census block group (cbg) geometries in intersect-events-cbg.R
 # Area for each geometry is computed in compute-cbg-area.R
 #
-# See project documentation for details about anticipated directory structure.
-# This script implements the breezy philosophy: github.com/benscarlson/breezy
-#
 # Major tasks of this script:
 #   * combine event/cbg intersection files
 #   * read in cbg area
 #   * combine event table with associated cbgs and cbg area
+#
+# See project documentation for details about anticipated directory structure.
+# This script implements the breezy philosophy: github.com/benscarlson/breezy
 
 # ==== Breezy setup ====
 
