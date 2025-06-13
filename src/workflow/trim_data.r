@@ -2,8 +2,10 @@
 
 # DESCRIPTION #
 # 
-# Trim database to only include studies from target period and area.
-# Correct species naming issues in data
+# Trim database to only include studies from target period and area and
+# correct species names in database. Generate new tables for the event, 
+# study, and individual data that serve as input into the next workflow
+# steps.
 
 '
 Trim data for the COVID-19 Animal Movement Project
@@ -40,13 +42,8 @@ if(interactive()) {
 } else {
   library(docopt)
   library(rprojroot)
-  
-  #ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
-  
   source(file.path(.wd, 'src/funs/input_parse.r'))
-  
-  # .dbPF <- makePath(ag$db)
   .dbPF <- '/tmp/mosey_mod.db'
   
 }

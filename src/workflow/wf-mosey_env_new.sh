@@ -1,4 +1,13 @@
-# New version of wf-mosey_env for run of the workflow with all species
+# Master workflow script for annotating database event table with environmental
+# layers via Google Earth Engine (GEE).
+# Notes:
+# - Before executing, this script requries 
+#   the user to create a GEE account and bucket, create subdirectories,
+#   change filepaths, and create a local python environment.
+# - Using the rgee package with a local python environment requires user
+#   to configure a python env path in the rgee config file
+# - Each shell script that is launched from this script needs to complete
+#   running prior to launching the next.
 
 wd=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife
 src=$wd/src
@@ -23,7 +32,6 @@ export envP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mob
 export annoP=/Users/juliet/Documents/OliverLab/covid_paper/repositories/human_mobility_wildlife/gee_data/annotated
 
 ##= -- GCS & GEE DIRS --
-# geePtsP=project/covid-mvmnt/assets/tracks #folder holding the gee point datasets
 export gcsBucket=covid-mvmnt-2024
 # dir for CSVs in GCS that will be imported GEE
 export gcsInP=ingest_gee

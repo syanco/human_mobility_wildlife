@@ -1,34 +1,23 @@
 #!/usr/bin/env Rscript 
-# Plot model summary sheet
+# Plot model summary sheet (PDF) for niche models. Select either the additive
+# or interactive model based on significance.
 
 
 #---- Input Parameters ----#
 if(interactive()) {
-  library(here)
   
-  .wd <- getwd()
-  
-  .datP <- file.path(.wd,'out/single_species_models')
-  .outPF <- file.path(.wd,'figs/area_fig.png')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .wd <- "/home/julietcohen/repositories/human_mobility_wildlife"
+  .datP <- file.path(.wd,'out/single_species_models_final')
+  .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
   
 } else {
+
   library(docopt)
-  # library(rprojroot)
-  
-  # ag <- docopt(doc, version = '0.1\n')
+
   .wd <- getwd()
-  
-  
   source('src/funs/input_parse.r')
-  
-  #.list <- trimws(unlist(strsplit(ag$list,',')))
-  # .datP <- makePath(ag$dat)
   .datP <- file.path(.wd,'out/single_species_models')
-  # .outPF <- makePath(ag$out)
   .dbPF <- '/tmp/mosey_mod.db'
-  # vector of probabilities foer conditional estimates
-  prob_vec <- c(0.2,0.8)
 }
 
 
@@ -84,18 +73,11 @@ add_modlist_full <- list.files(path=file.path(.datP, "niche_additive/"),
                                full.names = T)
 add_sp <- word(add_modlist, 1, sep = "_")
 
-
-
-#check that lists are same
+# check that lists are same
 int_sp == add_sp
 
-# add_sp <- append(add_sp, "NULL", after = 24)
-# add_modlist_full <- append(add_modlist_full, "NULL", after = 24)
-
 # Get US Background
-us <- ne_states(country = "United States of America", returnclass = "sf") #%>%
-        #st_set_crs(4326)
-
+us <- ne_states(country = "United States of America", returnclass = "sf")
 
 #---- Initialize database ----#
 message("Connecting to database...")
@@ -107,13 +89,10 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 #---- Perform analysis ----#
 
-# dbListTables(db)
-
 #-- Load Cleaned Data
 evt0 <- tbl(db, 'event_clean') %>% collect()
 std0 <- tbl(db, 'study_clean') %>% 
   collect() 
-# beepr::beep()
 
 # Init lists to store results
 pred_out <- list()
@@ -733,5 +712,5 @@ for(i in 1:length(int_modlist_full)){
 }# i 
 
 dbDisconnect(db)
-#beepr::beep()
+
 message("all done....")

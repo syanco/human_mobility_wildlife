@@ -4,10 +4,6 @@
 # (sg) and human modification (ghm).  It also produces conditional predictions of
 # space use at specified quantiles of the moderating variable.
 
-
-# TODO:
-#  - Update docopt
-
 # ==== Breezy Setup ====
 
 '
@@ -76,12 +72,6 @@ suppressWarnings(
     library(parameters)
   }))
 
-# call_fun <- function(f,x,...) {
-#   n <- length(x)
-#   items <- paste(glue('x[[{1:n}]]'),collapse=',')
-#   eval(parse(text=glue('f({items},...)')))
-# }
-
 #Source all files in the auto load funs directory
 list.files('src/funs/auto',full.names=TRUE) %>%
   walk(source)
@@ -97,10 +87,8 @@ int_modlist <- list.files(path=file.path(.datP, "niche_interactive/"), full.name
 int_modlist_full <- list.files( path=file.path(.datP, "niche_interactive/"), full.names = T)
 int_sp <- word(int_modlist, 1, sep = "_")
 
-# 
-
 # #-- Additive Models --#
-# 
+
 message('Loading additive models...')
 add_modlist <- list.files(path=file.path(.datP, "niche_additive/"), 
                           full.names = F)
@@ -108,14 +96,8 @@ add_modlist_full <- list.files(path=file.path(.datP, "niche_additive/"),
                                full.names = T)
 add_sp <- word(add_modlist, 1, sep = "_")
 
-
-
 #check that lists are same
 int_sp == add_sp
-
-# add_sp <- append(add_sp, "NULL", after = 24)
-# add_modlist_full <- append(add_modlist_full, "NULL", after = 24)
-
 
 #---- Estimate Effects ----#
 
@@ -352,4 +334,3 @@ write_csv(x = sg_es_df, file = file.path(.outPF, glue("niche_sg_marginal_{Sys.Da
 #--Marginal Effects of GHM --#
 ghm_es_df <- do.call("bind_rows", ghm_effects_out)
 write_csv(x = ghm_es_df, file = file.path(.outPF, glue("niche_ghm_marginal_{Sys.Date()}.csv")))
-

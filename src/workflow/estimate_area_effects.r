@@ -4,10 +4,6 @@
 # (sg) and human modification (ghm).  It also produces conditional predictions of
 # space use at specified quantiles of the moderating variable.
 
-
-# TODO:
-#  - Update docopt
-
 # ==== Breezy Setup ====
 
 '
@@ -36,7 +32,7 @@ if(interactive()) {
   .datP <- file.path(.wd,'out/single_species_models')
   .outPF <- file.path(.wd,'figs/area_fig.png')
   
-  # vector of probabilities foer conditional estimates
+  # vector of probabilities for conditional estimates
   prob_vec <- c(0.2,0.8)
   
   
@@ -54,7 +50,7 @@ if(interactive()) {
   .datP <- makePath(ag$dat)
   .outPF <- makePath(ag$out)
   
-  # vector of probabilities foer conditional estimates
+  # vector of probabilities for conditional estimates
   prob_vec <- c(0.2,0.8)
 }
 
@@ -75,12 +71,6 @@ suppressWarnings(
     library(emmeans)
     library(parameters)
   }))
-
-# call_fun <- function(f,x,...) {
-#   n <- length(x)
-#   items <- paste(glue('x[[{1:n}]]'),collapse=',')
-#   eval(parse(text=glue('f({items},...)')))
-# }
 
 #Source all files in the auto load funs directory
 list.files('src/funs/auto',full.names=TRUE) %>%
@@ -106,10 +96,6 @@ add_sp <- word(add_modlist, 1, sep = "_")
 
 #check that lists are same
 int_sp == add_sp
-
-# One species missing from interactive model - so insert NULL
-# int_sp <- append(int_sp, "NULL", after = 12)
-# int_modlist_full <- append(int_modlist_full, "NULL", after = 12)
 
 
 #---- Estimate Effects ----#
@@ -347,5 +333,3 @@ write_csv(x = sg_es_df, file = file.path(.outPF, glue("area_sg_marginal_{Sys.Dat
 #--Marginal Effects of GHM --#
 ghm_es_df <- do.call("bind_rows", ghm_effects_out)
 write_csv(x = ghm_es_df, file = file.path(.outPF, glue("area_ghm_marginal_{Sys.Date()}.csv")))
-
-#beepr::beep()

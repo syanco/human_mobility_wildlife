@@ -24,25 +24,19 @@ Options:
 
 #---- Input Parameters ----#
 if(interactive()) {
-  #library(here)
-  
-  #.wd <- getwd()
+
   .wd <- '~/repositories/human_mobility_wildlife'
-  .datP <- file.path(.wd,'out_old/single_species_models')
+  .datP <- file.path(.wd,'out/single_species_models')
   .traitPF <- '/home/julietcohen/covid_movement_full_repo/raw_data/anthropause_data_sheet.csv'
-  .outPF <- file.path(.wd,'out_old/figs_pd_change/')
+  .outPF <- file.path(.wd,'out/figs/')
   
 } else {
+
   library(docopt)
-  # library(rprojroot)
   
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
-  
-  
   source('src/funs/input_parse.r')
-  
-  #.list <- trimws(unlist(strsplit(ag$list,',')))
   .datP <- makePath(ag$dat)
   .outPF <- makePath(ag$out)
   .traitPF <- makePath(ag$trait)
@@ -76,12 +70,6 @@ call_fun <- function(f,x,...) {
 list.files('src/funs/auto',full.names=TRUE) %>%
   walk(source)
 
-# theme_set(theme_eda)
-
-#---- Local parameters ----#
-
-
-
 #---- Load data ----#
 message("Loading trait data...")
 traits <- read_csv(.traitPF) %>%
@@ -99,16 +87,14 @@ traits <- read_csv(.traitPF) %>%
 
 
 # #-- Interaction Models --#
-# 
+
 message('Loading interaction models...')
 int_modlist <- list.files(path=file.path(.datP, "area_interactive/"), full.names = F )
 int_modlist_full <- list.files( path=file.path(.datP, "area_interactive/"), full.names = T)
 int_sp <- word(int_modlist, 1, sep = "_")
 
-# 
-
 # #-- Additive Models --#
-# 
+
 message('Loading additive‚ models...')
 add_modlist <- list.files(path=file.path(.datP, "area_additive/"), 
                           full.names = F)
@@ -117,19 +103,15 @@ add_modlist_full <- list.files(path=file.path(.datP, "area_additive/"),
 add_sp <- word(add_modlist, 1, sep = "_")
 
 
-
 #check that lists are same
 int_sp == add_sp
 
-# int_sp <- append(int_sp, "NULL", after = 12)
-# int_modlist_full <- append(int_modlist_full, "NULL", after = 12)
 #---- Make Plots ----#
 
 pal2 <- c("#E66100", "#5D3A9B") # 2 color pallete
 pal3 <- c(pal2, "#808080") # add gray to the pallete
 palnew <- c("#7552A3", "#CEBEDA")
 palgray <- c("#808080", "#D3D3D3")
-
 
 
 #-- make combined plots --#
@@ -242,14 +224,6 @@ for(i in 1:length(int_modlist_full)){
       #get interaction quantiled
       ghmq <- quantile(out$data$ghm_scale, probs = c(0.05, 0.95), na.rm = T)
       sgq <- quantile(out$data$sg_norm, probs = c(0.05, 0.95), na.rm = T)
-      
-      # #get conditional effects estimates
-      # sg_ce <- conditional_effects(addmod, plot = F, effects = "sg_norm:ghm_scale",
-      #                              int_conditions = list("sg_norm" = med_sg,
-      #                                                    "ghm_scale" = ghmq))
-      # ghm_ce <- conditional_effects(addmod, plot = F, effects = "ghm_scale:sg_norm",
-      #                               int_conditions = list("ghm_scale" = med_ghm,
-      #                                                     "sg_norm" = sgq))
       
       # Stash df in out lists
       ghm_effects_out[[i]] <- emtrends(intmod, ~ "sg_norm", var = "ghm_scale", 
@@ -423,112 +397,3 @@ write_csv(x = sg_es_df, file = file.path(.outPF, glue("area_sg_effects_{Sys.Date
 
 ghm_es_df <- do.call("bind_rows", ghm_effects_out)
 write_csv(x = ghm_es_df, file = file.path(.outPF, glue("area_ghm_effects_{Sys.Date()}.csv")))
-
-# #---- Standardized Effects plot ----#
-# 
-# pal2 <- c("#E66100", "#5D3A9B") # 2 color pallete
-# pal3 <- c(pal2, "#808080") # add gray to the pallete
-# palnew <- c("#7552A3", "#CEBEDA")
-# palgray <- c("#808080", "#D3D3D3")
-# 
-# coeff_pal <- c("ns_add" = "#808080", "sig_add" = "#E66100", "low_int" = "#CEBEDA", "high_int" ="#7552A3")
-# 
-# 
-# # SG
-# 
-# sg_es_df <- do.call("bind_rows", sg_effects_out) %>% 
-#   left_join(traits, by = c("species" = "Species")) %>% 
-#   # group by 'mammal' or 'bird' class, which is character, so need .fun = first
-#   mutate(species_by_class = fct_reorder(species, class, .fun = first))
-# 
-# (sg_coef_plot <- ggplot(sg_es_df) +
-#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), 
-#                    color = sig_code), position = position_dodge2(width = 0.5)) +
-#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
-#                        y = reorder(species, Estimate),
-#                        color = sig_code), position = position_dodge2(width = 0.5)) +
-#     scale_color_manual(name = "", values = coeff_pal) +
-#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
-#     ylab("Species") +
-#     xlab("Standardized Conditional Effect") +
-#     ggtitle("Human Mobility") +
-#     theme_classic())
-# 
-# 
-# 
-# (sg_coef_plot_zoom <- ggplot(sg_es_df) +
-#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), 
-#                    color = sig_code), position = position_dodge2(width = 0.5)) +
-#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
-#                        y = reorder(species, Estimate),
-#                        color = sig_code), position = position_dodge2(width = 0.5)) +
-#     scale_color_manual(name = "", values = coeff_pal) +
-#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
-#     ylab("Species") +
-#     xlab("Standardized Conditional Effect") +
-#     ggtitle("Human Mobility") +
-#     xlim(-1,1)+
-#     theme_classic())
-# 
-# (sg_coef_plot_facet <- ggplot(sg_es_df) +
-#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), 
-#                    color = sig_code), position = position_dodge2(width = 0.5)) +
-#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
-#                        y = reorder(species, Estimate),
-#                        color = sig_code), position = position_dodge2(width = 0.5)) +
-#     scale_color_manual(name = "", values = coeff_pal) +
-#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
-#     ylab("") +
-#     xlab("Standardized Conditional Effect") +
-#     ggtitle("Human Mobility") +
-#     theme_classic() +
-#     facet_wrap(~class+species, scales = "free", ncol = 1, strip.position = "left",
-#                labeller = label_wrap_gen(width = 10))+
-#     theme(axis.text.y = element_blank(),
-#           # strip.background = element_blank(),
-#           # strip.text.x = element_blank(),
-#           axis.ticks.y = element_blank(),
-#           strip.text = element_text(size = 5),
-#           NULL))
-# 
-# # change the defalt setting for saving PNGs to avoid the requirement for having a display
-# options(bitmapType = "cairo")
-# ggsave(sg_coef_plot_facet, file = file.path(.outPF, "facet_test.png"), width = 4, height = 12)
-# # GHM
-# 
-# ghm_es_df <- do.call("bind_rows", ghm_effects_out)
-# 
-# (ghm_coef_plot <- ggplot(ghm_es_df) +
-#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), color = sig_code), 
-#                position = position_dodge2(width = 0.5)) +
-#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
-#                        y = reorder(species, Estimate), color = sig_code),
-#                    position = position_dodge2(width = 0.5),) +
-#     scale_color_manual(name = "", values = coeff_pal) +
-#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
-#     ylab("Species") +
-#     xlab("Standardized Conditional Effect") +
-#     ggtitle("Human Modification") +
-#     theme_classic())
-# 
-# 
-# 
-# (ghm_coef_plot_zoom <- ggplot(ghm_es_df) +
-#     geom_point(aes(x = Estimate, y = reorder(species, Estimate), color = sig_code), 
-#                position = position_dodge2(width = 0.5)) +
-#     geom_linerange(aes(xmin = LCL, xmax = HCL, 
-#                        y = reorder(species, Estimate), color = sig_code),
-#                    position = position_dodge2(width = 0.5),) +
-#     scale_color_manual(name = "", values = coeff_pal) +
-#     geom_vline(aes(xintercept = 0), linetype = "dashed") +
-#     ylab("Species") +
-#     xlab("Standardized Conditional Effect") +
-#     ggtitle("Human Modification") +
-#     xlim(c(-0.5, 0.5)) +
-#     theme_classic())
-# 
-# (coef_comb <- sg_coef_plot + ghm_coef_plot + plot_layout(guides = "collect"))
-# (coef_zoom_comb <- sg_coef_plot_zoom + ghm_coef_plot_zoom + plot_layout(guides = "collect"))
-# 
-# ggsave(coef_comb, file = file.path(.outPF, "space_use_coef.png"), width = 10, height = 6)
-# ggsave(coef_zoom_comb, file = file.path(.outPF, "space_use_coef_zoom.png"), width = 10, height = 6)
