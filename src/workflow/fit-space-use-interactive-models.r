@@ -67,7 +67,7 @@ suppressWarnings(
     library(doMC)
     
   }))
-
+options(scipen = 999)
 # Manage package conflicts
 conflict_prefer("accumulate", "foreach")
 conflict_prefer("ar", "brms")
@@ -106,8 +106,13 @@ size <- read_csv("out/dbbmm_size.csv") %>%
     species == "Chen caerulescens" ~ "Anser caerulescens",
     species == "Chen rossii" ~ "Anser rossii",
     TRUE ~ species
-  )) %>% 
-  distinct()
+  )) %>%
+  # exclude some individuals per data owner's request
+  filter(individual != 3418130234, 
+        individual != 3418130244, 
+        individual != 3418130245, 
+        individual != 3418130249) %>%
+  distinct() 
 
 # get ind count per species
 sp_sum <- size %>%
@@ -162,10 +167,11 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
     form,
     data = dat,
     family = student(),
-    inits = 0,
+    init = 0,
     cores = 1,
     iter = .iter,
-    thin = .thin
+    thin = .thin,
+    control = list(adapt_delta = 0.95)
   )
 
   #stash results into named list
