@@ -1,7 +1,0 @@
-/var/spool/slurmd/job20077060/slurm_script: line 9: SBATCH: command not found
-here() starts at /gpfs/gibbs/pi/jetz/from_loomis/de293/Anthropause/Anthropause_2023/Code
-Running startup script...
-Initializing database connection...
-Error in save(data.frame(unique(evt0$individual_week_year)), file = "/gpfs/gibbs/pi/jetz/from_loomis/de293/Anthropause/Anthropause_2023/out/indtb.Rdata") : 
-  object ‘data.frame(unique(evt0$individual_week_year))’ not found
-Execution halted
