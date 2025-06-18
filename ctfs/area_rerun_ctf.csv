@@ -1,7 +1,7 @@
-﻿species,adapt_delta,iter,thin,warmup,run
-Accipiter gentilis,0.99,10000,5,,0
-Anas discors,0.99,10000,5,,0
-Anser albifrons,0.99,10000,5,,0
-Anser rossii,0.99,10000,5,,0
-Ardea alba,0.99,10000,5,,0
+species,adapt_delta,iter,thin,warmup,run
+Accipiter gentilis,0.99,10000,5,,1
+Anas discors,0.99,10000,5,,1
+Anser albifrons,0.99,10000,5,,1
+Anser rossii,0.99,10000,5,,1
+Ardea alba,0.99,10000,5,,1
 Procyon lotor,0.99,50000,20,5000,1

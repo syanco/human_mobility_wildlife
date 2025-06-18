@@ -1,6 +1,6 @@
 species,adapt_delta,iter,thin,warmup,run
-Anas clypeata,0.99,10000,5,,0
-Anas discors,0.99,20000,10,,0
-Ardea alba,0.99,10000,5,,0
+Anas clypeata,0.99,10000,5,,1
+Anas discors,0.99,20000,10,,1
+Ardea alba,0.99,10000,5,,1
 Procyon lotor,0.99,50000,20,5000,1
-Ursus americanus,0.99,10000,5,,0
+Ursus americanus,0.99,10000,5,,1
