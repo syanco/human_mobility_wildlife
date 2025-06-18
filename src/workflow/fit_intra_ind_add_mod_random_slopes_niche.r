@@ -17,9 +17,9 @@ fit_intra_ind_mod_random_slopes.r <dat> <out> <cores> [<iter> <thin>]
 fit_intra_ind_mod_random_slopes.r (-h | --help)
 
 Parameters:
-  db: path to movement database. 
-  out: path to output directory.
-  nc: number of cores for parallel processing
+  dat: path to input data 
+  out: path to output directory
+  cores: number of cores for parallel processing
   
 Options:
 -h --help     Show this screen.
@@ -28,16 +28,15 @@ Options:
 
 #---- Input Parameters ----#
 if(interactive()) {
-  library(here)
   
-  .wd <- getwd()
+  .wd <- '/home/julietcohen/repositories/human_mobility_wildlife'
   
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
   .outP <- file.path(.wd,'out/intra_ind_models')
   
   .cores <- 1
   .iter <- 1000
-  .thin <- 2
+  .thin <- 5
   
 } else {
   library(docopt)
@@ -227,14 +226,14 @@ spp_sufficient_ss <- breadth_wide %>%
 # subset paired data to just the species with 5+ individuals
 breadth_wide_sub <- breadth_wide %>% 
   semi_join(spp_sufficient_ss, by = "scientificname") %>%
-  # scale each difference value 
+  # scale each difference value but retain class numeric with c()
+  # otherwise col is converted to class matrix
   ungroup() %>%
-  mutate(size_diff = scale(size_diff, center = F),
-         ghm_diff = scale(ghm_diff, center = F),
-         sg_diff = scale(sg_diff, center = F),
-         ndvi_diff = scale(ndvi_diff, center = F),
-         tmax_diff = scale(tmax_diff, center = F),
-         area_diff = scale(area_diff, center = F)) %>%
+  mutate(ghm_diff = c(scale(ghm_diff, center = F)),
+         sg_diff = c(scale(sg_diff, center = F)),
+         ndvi_diff = c(scale(ndvi_diff, center = F)),
+         tmax_diff = c(scale(tmax_diff, center = F)),
+         area_diff = c(scale(area_diff, center = F))) %>%
   # filter outliers for safegraph values
   filter(sg_diff < 2.5 & sg_diff > -2.5)
 
@@ -243,7 +242,7 @@ breadth_wide_sub <- breadth_wide %>%
 message("Starting that modeling magic...")
 
 # form <- bf(breadth_diff ~ area_diff + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1 + area_diff + sg_diff + ghm_diff + ndvi_diff + tmax_diff | scientificname) + (1 | scientificname:ind_f))
-form <- bf(breadth_diff ~ area_diff + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (area_diff + sg_diff + ghm_diff + ndvi_diff + tmax_diff || scientificname) + (1 | gr(ind_f, by = scientificname)))
+form <- bf(breadth_diff ~ 1 + area_diff + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1 + area_diff + sg_diff + ghm_diff + ndvi_diff + tmax_diff || scientificname) + (1 | gr(ind_f, by = scientificname)))
 message("Fitting models with formula:")
 print(form)
 
@@ -262,16 +261,15 @@ mod <- brm(
   control = list(adapt_delta = 0.95)
 )
 
-#stash results into named list
+# stash results into named list
 out <- list(
   data = breadth_wide_sub,
   model = mod
 )
 
-#write out results
-save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/min_5/wo_ar_term/niche_intra_ind_add_rs_mod_{Sys.Date()}.rdata"))
+# write out results
+save(out, file = glue("{.outP}/niche_intra_ind_add_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
-
 
 message(glue('Script complete in {diffmin(t0)} minutes'))

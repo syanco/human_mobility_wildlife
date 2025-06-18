@@ -17,7 +17,7 @@ fit_intra_ind_mod_random_slopes.r <dat> <out> <cores> [<iter> <thin>]
 fit_intra_ind_mod_random_slopes.r (-h | --help)
 
 Parameters:
-  db: path to movement databse. 
+  dat: path to input data
   out: path to output directory.
   nc: number of cores for parallel processing
   
@@ -28,16 +28,15 @@ Options:
 
 #---- Input Parameters ----#
 if(interactive()) {
-  library(here)
   
-  .wd <- getwd()
+  .wd <- '/home/julietcohen/repositories/human_mobility_wildlife'
   
   .datPF <- file.path(.wd,'out/dbbmm_size.csv')
   .outP <- file.path(.wd,'out/intra_ind_models')
   
   .cores <- 1
-  .iter <- 1000
-  .thin <- 2
+  .iter <- 10000
+  .thin <- 5
   
 } else {
   library(docopt)
@@ -203,12 +202,11 @@ size_wide_sub <- size_wide %>%
   semi_join(spp_sufficient_ss, by = "species") %>%
   # scale each difference value 
   ungroup() %>%
-  mutate(size_diff = scale(size_diff, center = F),
-         ghm_diff = scale(ghm_diff, center = F),
-         sg_diff = scale(sg_diff, center = F),
-         ndvi_diff = scale(ndvi_diff, center = F),
-         tmax_diff = scale(tmax_diff, center = F),
-         area_diff = scale(area_diff, center = F)) %>%
+  mutate(size_diff = c(scale(size_diff, center = F)),
+         ghm_diff = c(scale(ghm_diff, center = F)),
+         sg_diff = c(scale(sg_diff, center = F)),
+         ndvi_diff = c(scale(ndvi_diff, center = F)),
+         tmax_diff = c(scale(tmax_diff, center = F))) %>%
   # filter outliers for safegraph values
   filter(sg_diff < 2.5 & sg_diff > -2.5)
 
@@ -243,9 +241,8 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/min_5/wo_ar_term/size_intra_ind_add_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/size_intra_ind_add_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
-
 
 message(glue('Script complete in {diffmin(t0)} minutes'))

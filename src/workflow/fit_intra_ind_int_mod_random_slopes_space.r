@@ -2,22 +2,12 @@
 #
 # This script models random slopes within species as a function of changes in human activities
 # and environmental conditions experienced by each individual with movement data in both 2019 
-# and 2020. Human mobility and landscape modification are considered additive terms. The 
-# model includes a random intercept by species, a random intercept by individual, an autoregressive
-# covariance structure to account for temporal autocorrelation, and NDVI and TMAX as additive 
-# fixed effects.
+# and 2020. Human mobility and landscape modification are considered interactive terms. The 
+# model includes NDVI and TMAX as additive fixed effects, random slopes by species, and groups 
+# the individual random intercept hierarchically within species. Afterwards, we check
+# autocorrelation with the script check_intra_ind_mod_ac.R
  
 # See manuscript section: Behavioral plasticity of responses
-
-# other intra-ind model: form <- bf(breadth_diff ~ area_diff + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1|scientificname/ind_f) + ar(time = wk, gr = ind_f))
-# in order to achieve random clopes, change component (1|scientificname/ind_f) which is ind within sp
-# we want to allow the slopes to vary within species not by ind
-# maybe: (1 + x | species) + (1 | species:ind)
-# form <- bf(breadth_diff ~ area_diff + sg_diff + ghm_diff + ndvi_diff + tmax_diff + (1 + x | species) + (1 | species:ind) + ar(time = wk, gr = ind_f))
-# https://bbolker.github.io/mixedmodels-misc/glmmFAQ.html
-# we will be able to tell from the params output if it did what we think
-# it may struggle to converge, then we fiddle with MCMC (inc iterations)
-# test locally, reduce number of iterations so it can run on my computer first
 
 # ==== Setup ====
 
@@ -27,7 +17,7 @@ fit_intra_ind_mod_random_slopes.r <dat> <out> <cores> [<iter> <thin>]
 fit_intra_ind_mod_random_slopes.r (-h | --help)
 
 Parameters:
-  db: path to movement databse. 
+  dat: path to input data 
   out: path to output directory.
   nc: number of cores for parallel processing
   
@@ -46,12 +36,12 @@ if(interactive()) {
   .outP <- file.path(.wd,'out/intra_ind_models')
   
   .cores <- 1
-  .iter <- 1000
-  .thin <- 2
+  .iter <- 10000
+  .thin <- 5
   
 } else {
+
   library(docopt)
-  # library(rprojroot)
   
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
@@ -213,12 +203,11 @@ size_wide_sub <- size_wide %>%
   semi_join(spp_sufficient_ss, by = "species") %>%
   # scale each difference value 
   ungroup() %>%
-  mutate(size_diff = scale(size_diff, center = F),
-         ghm_diff = scale(ghm_diff, center = F),
-         sg_diff = scale(sg_diff, center = F),
-         ndvi_diff = scale(ndvi_diff, center = F),
-         tmax_diff = scale(tmax_diff, center = F),
-         area_diff = scale(area_diff, center = F)) %>%
+  mutate(size_diff = c(scale(size_diff, center = F)),
+         ghm_diff = c(scale(ghm_diff, center = F)),
+         sg_diff = c(scale(sg_diff, center = F)),
+         ndvi_diff = c(scale(ndvi_diff, center = F)),
+         tmax_diff = c(scale(tmax_diff, center = F))) %>%
   # filter outliers for safegraph values
   filter(sg_diff < 2.5 & sg_diff > -2.5)
 
@@ -254,7 +243,7 @@ out <- list(
 )
 
 #write out results
-save(out, file = glue("{.outP}/intra_ind_int_rs_sufficient_ss/min_5/wo_ar_term/size_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
+save(out, file = glue("{.outP}/size_intra_ind_int_rs_mod_{Sys.Date()}.rdata"))
 
 #---- Finalize script ----#
 
