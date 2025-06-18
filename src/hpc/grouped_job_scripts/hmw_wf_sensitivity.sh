@@ -95,13 +95,3 @@ echo "studyid, individual, scientificname, year, status, week" > $wd/out/niche_s
 Rscript $src/calc-niche-breadth-subsample.r /tmp/mosey_mod.db ./out/niche_subsamples/niche_determinant_anthropause_subsample_10.csv 24 10
 
 echo "SCRIPT COMPLETE: calc-niche-breadth-subsample.r for sample size 10"
-
-# ------------ Plot niche breadth subsample ------------
-
-# TODO: ADJUST FOLLOWING TO PLOT ALL 5 ITERATIONS OF SUBSAMPLES
-
-#echo "STARTING SCRIPT: graph_niche_subsample.R"
-
-#Rscript $src/graph_niche_subsample.R
-
-#echo "SCRIPT COMPLETE: graph_niche_subsample.R"

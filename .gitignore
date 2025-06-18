@@ -46,6 +46,5 @@ processed_data/*
 gee_data/*
 logs/*
 out/*
-old_slurm_output/*
-out_old/*
-out_20250409_paused/*
+delete/*
+slurm_final_run/*

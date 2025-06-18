@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 24:00:00
+#SBATCH -t 10:00:00
 #SBATCH --job-name fix_rate
 #SBATCH -c 10
 #SBATCH --mail-type ALL
@@ -35,7 +35,7 @@ $CXX --version
 echo "Make version:"
 make --version
 
-echo "study_id, species, individual_id, year, fix_rate_min, fix_rate_max" > $wd/out/fixrate_min_max.csv
+echo "study_id, species, individual_id, year, fix_rate_med, fix_rate_min, fix_rate_max" > $wd/out/fixrate_med_min_max.csv
 
 Rscript $src/fix_rate_fig.r /tmp/mosey_mod.db $wd/out 7
 

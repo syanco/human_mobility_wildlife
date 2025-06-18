@@ -1,14 +1,14 @@
 #!/bin/bash
 
 #SBATCH -t 48:00:00
-#SBATCH --job-name hmw_wf_part2_models
+#SBATCH --job-name hmw_wf_part2
 #SBATCH -c 32
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
+#SBATCH --mem=300G 
 ##SBATCH --nodelist=node53
 ##SBATCH --partition=largemem
 ##SBATCH --mem-per-cpu=112G
-##SBATCH --mem=300G 
 
 # set up paths
 export wd=/home/julietcohen/repositories/human_mobility_wildlife
@@ -83,20 +83,11 @@ Rscript $src/calc-niche-breadth.r /tmp/mosey_mod.db ./out/niche_determinant_anth
 echo "SCRIPT COMPLETE: calc-niche-breadth.r"
 
 
-# ------------ HPC step 11: Inferential Models - Fit space use models part 1 ------------
-
-#echo "STARTING SCRIPT: fit-space-use-dot-models.r"
-
-#Rscript $src/fit-space-use-dot-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_dot 7 3 10000 5
-
-#echo "SCRIPT COMPLETE: fit-space-use-dot-models.r"
-
-
 # ------------ HPC step 12: Inferential Models - Fit space use models part 2 ------------
 
 echo "STARTING SCRIPT: fit-space-use-interactive-models.r"
 
-Rscript $src/fit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_interactive 18 3 10000 5
+Rscript $src/fit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/skunk_reruns/area_interactive 1 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-space-use-interactive-models.r"
 
@@ -105,7 +96,7 @@ echo "SCRIPT COMPLETE: fit-space-use-interactive-models.r"
 
 echo "STARTING SCRIPT: fit-space-use-additive-models.r"
 
-Rscript $src/fit-space-use-additive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_additive 18 3 10000 5
+Rscript $src/fit-space-use-additive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/skunk_reruns/area_additive 1 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-space-use-additive-models.r"
 

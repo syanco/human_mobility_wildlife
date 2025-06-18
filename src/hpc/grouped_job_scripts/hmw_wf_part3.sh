@@ -6,8 +6,6 @@
 #SBATCH --mail-type ALL
 #SBATCH --mail-user jscohen@ucsb.edu
 #SBATCH --mem=300G 
-##SBATCH --nodelist=node53
-##SBATCH --partition=largemem
 
 # set up paths
 export wd=/home/julietcohen/repositories/human_mobility_wildlife
@@ -36,15 +34,6 @@ echo "C++ compiler version:"
 $CXX --version
 echo "Make version:"
 make --version
-
-
-# ------------ HPC step 15: Fit niche breadth models part 1 ------------
-
-#echo "STARTING SCRIPT: fit-niche-breadth-dot-models.r"
-
-#Rscript $src/fit-niche-breadth-dot-models.r $wd/out/niche_determinant_anthropause.csv $wd/out/dbbmm_size.csv $wd/out/single_species_models/niche_dot 14 3 10000 5
-
-#echo "SCRIPT COMPLETE: fit-niche-breadth-dot-models.r"
 
 
 # ------------ HPC step 16: Fit niche breadth models part 2 ------------
