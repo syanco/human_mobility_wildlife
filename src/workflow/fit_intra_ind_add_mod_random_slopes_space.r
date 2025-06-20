@@ -19,7 +19,7 @@ fit_intra_ind_mod_random_slopes.r (-h | --help)
 Parameters:
   dat: path to input data
   out: path to output directory.
-  nc: number of cores for parallel processing
+  cores: number of cores for parallel processing
   
 Options:
 -h --help     Show this screen.
@@ -40,7 +40,6 @@ if(interactive()) {
   
 } else {
   library(docopt)
-  # library(rprojroot)
   
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
@@ -202,11 +201,11 @@ size_wide_sub <- size_wide %>%
   semi_join(spp_sufficient_ss, by = "species") %>%
   # scale each difference value 
   ungroup() %>%
-  mutate(size_diff = c(scale(size_diff, center = F)),
-         ghm_diff = c(scale(ghm_diff, center = F)),
-         sg_diff = c(scale(sg_diff, center = F)),
-         ndvi_diff = c(scale(ndvi_diff, center = F)),
-         tmax_diff = c(scale(tmax_diff, center = F))) %>%
+  mutate(size_diff = scale(size_diff, center = F),
+         ghm_diff = scale(ghm_diff, center = F),
+         sg_diff = scale(sg_diff, center = F),
+         ndvi_diff = scale(ndvi_diff, center = F),
+         tmax_diff = scale(tmax_diff, center = F)) %>%
   # filter outliers for safegraph values
   filter(sg_diff < 2.5 & sg_diff > -2.5)
 

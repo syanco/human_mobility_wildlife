@@ -6,7 +6,7 @@
 # hypervolumes (Lu et al. 2021) on weekly time scales. Subset event data for
 # each individual animal to only weeks that have a minimum number of events. Run 
 # the script 5 times with 10, 20, 30, 40, and 50 as the sample size and output
-# a CSV for each set of  for the multi-variate niche hyperbolume. Plot the results 
+# a CSV for each set of  for the multi-variate niche hypervolume. Plot the results 
 # with graph_niche_subsample.R to determine the minimum value of events per week at 
 # to use as input to filter_data_mins.R
 
@@ -33,18 +33,16 @@ Options:
 
 #---- Input Parameters ----#
 if(interactive()) {
-  # library(here)
   
   .wd <- "/home/julietcohen/repositories/human_mobility_wildlife"
   
   .outPF <- file.path(.wd,'out/niche_subsamples/niche_determinant_anthropause_subsample_20.csv')
   .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
   
-  #.nc <- 2
-  
   .samp_size <- 20
   
 } else {
+  
   library(docopt)
   
   ag <- docopt(doc, version = '0.1\n')

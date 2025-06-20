@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 10:00:00
+#SBATCH -t 72:00:00
 #SBATCH --job-name rs_n
 #SBATCH -c 15
 #SBATCH --mail-type ALL

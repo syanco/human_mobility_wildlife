@@ -4,19 +4,22 @@
 
 library(tidyverse)
 
-dir <- "~/repositories/human_mobility_wildlife/out/intra_ind_models/"
+.wd <- "~/repositories/human_mobility_wildlife/out/intra_ind_models/"
 
 # --- AREA ---
 
-load(file.path(dir, "area_interactive_rs-SY.rdata"))
-test_dat <- test_mod$data
+load(list.files(path = file.path(dir, "out/intra_ind_models"), 
+                pattern = "^size_intra_ind_int_rs_mod_.*\\.rdata$", 
+                full.names = TRUE)
+
+dat <- out$data
 
 # Get posterior fitted values (mean)
-test_dat$resid <- residuals(test_mod, summary = TRUE)[, "Estimate"]
-test_dat$fitted <- fitted(test_mod, summary = TRUE)[, "Estimate"]
+dat$resid <- residuals(out, summary = TRUE)[, "Estimate"]
+dat$fitted <- fitted(out, summary = TRUE)[, "Estimate"]
 
 # Compute autocorrelation per individual
-acf_plots <- test_dat %>%
+acf_plots <- dat %>%
   group_by(ind_f) %>%
   summarise(acf1 = acf(resid, 
                        plot = FALSE, 
@@ -39,22 +42,25 @@ plot <- ggplot(acf_plots, aes(x = acf1)) +
        y = "Count",
        title = "Area Intra-Ind Model: Residual autocorrelation across individuals")
 
-ggsave(file.path(dir, "area_ac_check.png"))
+ggsave(file.path(.wd, "area_ac_check.png"))
 
 
 
 
 # --- NICHE ---
 
-load(file.path(dir, "niche_interactive_rs-SY.rdata"))
-test_dat <- test_mod$data
+load(list.files(path = file.path(dir, "out/intra_ind_models"), 
+                pattern = "^niche_intra_ind_int_rs_mod_.*\\.rdata$", 
+                full.names = TRUE)
+
+dat <- out$data
 
 # Get posterior fitted values (mean)
-test_dat$resid <- residuals(test_mod, summary = TRUE)[, "Estimate"]
-test_dat$fitted <- fitted(test_mod, summary = TRUE)[, "Estimate"]
+dat$resid <- residuals(out, summary = TRUE)[, "Estimate"]
+dat$fitted <- fitted(out, summary = TRUE)[, "Estimate"]
 
 # Compute autocorrelation per individual
-acf_plots <- test_dat %>%
+acf_plots <- dat %>%
   group_by(ind_f) %>%
   summarise(acf1 = acf(resid, 
                        plot = FALSE, 

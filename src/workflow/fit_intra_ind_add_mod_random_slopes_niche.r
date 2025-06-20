@@ -229,11 +229,11 @@ breadth_wide_sub <- breadth_wide %>%
   # scale each difference value but retain class numeric with c()
   # otherwise col is converted to class matrix
   ungroup() %>%
-  mutate(ghm_diff = c(scale(ghm_diff, center = F)),
-         sg_diff = c(scale(sg_diff, center = F)),
-         ndvi_diff = c(scale(ndvi_diff, center = F)),
-         tmax_diff = c(scale(tmax_diff, center = F)),
-         area_diff = c(scale(area_diff, center = F))) %>%
+  mutate(ghm_diff = scale(ghm_diff, center = F),
+         sg_diff = scale(sg_diff, center = F),
+         ndvi_diff = scale(ndvi_diff, center = F),
+         tmax_diff = scale(tmax_diff, center = F),
+         area_diff = scale(area_diff, center = F)) %>%
   # filter outliers for safegraph values
   filter(sg_diff < 2.5 & sg_diff > -2.5)
 

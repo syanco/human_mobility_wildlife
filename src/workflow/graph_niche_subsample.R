@@ -1,3 +1,8 @@
+# Plot the results from the niche breadth sensitivity analysis executed
+# with calc-niche-breadth-subsample.r that subsampled the weekly event data
+# with sizes of 10, 20, 30, 40, and 50 events and calculated niche 
+# hypervolumes. Outputs niche_subsample_plot.png
+
 #---- Graph Niche Subsample ----#
 
 library(tidyverse)
