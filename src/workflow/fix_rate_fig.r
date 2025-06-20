@@ -28,7 +28,7 @@ if(interactive()) {
   
   .wd <- "/home/julietcohen/repositories/human_mobility_wildlife"
   .dbPF <- file.path(.wd, 'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
-  # .outPF <- file.path(.wd,'out')
+  .outPF <- file.path(.wd,'out')
   
   .nc <- 1
   
@@ -204,6 +204,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
   }
 
 
+library(tidyverse)
 options(scipen = 999)
 
 fixrate <- read_csv(glue("{.outPF}/fixrate_med_min_max.csv"))
