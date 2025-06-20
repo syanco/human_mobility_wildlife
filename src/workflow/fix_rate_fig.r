@@ -203,4 +203,19 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
     }
   }
 
+
+options(scipen = 999)
+
+fixrate <- read_csv(glue("{.outPF}/fixrate_med_min_max.csv"))
+
+fixrate_species <- fixrate %>%
+  group_by(species) %>%
+  # calc median fixrate of the medians across all studies 
+  # within species grouping
+  summarise(med_fixrate_minutes = median(fix_rate_med)) %>% 
+  # convert minutes to hours
+  mutate(med_fixrate_hours = med_fixrate_minutes/60)
+
+write_csv(fixrate_species, glue("{.outPF}/fixrate_sp_median.csv"))
+
 message(glue('Script complete in {diffmin(t0)} minutes'))
