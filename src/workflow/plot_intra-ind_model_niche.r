@@ -15,16 +15,9 @@ int_mod_fp <- list.files(path = file.path(.wd, "out/intra_ind_models"), pattern 
 load(int_mod_fp)
 int_mod <- out$mod
 
-# loo(add_mod, int_mod)
-# waic(add_mod, int_mod, compare = T)
-# 
-# conditional_effects(int_mod)
-# 
-# pp_check(int_mod)
-# pp_check(add_mod, type='error_scatter_avg')
+# plot interactive model
+fe <- fixef(int_mod) # get fixed effects
 
-fe <- fixef(add_mod) #get fixed effects
-# add_re <- posterior_summary(out$model, variable = c("sd_grp__Intercept", "sigma"))
 adddf <- tibble("species"=out$species, # grab estimates
                 # SG EFFECTS
                 "sg_diff"=as.numeric(fe["sg_diff", "Estimate"]),
@@ -34,12 +27,7 @@ adddf <- tibble("species"=out$species, # grab estimates
                 # GHM EFFECTS
                 "ghm_diff"=as.numeric(fe["ghm_diff", "Estimate"]),
                 "ghm_diff_lci"=fe["ghm_diff", "Q2.5"],
-                "ghm_diff_uci"=fe["ghm_diff", "Q97.5"],
-                
-                # RANDOM EFFECTS
-                # add_resid = add_re[2,1],
-                # add_group = add_re[1,1]
-) %>% 
+                "ghm_diff_uci"=fe["ghm_diff", "Q97.5"]) %>% 
   mutate(sg_sign = case_when(sg_diff < 0 ~ "n",
                              sg_diff >= 0 ~ "p"),
          sg_sig = case_when((sg_diff_lci < 0 & 0 < sg_diff_uci) ~ "N",
@@ -50,7 +38,6 @@ adddf <- tibble("species"=out$species, # grab estimates
                                  sg_sig == "Y" & sg_sign == "p" ~ "Pos",
                                  sg_sig == "N" ~ "Non Sig"), 
                        levels=c("Neg", "Pos", "Non Sig")),
-         
          ghm_sign = case_when(ghm_diff < 0 ~ "n",
                               ghm_diff >= 0 ~ "p"),
          ghm_sig = case_when((ghm_diff_lci < 0 & 0 < ghm_diff_uci) ~ "N",
@@ -60,13 +47,7 @@ adddf <- tibble("species"=out$species, # grab estimates
          code = factor(case_when(ghm_sig == "Y" & ghm_sign == "n" ~ "Neg",
                                  ghm_sig == "Y" & ghm_sign == "p" ~ "Pos",
                                  ghm_sig == "N" ~ "Non Sig"), 
-                       levels=c("Neg", "Pos", "Non Sig")),
-         
-         # add_ICC = add_group/(add_group + add_resid),
-         # add_var_ratio = add_resid/add_group
-  )
-
-# adddf
+                       levels=c("Neg", "Pos", "Non Sig")))
 
 
 pal2 <- c("#E66100", "#5D3A9B") # 2 color pallete
@@ -74,37 +55,34 @@ pal3 <- c(pal2, "#808080") # add gray to the pallete
 palnew <- c("#7552A3", "#CEBEDA")
 palgray <- c("#808080", "#D3D3D3")
 
+ghmq <- quantile(out$data$ghm_diff, probs = c(0.2, 0.8), na.rm = T)
 
+ce_int <- conditional_effects(x = int_mod,
+                              effects = "sg_diff:ghm_diff",
+                              int_conditions = list(ghm_diff = ghmq),
+                              re_formula = NA,
+                              prob = 0.9,
+                              method = "posterior_linpred")
 
-ce_sg <- conditional_effects(x=add_mod,
-                             effects = "sg_diff",
-                             re_formula = NA)
 (sg_ce_plot <-  plot(ce_sg, 
                      plot = F,
                      rug = F,
                      line_args = list("se" = T,
                                       "color" = "black",
-                                      "fill" = "gray"))[[1]] + 
-    # scale_color_manual(values = palnew[3])+         
+                                      "fill" = "gray"))[[1]] +  
     theme_tufte() +
-    # xlab(glue("{expression(delta)} Human Mobility")) +
     xlab(bquote(~Delta~"Human Mobility")) +
     ylab(bquote(~Delta~"Niche Breadth"))+
     geom_vline(aes(xintercept = 0), linetype = "dashed") +
     geom_hline(aes(yintercept = 0), linetype = "dashed") +
-    theme(
-      axis.line = element_line(size = .5),
-          # axis.text = element_blank(),
-          # axis.ticks = element_blank(),
-          # axis.title = element_blank(),
-          aspect.ratio = 1,
-          # text = element_text(family = "Roboto", size = 20)
-    ))
+    theme(axis.line = element_line(size = .5),
+          aspect.ratio = 1))
+
 ggsave(filename = file.path(.wd, "out/niche_intra_ind_sg.png"), sg_ce_plot,
        width = 6, height = 6)
 
 
-ce_ghm <- conditional_effects(x=add_mod,
+ce_ghm <- conditional_effects(x = int_mod,
                              effects = "ghm_diff",
                              re_formula = NA)
 (ghm_ce_plot <-  plot(ce_ghm, 
@@ -121,12 +99,8 @@ ce_ghm <- conditional_effects(x=add_mod,
     geom_vline(aes(xintercept = 0), linetype = "dashed") +
     geom_hline(aes(yintercept = 0), linetype = "dashed") +
     theme(axis.line = element_line(size = .5),
-          # axis.text = element_blank(),
-          # axis.ticks = element_blank(),
-          # axis.title = element_blank(),
-          aspect.ratio = 1
-          # text = element_text(family = "Roboto", size = 20)
-    ))
+          aspect.ratio = 1))
+
 ggsave(filename = file.path(.wd, "out/niche_intra_ind_ghm.png"), ghm_ce_plot,
        width = 6, height = 6)
 
@@ -171,8 +145,8 @@ ce_int <- conditional_effects(x=int_mod,
                                       face = "bold"),
           axis.ticks.x = element_line(color = "#4a4e4d"),
           text = element_text(family = "Arial", color = "#4a4e4d")) +
-    labs(x = "Change in human mobility", y = "Change in area size")
-)
+    labs(x = "Change in human mobility", y = "Change in area size"))
+
 ggsave(filename = file.path(.wd, "out/niche_intra_ind_int.png"), int_ce_plot)
 
 
@@ -187,15 +161,13 @@ niche_med_ghm <- median(int_mod$data$ghm_diff, na.rm = T)
     as.data.frame() %>% 
     rename("Estimate" = "ghm_diff.trend",
            "LCL" = "lower.HPD",
-           "HCL" = "upper.HPD") 
-)
+           "HCL" = "upper.HPD"))
 
 (niche_sg_effects <- emtrends(int_mod, ~ "ghm_diff", var = "sg_diff", 
                               at = list("ghm_diff" = niche_med_ghm))  %>% 
     as.data.frame() %>% 
     rename("Estimate" = "sg_diff.trend",
            "LCL" = "lower.HPD",
-           "HCL" = "upper.HPD") 
-)
+           "HCL" = "upper.HPD"))
 
 parameters::parameters(int_mod)
