@@ -1,0 +1,48 @@
+name: hmw_py3-9
+channels:
+  - defaults
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - ca-certificates=2024.9.24
+  - libcxx=14.0.6
+  - libffi=3.4.4
+  - ncurses=6.4
+  - openssl=3.0.15
+  - pip=24.2
+  - python=3.9.20
+  - readline=8.2
+  - setuptools=75.1.0
+  - sqlite=3.45.3
+  - tk=8.6.14
+  - tzdata=2024b
+  - wheel=0.44.0
+  - xz=5.4.6
+  - zlib=1.2.13
+  - pip:
+      - cachetools==5.5.0
+      - certifi==2024.8.30
+      - charset-normalizer==3.4.0
+      - earthengine-api==0.1.370
+      - google-api-core==2.23.0
+      - google-api-python-client==2.151.0
+      - google-auth==2.36.0
+      - google-auth-httplib2==0.2.0
+      - google-cloud-core==2.4.1
+      - google-cloud-storage==2.18.2
+      - google-crc32c==1.6.0
+      - google-resumable-media==2.7.2
+      - googleapis-common-protos==1.66.0
+      - httplib2==0.22.0
+      - idna==3.10
+      - numpy==2.0.2
+      - proto-plus==1.25.0
+      - protobuf==5.28.3
+      - pyasn1==0.6.1
+      - pyasn1-modules==0.4.1
+      - pyparsing==3.2.0
+      - requests==2.32.3
+      - rsa==4.9
+      - uritemplate==4.1.1
+      - urllib3==2.2.3
+prefix: /opt/anaconda3/envs/hmw_py3-9
