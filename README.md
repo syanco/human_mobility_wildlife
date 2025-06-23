@@ -37,7 +37,11 @@ The code in this repository anticipates the following minimal directory structur
 
 ```
 
-Data are stored as a [mosey_db](https://github.com/benscarlson/mosey_db), which is a SQLite relational database built to store data from [MoveBank](www.movebank.org). Raw wildlife movement data associated with this project includes data for species that pose conservation concerns and therefore cannot be released publicly. Aggregated data products at the individual-year-week scale, model files and plots, and tabular model results are publicly available [here on Open Science Framework](https://osf.io/3ua2c/files/osfstorage).
+Data are stored as a [mosey_db](https://github.com/benscarlson/mosey_db), which is a SQLite relational database built to store data from [MoveBank](www.movebank.org).
+
+[This repository release](https://github.com/julietcohen/mosey_db/releases/tag/v1.0.0) includes the forked `mosey_db` code used to build the database used as input for this repository's workflow.
+
+Raw wildlife movement data associated with this project includes data for species that pose conservation concerns and therefore cannot be released publicly. Aggregated data products at the individual-year-week scale, model files and plots, and tabular model results are publicly available [here on Open Science Framework](https://osf.io/3ua2c/files/osfstorage).
 
 ## Citation
 
