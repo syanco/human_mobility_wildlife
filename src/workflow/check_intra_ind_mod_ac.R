@@ -4,19 +4,19 @@
 
 library(tidyverse)
 
-.wd <- "~/repositories/human_mobility_wildlife/out/intra_ind_models/"
+.wd <- "~/repositories/human_mobility_wildlife/out/intra_ind_models"
 
 # --- AREA ---
 
-load(list.files(path = file.path(dir, "out/intra_ind_models"), 
+load(list.files(path = .wd, 
                 pattern = "^size_intra_ind_int_rs_mod_.*\\.rdata$", 
-                full.names = TRUE)
+                full.names = TRUE))
 
 dat <- out$data
 
 # Get posterior fitted values (mean)
-dat$resid <- residuals(out, summary = TRUE)[, "Estimate"]
-dat$fitted <- fitted(out, summary = TRUE)[, "Estimate"]
+dat$resid <- residuals(out$model, summary = TRUE)[, "Estimate"]
+dat$fitted <- fitted(out$model, summary = TRUE)[, "Estimate"]
 
 # Compute autocorrelation per individual
 acf_plots <- dat %>%
@@ -49,15 +49,15 @@ ggsave(file.path(.wd, "area_ac_check.png"))
 
 # --- NICHE ---
 
-load(list.files(path = file.path(dir, "out/intra_ind_models"), 
+load(list.files(path = .wd, 
                 pattern = "^niche_intra_ind_int_rs_mod_.*\\.rdata$", 
-                full.names = TRUE)
+                full.names = TRUE))
 
 dat <- out$data
 
 # Get posterior fitted values (mean)
-dat$resid <- residuals(out, summary = TRUE)[, "Estimate"]
-dat$fitted <- fitted(out, summary = TRUE)[, "Estimate"]
+dat$resid <- residuals(out$model, summary = TRUE)[, "Estimate"]
+dat$fitted <- fitted(out$model, summary = TRUE)[, "Estimate"]
 
 # Compute autocorrelation per individual
 acf_plots <- dat %>%
@@ -83,4 +83,4 @@ plot <- ggplot(acf_plots, aes(x = acf1)) +
        y = "Count",
        title = "Niche Intra-Ind Model: Residual autocorrelation across individuals")
 
-ggsave(file.path(dir, "niche_ac_check.png"))
+ggsave(file.path(.wd, "niche_ac_check.png"))
