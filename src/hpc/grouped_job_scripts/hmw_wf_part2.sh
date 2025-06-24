@@ -87,7 +87,7 @@ echo "SCRIPT COMPLETE: calc-niche-breadth.r"
 
 echo "STARTING SCRIPT: fit-space-use-interactive-models.r"
 
-Rscript $src/fit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/skunk_reruns/area_interactive 1 3 10000 5
+Rscript $src/fit-space-use-interactive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_interactive 1 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-space-use-interactive-models.r"
 
@@ -96,7 +96,7 @@ echo "SCRIPT COMPLETE: fit-space-use-interactive-models.r"
 
 echo "STARTING SCRIPT: fit-space-use-additive-models.r"
 
-Rscript $src/fit-space-use-additive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/skunk_reruns/area_additive 1 3 10000 5
+Rscript $src/fit-space-use-additive-models.r $wd/out/dbbmm_size.csv $wd/out/single_species_models/area_additive 1 3 10000 5
 
 echo "SCRIPT COMPLETE: fit-space-use-additive-models.r"
 
