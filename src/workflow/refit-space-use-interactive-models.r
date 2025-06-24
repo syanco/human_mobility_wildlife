@@ -114,7 +114,7 @@ size <- read_csv("out/dbbmm_size.csv") %>%
 sp_sum <- size %>%
   group_by(species) %>%
   summarize(nind = length(unique(ind_f))) %>%
-  filter(nind > .minsp) #require a minimum of 10 individuals
+  filter(nind >= .minsp) # require a minimum of 3 individuals
 
 # ==== Start cluster and register backend ====
 registerDoMC(.cores)

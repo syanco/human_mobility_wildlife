@@ -141,7 +141,7 @@ breadth <- read_csv(.datPF) %>%
 sp_sum <- breadth %>%
   group_by(scientificname) %>%
   summarize(nind = length(unique(ind_f))) %>%
-  filter(nind > .minsp) #require a minimum of 10 individuals
+  filter(nind >= .minsp) # require a minimum of 3 individuals
 
 # ==== Start cluster and register backend ====
 registerDoMC(.cores)
