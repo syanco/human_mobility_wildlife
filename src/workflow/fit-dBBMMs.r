@@ -33,11 +33,11 @@ Options:
 if(interactive()) {
   library(here)
   
-  .wd <- '~/project/covid-19_movement'
+  .wd <- getwd()
   rd <- here::here
   
   .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .dbPF <- file.path('/Users/juliet/Documents/OliverLab/covid_paper/db_explore/db_after_hmw_wf_part1/mosey_mod_clean-movement_complete.db')
   
   .nc <- 2
   
@@ -48,10 +48,10 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd, 'src/funs/input_parse.r'))
   
-  .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
+  .outPF <- makePath(ag$out)
   .nc <- ag$nc
   
 }
@@ -61,7 +61,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -73,10 +73,11 @@ suppressWarnings(
     library(move)
     library(doMC)
     library(foreach)
+    library(glue)
   }))
 
 #Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
+list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
 #---- Initialize database ----#
@@ -85,21 +86,31 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual') %>% 
-  collect()
+indtb <- tbl(db,'individual_clean') %>%
+# note that the following species name fixes were also introduced to
+# trimming step, so can remove here when workflow is restarted
+  mutate(taxon_canonical_name = case_when(
+        study_id == 2548691779 ~ "Odocoileus hemionus",
+        study_id == 2575515057 ~ "Cervus elaphus",
+        study_id == 1044238185 ~ "Alces alces",
+        TRUE ~ taxon_canonical_name)) %>%
+  collect() 
 
-message("Disconnecting from databse...")
+indtb <- indtb[!duplicated(indtb),]
+
+message("Disconnecting from database...")
 dbDisconnect(db)
 
 ind <- indtb %>% 
   pull(individual_id)
 
+#remove duplicated created due to merging of dbs
+ind <- ind[!duplicated(ind)] 
 
 yearvec <- c("2019", "2020")
 
 # Read in output log
 log <- read_csv(glue("{.outPF}/dbbmm_log.csv"))
-
 
 registerDoMC(.nc)
 
@@ -110,7 +121,7 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
     # check whether individual has been previously considered
     if(log %>% 
        filter(ind_id == ind[j] & year == yearvec[i]) %>% 
-       nrow() == 0){
+       nrow() == 0) {
       message(glue("Starting individual {ind[j]}, year {yearvec[i]}..."))  
       
       #---- Initialize database ----#
@@ -134,7 +145,6 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         filter(individual_id == !!ind[j]) %>% 
         pull(study_id)
       
-      
       message("Filtering data and manipulating dates...")
       
       # prep data
@@ -145,32 +155,49 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
         filter(yr == !!yearvec[i]) %>%
         collect() %>% 
         mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T")) %>% 
+        distinct() %>% 
         # sort by timestamp
         arrange(timestamp)
       
-      dbDisconnect(db) 
+      dbDisconnect(db)
       
-      # TODO: this is an arbitrary minimum... check
-      if(nrow(evt_mod) <= 25){
-        message(glue("Insufficient records for individual {ind[j]}, year {yearvec[i]}, movin on..."))
+      # check that the filtered dataframe has any data
+      if (nrow(evt_mod) == 0) {
         
-        # Make entry in log file
-        outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
-                           glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                           0, as.character(Sys.Date())), 
-                         nrow = 1)
-        write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
-                    col.names = F, sep = ",")
+        # if no rows, record this combination as failed in the appropriate df
+        # in order to track how many errors are from lack of data
+        # versus failed dBBMM generation
+        no_ind_yr_pairs <- data.frame("study_id" = studyid,
+                                      "individual_id" = ind[j],
+                                      "year" = yearvec[i])
+        
+        write.table(no_ind_yr_pairs, 
+                    glue("{.outPF}/no_ind_yr_pairs.csv"), 
+                    append = T, 
+                    row.names = F, 
+                    col.names = F, 
+                    sep = ",")
+
+        message(glue("No paired data available for ind {ind[j]}, yr {yearvec[i]}; no dBBMM available."))
+        
+        # move onto the next iteration of ind and year, no use in trying to fit the dMMBB
+        return(NULL)
         
       } else {
+        
         # if event data is large...
         # TODO:  I think this upper size check is unecessary - maybe remove someday, but for now I just set the threshold very high
-        if(nrow(evt_mod) > 50000){
-          # Just make anentry in the big mem log file - save dbbmm for later
-          outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
-                             glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                             0, as.character(Sys.Date())), 
-                           nrow = 1)
+        if(nrow(evt_mod) > 100000){
+          
+          # ...make an entry in the big mem log file - save dbbmm for later
+          outlog <- data.frame("species" = scientificname, 
+                               "ind_id" = ind[j], 
+                               "study_id" = studyid, 
+                               "year" = yearvec[i], 
+                               "out_type" = "dbbm", 
+                               "filename" = glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"), 
+                               "produced" = 0, 
+                               "out_date" = as.character(Sys.Date()))
           write.table(outlog, glue("{.outPF}/dbbmm_bigmem_log.csv"), append = T, row.names = F, 
                       col.names = F, sep = ",")
         } else {
@@ -184,63 +211,115 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
             evt_tmp <- evt_mod %>% 
               select(lon, lat, timestamp, wk)
             
-            evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp, trt = evt_tmp$trt,
+            evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp,
                            proj=CRS("+proj=longlat"))
             burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
+
+            # free up memory
+            rm(evt_tmp)
+            gc()
+
             #id "intended fix rate"
             fixmed <- median(timeLag(x=evt_mv, units="mins"))
             evt_burst <- burst(evt_mv, burstid)
-            evt_mv_t <- spTransform(evt_burst, center = T)
+
+            # transform for spTransform's default CRS, equidistant
+            # evt_mv_t <- spTransform(evt_burst, center = T)
+
+            # transform to an equal area CRS (Mollweide), as advised by dbbmm documentation
+            evt_mv_t <- spTransform(evt_burst, CRSobj="+proj=moll +ellps=WGS84")
+
+            # remove variance of the segments corresponding to large time gaps
             dbb_var <- brownian.motion.variance.dyn(object = evt_mv_t, 
-                                                    # TODO check on error modeling
                                                     location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
-                                                      #TODO: fixed at 5m - maybe reset to the global mean horiz accuracy in the data?
                                                       rep(5, n.locs(evt_mv_t))}else{
                                                         evt_mod$horizontal_accuracy},
-                                                    
-                                                    #TODO: think about these...
                                                     margin = 11, 
                                                     window.size = 31)
             # remove any segments with gaps > 3x the intended fix rate
             dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
             
             dbbm <- brownian.bridge.dyn(dbb_var, 
-                                        #TODO: need to come up with a way to select this more dynamically based on the scale of the data
-                                        # raster = 100,
-                                        # If we have horiz accuracy use that, otherwise use fixed accuracy
                                         location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
-                                                                #TODO: fixed at 5m - maybe reset to the global mean horiz accuracy in the data?
-                                                                rep(5, n.locs(evt_mv_t))}else{
-                                                                evt_mod$horizontal_accuracy} ,
-                                        # location.error = rep(10, n.locs(evt_mv_t)),
+                                          rep(5, n.locs(evt_mv_t))}else{
+                                            evt_mod$horizontal_accuracy} ,
                                         time.step = (fixmed/15),
-                                        # burstType = levels(burstid),
-                                        #TODO: below is somewhat arbitrary
-                                        dimSize = 1000,
-                                        ext = 10,
-                                        margin = 11, window.size = 31)
-          }, error = function(e){cat(glue("ERROR: unspecified error in fitting dBBMM for ind {ind[j]}, yr {yearvec[i]}", 
-                                          "\n"))})
-          tryCatch({
-            if(exists("dbbm")){
-              # # Get UD volume
-              # vol <- getVolumeUD(dbbm)
-              # 
-              # # Make 95% mask
-              # mask95 <- vol
-              # mask95[mask95>0.95] <- NA
-              # mask95[mask95<0.95] <- 1
-              # 
-              # # Clip out 95% UD
-              # ud95 <- dbbm*mask95
+                                        raster = 500,
+                                        ext = 0.3,
+                                        margin = 11, 
+                                        window.size = 31)
+          }, error = function(e){
+            
+            # catch the exact error reported from the move package
+            error_msg <- conditionMessage(e)
+            # log infor for failed sp/ind/yr with error message
+            message(glue("ERROR fitting dBBMM for {scientificname} ind {ind[j]}, yr {yearvec[i]}:\n{error_msg}", 
+                                          "\n"))
+
+            # check if error is about ext arg being too small
+            if (grepl("grid not large enough", error_msg)) {
               
+              message("Attempting again with larger ext value...\n")
+
+              # try fitting dbbmm again with larger ext value
+              tryCatch({
+
+                # redefine variables leading up to dbbmm
+                # make minimal df for `move`    
+                evt_tmp <- evt_mod %>% 
+                  select(lon, lat, timestamp, wk)
+                
+                evt_mv <- move(x=evt_tmp$lon, y=evt_tmp$lat, time=evt_tmp$timestamp,
+                              proj=CRS("+proj=longlat"))
+                burstid <- factor(evt_tmp$wk[1:(n.locs(evt_mv)-1)])
+
+                # free up memory
+                rm(evt_tmp)
+                gc()
+
+                #id "intended fix rate"
+                fixmed <- median(timeLag(x=evt_mv, units="mins"))
+                evt_burst <- burst(evt_mv, burstid)
+
+                # transform for spTransform's default CRS, equidistant
+                # evt_mv_t <- spTransform(evt_burst, center = T)
+
+                # transform to an equal area CRS (Mollweide), as advised by dbbmm documentation
+                evt_mv_t <- spTransform(evt_burst, CRSobj="+proj=moll +ellps=WGS84")
+
+                # remove variance of the segments corresponding to large time gaps
+                dbb_var <<- brownian.motion.variance.dyn(object = evt_mv_t, 
+                                                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                                                          rep(5, n.locs(evt_mv_t))}else{
+                                                            evt_mod$horizontal_accuracy},
+                                                        margin = 11, 
+                                                        window.size = 31)
+                # remove any segments with gaps > 3x the intended fix rate
+                dbb_var@interest[timeLag(evt_mv_t,"mins")>(fixmed*3)] <- FALSE
+
+                # retry dbbmm with higher variance
+                dbbm <<- brownian.bridge.dyn(dbb_var, 
+                                        location.error = if(any(is.na(evt_mod$horizontal_accuracy))){
+                                          rep(5, n.locs(evt_mv_t))}else{
+                                            evt_mod$horizontal_accuracy} ,
+                                        time.step = (fixmed/15),
+                                        raster = 500,
+                                        ext = 5,
+                                        margin = 11, 
+                                        window.size = 31)
+                
+                message(glue("dbbmm produced with larger ext value for {scientificname} ind {ind[j]}, yr {yearvec[i]}"))
+
+                }, error = function(e){
+                  message(glue("ERROR in second attempt: {conditionMessage(e)}", "\n"))})
+                  }})
+
+          tryCatch({
+
+            if(exists("dbbm")){
               # write the dbbmm objects to list
               tmp_out <- list("dBBMM Variance" = dbb_var,
                               "dBBMM Object" = dbbm,
-                              # "Contours" =  raster2contour(dbbm),
-                              # "UD Volume" = vol,
-                              # "95% Mask" = mask95,
-                              # "95% UD" = ud95,
                               "events" = evt_mod
               )
             } else {
@@ -251,27 +330,36 @@ foreach(j = 1:length(ind), .errorhandling = "pass", .inorder = F) %:%
           
           #-- Save individual output
           
-          message(glue("Writing output for individual {ind[j]} to file..."))
+          message(glue("Writing output for individual {scientificname} {ind[j]} {yearvec[i]} to file..."))
           tryCatch({
             if(exists("tmp_out")){
               save(tmp_out,
-                   file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata")
-              )
-              
+                   file = glue("{.outPF}/dbbmms/dbbmm_{ind[j]}_{yearvec[i]}.rdata"))
+
+              message(glue("Successfully wrote output for {scientificname} individual {ind[j]} {yearvec[i]} to file"))
+
+              # remove large objects from memory
+              rm(list = c("dbbm", "dbb_var", "evt_mod", "evt_tmp", "evt_mv", "tmp_out"))
+              gc()
+
               # Make entry in log file
-              outlog <- matrix(c(scientificname, ind[j], studyid, yearvec[i], "dbbm", 
-                                 glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"),
-                                 1, as.character(Sys.Date())), 
-                               nrow = 1)
+              outlog <- data.frame("species" = scientificname, 
+                                   "ind_id" = ind[j], 
+                                   "study_id" = studyid, 
+                                   "year" = yearvec[i], 
+                                   "out_type" = "dbbm", 
+                                   "filename" = glue("dbbmm_{ind[j]}_{yearvec[i]}.rdata"), 
+                                   "produced" = 1, 
+                                   "out_date" = as.character(Sys.Date()))
               write.table(outlog, glue("{.outPF}/dbbmm_log.csv"), append = T, row.names = F, 
                           col.names = F, sep = ",")
-            }else {
-              message(glue("No tmp list in memory, nothing written to file for {ind[j]}, {yearvec[i]}"))
+            } else {
+              message(glue("No tmp list in memory, nothing written to file for {scientificname} {ind[j]}, {yearvec[i]}"))
             }
-          }, error = function(e){cat("ERROR: couldnt save tmp_out to file", 
+          }, error = function(e){cat("ERROR: either couldnt save tmp_out to file or couldnt write outlog", 
                                      "\n")})
-        } # fi
-      } # fi
+        } # fi data not too large
+      } # fi end the check whether the filtered dataframe has any data
     } # fi end the check whether individual has been previously considered
   } #i (end loop through years) : #j (end loop through individuals)
 

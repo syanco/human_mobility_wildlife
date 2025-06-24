@@ -13,7 +13,7 @@ suppressPackageStartupMessages({
   library(here)
   library(tictoc)
   library(tidyverse)
-  library(uuid)
+  # library(uuid)
 }))
 
 
@@ -21,3 +21,5 @@ suppressPackageStartupMessages({
 # Several common packages have conflicts with dplyr filter() and select()
 conflict_prefer('filter','dplyr',quiet=TRUE)
 conflict_prefer('select','dplyr',quiet=TRUE)
+
+`%notin%` <- Negate(`%in%`)

@@ -37,3 +37,14 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+src/workflow/adjust_skunk_data.R
+
+# data dirs
+raw_data/*
+processed_data/*
+gee_data/*
+logs/*
+out/*
+delete/*
+slurm_final_run/*
