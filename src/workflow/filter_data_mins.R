@@ -2,11 +2,15 @@
 
 # DESCRIPTION #
 # 
-# This script checks for data completeness and trims data absed on minimum data requirements
+# This script checks for data completeness and trims data based on minimum data 
+# requirements, including a minimum number of 3 individuals per species and 
+# 30 fixes per week. The output is 3 updated db tables for event, individual,
+# and study. These will be further cleaned by clean_movement.r
 
 
 '
-Filters data to minimums, reports out sample sizes
+Filters data to minimums for sample sizes per week and number of individuals 
+per species, reports out sample sizes
 
 Usage:
 filter_data_mins.r [--db=<db>] <wkmin> <minsp>
@@ -28,9 +32,9 @@ if(interactive()) {
   library(here)
   
   # .wd <- '~/project/covid-19_movement'
-  .wd <- '~/Documents/covid-19_movement/'
+  .wd <- getwd()
   
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
   .wkmin <- 30
   .minsp <- 5
   
@@ -42,11 +46,11 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd, 'src/funs/input_parse.r'))
   
   .dbPF <- makePath(ag$db)
-  .wkmin <- ag$wkmin
-  .minsp <- ag$minsp
+  .wkmin <- as.numeric(ag$wkmin)
+  .minsp <- as.numeric(ag$minsp)
 }
 
 #---- Initialize Environment ----#
@@ -55,7 +59,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -65,16 +69,18 @@ suppressWarnings(
     library(sf)
     library(geosphere)
     library(lubridate)
+    library(tidyverse)
   }))
 
-#Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
+# Source all files in the auto load funs directory
+list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
+# create operator that is opposite of %in%
 `%notin%` <- Negate(`%in%`)
 
 #---- Load control files ----#
-periods <- read_csv(file.path(.wd,'analysis/ctfs/dates.csv'),
+periods <- read_csv(file.path(.wd,'ctfs/dates.csv'),
                     col_types=list("date" = col_date(format = "%m/%d/%Y"))) 
 
 #---- Initialize database ----#
@@ -103,14 +109,13 @@ std_cln <- tbl(db, "study_trim") %>%  collect()
 
 # -- Remove incomplete cases
 
-message(glue("Removing weeks wihtout complete env annotations"))
+message(glue("Removing weeks without complete env annotations"))
 
-evt_out2 <- evt_cln %>% 
+evt_out2 <- evt_cln %>%
   mutate(timestamp2 = ymd_hms(timestamp),
          # timestamp_char <- as.character(timestamp2)
-         wk = week(timestamp2)) %>% 
-  drop_na(tmax, ndvi, elev)
-
+         wk = week(timestamp2)) %>% # add column for week component of timestamp
+  drop_na(tmax, ndvi, elev) # drop any rows with NA values for annotation cols
 
 # evt_comp <- evt_fix %>%
 #   select(species, ind_f, tmax, ndvi, elev) %>%
@@ -122,37 +127,38 @@ evt_out2 <- evt_cln %>%
 #-- Remove species with too few individuals
 
 message(glue("Removing species below theshold of {.minsp} individuals..."))
+
 # get ind count per species
+# remove species that have less than the minimum # of individuals
 sp_sum <- evt_out2 %>%
   group_by(species) %>%
   summarize(nind = length(unique(ind_f))) %>%
-  filter(nind >= .minsp) #require a minimum# of individuals
+  filter(nind >= .minsp)
 
+# retain events only for species that have the minimum # of individuals
 evt_sp <- evt_out2 %>% 
   semi_join(sp_sum, by = "species")
-
 
 #-- Remove weeks with too few fixes per week
 
 message(glue("Removing weeks below threshold of {.wkmin} fixes per individual"))
 
+# remove individuals with fewer than min number fixes per week
 fix_sum <- evt_sp %>% 
   group_by(ind_f, yr, wk) %>% 
   summarize(n= n()) %>% 
   filter((n >= .wkmin))
 
+# retain events only for weeks that have the minimum number of fixes
 evt_fix <- evt_sp %>% 
-  semi_join(fix_sum, by = "ind_f")
-
-
-
+  semi_join(fix_sum, by = c("ind_f", "yr", "wk"))
 
 #-- Write out individual table
 
 message("Writing event table back to database...")
 
 # write table back to db
-dbWriteTable(conn = db, name = "event_final2", value = evt_fix, append = FALSE, overwrite = T)
+dbWriteTable(conn = db, name = "event_final", value = evt_fix, append = FALSE, overwrite = T)
 
 #-- Sync up study and individual tables
 
@@ -175,7 +181,7 @@ std_out <- std_cln %>%
 dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, overwrite = T)
 
 
-#-- Generate Sample Size Sumaries
+#-- Generate Sample Size Summaries
 
 # No of species
 (no_sp <- evt_fix %>% pull(species) %>% unique() %>% length())
@@ -188,7 +194,7 @@ dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, o
 # Fixes per species
 (fix_p_sp <- evt_cln %>% group_by(species) %>%
     summarize(n = n()) %>%
-    janitor::adorn_totals("row") )
+    janitor::adorn_totals("row"))
 
 # No of individuals
 (no_inds <- evt_fix %>% pull(ind_f) %>% unique() %>% length())
@@ -198,11 +204,12 @@ dbWriteTable(conn = db, name = "study_final", value = std_out, append = FALSE, o
     group_by(species) %>%
     summarize(n = n_distinct(study_id)) %>%
     janitor::adorn_totals("row") )
+
 #-- Write our sample size summaries
 
 message("Writing out sample size report...")
 
-sink("out/sample_report_after_data_clean.txt")
+sink("out/sample_report_after_filter_data_mins.txt")
 print(glue("Description of sample sizes after all data cleaning, prior to estimating dBBMMs and MVNH Niche Breadths"))
 print(glue("\n ##########################################################"))
 
@@ -219,6 +226,8 @@ print(glue("\n \n Total number of fixes in data: {sum(fix_p_sp$n)}"))
 print(glue("\n \n Fixes per species: \n {fix_p_sp}"))
 
 sink()
+
+dbDisconnect(db)
 
 message("Script Complete!")
 

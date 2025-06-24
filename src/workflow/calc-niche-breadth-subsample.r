@@ -2,7 +2,13 @@
 #       COVID-19 Animal Movement                                                                               #
 ################################################################################################################
 
-# This script generates individual n-dimensional hypervolumes (Lu et al. 2020).
+# This script is a sensitivity analysis for the individual n-dimensional 
+# hypervolumes (Lu et al. 2021) on weekly time scales. Subset event data for
+# each individual animal to only weeks that have a minimum number of events. Run 
+# the script 5 times with 10, 20, 30, 40, and 50 as the sample size and output
+# a CSV for each set of  for the multi-variate niche hypervolume. Plot the results 
+# with graph_niche_subsample.R to determine the minimum value of events per week at 
+# to use as input to filter_data_mins.R
 
 # ==== Setup ====
 
@@ -14,7 +20,7 @@ calc-niche-breadth.r <db> <out> <nc> <ss>
 calc-niche-breadth.r (-h | --help)
 
 Parameters:
-  db: path to movement databse. 
+  db: path to movement database. 
   out: path to output directory.
   nc: number of cores for parallel processing
   ss: sample size for subsampling
@@ -27,29 +33,27 @@ Options:
 
 #---- Input Parameters ----#
 if(interactive()) {
-  # library(here)
   
-  .wd <- getwd()
+  .wd <- "/home/julietcohen/repositories/human_mobility_wildlife"
   
-  .outPF <- file.path(.wd,'out/niche_determinant_anthropause_subsample.csv')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod.db')
+  .outPF <- file.path(.wd,'out/niche_subsamples/niche_determinant_anthropause_subsample_20.csv')
+  .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
   
-  .nc <- 2
-  
-  .samp_size <- 25
+  .samp_size <- 20
   
 } else {
+  
   library(docopt)
   
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd, 'src/funs/input_parse.r'))
   
-  .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
+  .outPF <- makePath(ag$out)
   .nc <- ag$nc
-  .samp_size <- ag$ss
+  .samp_size <- as.numeric(ag$ss)
   
 }
 
@@ -58,7 +62,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -72,10 +76,11 @@ suppressWarnings(
     library(foreach)
     library(MVNH)
     library(tidyverse)
+    library(glue)
   }))
 
 #Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
+list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
 #---- Initialize database ----#
@@ -84,14 +89,14 @@ message("Initializing database connection...")
 invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
-indtb <- tbl(db,'individual') %>%  # Load a tibble with all individual animals
+indtb <- tbl(db,'individual_clean') %>%  # Load a tibble with all individual animals
   collect()
 
-# Load the entire event table:
-evt0 <- tbl(db, "event_clean")%>%
+# Load the entire clean event table:
+evt0 <- tbl(db, "event_clean") %>%
   collect()
 
-message("Disconnecting from databse...")
+message("Disconnecting from database...")
 dbDisconnect(db)
 
 ind <- indtb %>% 
@@ -101,13 +106,8 @@ ind <- ind[ind  %in% unique(evt0$individual_id)]
 
 yearvec <- c("2019", "2020")
 
-# Add empty columns study:
-
-# log <- read_csv(glue("{.outPF}/niche_log.csv")) #####
-
 registerDoMC(.nc)
 
-# foreach(j = 1:10, .errorhandling = "pass", .inorder = F) %:%
 foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
   foreach(i = unique(yearvec), .errorhandling = "pass", .inorder = F) %dopar% {
     
@@ -126,17 +126,13 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
     
     message("Filtering and scaling data...")
     
-    # print(i)
-    
-    # i = 2020
     evt_mod <- evt0 %>% 
       filter(individual_id == ind[j]) %>%
       dplyr::filter(yr == i) %>%
-      mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T"),
+      mutate(timestamp = as.POSIXct(timestamp, format = "%Y-%m-%d %T", tz = 'UTM'),
              week = week(timestamp),
              n_indiv_week_year = paste0(individual_id, '_' , week, '_' , yr),
              tmax_scale = scale(tmax),
-             # tmin_scale = scale(tmin),
              ndvi_scale = scale(ndvi),
              elev_scale = scale(elev)
              ) %>% 
@@ -147,8 +143,8 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
     message("Estimating Multivariate niches")
     
     wk <- unique(evt_mod$week)
-    # wk = wk[complete.cases(wk)]
-    if(length(wk)==0){print(paste0('No data for year ', i, 
+    if(length(wk)==0){print(paste0('No data for ind ,', j,
+                                   ' year ', i, 
                                    ' writing in logfile'))
       
       tmp_dummy_fail = data.frame(
@@ -159,16 +155,13 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
         week = NA,
         status = 0)
       
-      # logfile_template$studyid <- studyid
-      write.table(tmp_dummy_fail, glue("./out/niche_log.csv"), append = T, 
+      write.table(tmp_dummy_fail, glue("./out/niche_subsamples/niche_subsample_log_{.samp_size}.csv"), append = T, 
                   row.names = F, col.names = F, sep = ",")
       
       
-    } else { # if no weeks in data
+    } else { # fi no weeks in data
       
-      # i <- 10
       for(w in min(wk):max(wk)){
-        # w <- 26
         
         evt_tmp <- evt_mod %>% 
           filter(week == w) %>%
@@ -203,8 +196,12 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
             determinant_df$year <- i
             determinant_df$n <- ss
             
-            write.table(determinant_df, glue("{.outPF}"), append = T, 
-                        row.names = F, col.names = F, sep = ",")
+            write.table(determinant_df,
+                        glue("{.outPF}"), 
+                        append = T, 
+                        row.names = F, 
+                        col.names = F, 
+                        sep = ",")
             
             tmp_dummy_success = data.frame(
               studyid = studyid, 
@@ -214,10 +211,12 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
               status = 1,
               week = w)
             
-            # logfile_template$studyid <- studyid
-            write.table(tmp_dummy_success, glue("./out/niche_log.csv"), 
-                        append = T, row.names = F, 
-                        col.names = F, sep = ",")
+            write.table(tmp_dummy_success, 
+                        glue("./out/niche_subsamples/niche_subsample_log_{.samp_size}.csv"), 
+                        append = T, 
+                        row.names = F, 
+                        col.names = F, 
+                        sep = ",")
           } else {# if there's no data
             
             tmp_dummy_fail = data.frame(
@@ -228,8 +227,7 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
               status = 0,
               week = w)
             
-            # logfile_template$studyid <- studyid
-            write.table(tmp_dummy_fail, glue("./out/niche_log.csv"), 
+            write.table(tmp_dummy_fail, glue("./out/niche_subsamples/niche_subsample_log_{.samp_size}.csv"), 
                         append = T, row.names = F, 
                         col.names = F, sep = ",")
             
@@ -237,15 +235,17 @@ foreach(j = 1:length(unique(ind)), .errorhandling = "pass", .inorder = F) %:%
                          ' has NA in niche determinant, moving to the next week'))
           } # else
           
-        }, error = function(e){cat(
-          glue("ERROR: unspecified error in fitting niche determinant for ind {ind[j]}, yr {i}", 
+        }, error = function(e){
+          
+          error_msg <- conditionMessage(e)
+          
+          message(glue("ERROR: fitting niche determinant for ind {ind[j]}, yr {i}:\n{error_msg}", 
                                         "\n"))})
         
       } # for w in wks
     } # else (if wks > 0)
     #  } # fi end the check whether individual has been previously considered
   } #i (end loop through years) : #j (end loop through individuals)
-
 
 #---- Finalize script ----#
 

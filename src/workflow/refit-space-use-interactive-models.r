@@ -37,10 +37,10 @@ if(interactive()) {
   
   .wd <- getwd()
   .cores <- ag$cores
-  .minsp <- 5
+  .minsp <- 3
 
   
-  source(file.path(.wd,'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd,'src/funs/input_parse.r'))
   
   .datPF <- makePath(ag$dat)
   .outP <- makePath(ag$out)
@@ -53,7 +53,7 @@ if(interactive()) {
 
 t0 <- Sys.time()
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -78,11 +78,11 @@ conflict_prefer("pack", "tidyr")
 conflict_prefer("unpack", "tidyr")
 
 # load breezy functions
-source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
+source(file.path(.wd,'src/funs/auto/breezy_funs.r'))
 
 #- Load Control File 
 
-mcmc_ctf <- read_csv(file.path(.wd, "analysis/ctfs/area_int_rerun_ctf.csv"),
+mcmc_ctf <- read_csv(file.path(.wd, "ctfs/area_rerun_ctf.csv"),
                      col_types = "cnnnn") %>% 
   filter(run == 1)
 
@@ -96,7 +96,6 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   mutate(ind_f = as.factor(ind_id))%>%  # create factor version of ind for REs)
   mutate(species = case_when( # correct species names
     study_id == 1442516400 ~ "Anser caerulescens",
-    study_id == 1233029719 ~ "Odocoileus virginianus",
     study_id == 1631574074 ~ "Ursus americanus",
     study_id == 1418296656 ~ "Numenius americanus",
     study_id == 474651680  ~ "Odocoileus virginianus",
@@ -105,6 +104,7 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   ))%>% 
   mutate(species = case_when(
     species == "Chen caerulescens" ~ "Anser caerulescens",
+    species == "Chen rossii" ~ "Anser rossii",
     TRUE ~ species
   )) %>% 
   distinct()
@@ -135,10 +135,10 @@ foreach(i = 1:nrow(mcmc_ctf), .errorhandling = "pass", .inorder = F) %dopar% {
   message(glue("Starting model for {sp}..."))
 
   # Unpack params
-  .iter <- ifelse(is.na(mcmc_ctf$iter[i]), 5000, mcmc_ctf$iter[i])
+  .iter <- ifelse(is.na(mcmc_ctf$iter[i]), 10000, mcmc_ctf$iter[i])
   .thin <- ifelse(is.na(mcmc_ctf$thin[i]), 5, mcmc_ctf$thin[i])
-  .warmup <- ifelse(is.na(mcmc_ctf$warmup[i]), 2000, mcmc_ctf$warmup[i])
-  .adapt_delta <- ifelse(is.na(mcmc_ctf$adapt_delta[i]), 0.8, mcmc_ctf$adapt_delta[i])
+  .warmup <- ifelse(is.na(mcmc_ctf$warmup[i]), 5000, mcmc_ctf$warmup[i])
+  .adapt_delta <- ifelse(is.na(mcmc_ctf$adapt_delta[i]), 0.99, mcmc_ctf$adapt_delta[i])
   
   #filter data
   dat <- size %>%

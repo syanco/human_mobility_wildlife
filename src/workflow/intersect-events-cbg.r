@@ -43,7 +43,7 @@ if(interactive()) {
   .test <- TRUE
   rd <- here::here
   
-  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db'
+  .dbPF <- file.path(.wd, 'processed_data/mosey_mod.db')
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
   .datPF <- file.path(.wd,'raw_data/')
   .outPF <- file.path(.wd,'analysis/event-cbg-intersection/')
@@ -52,17 +52,18 @@ if(interactive()) {
   library(docopt)
   library(rprojroot)
   
-  .wd <- '/home/sy522/project/covid-19_movement'
+  .wd <- getwd()
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
-  .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_mod_2023.db'
+  .dbPF <- file.path('/tmp/mosey_mod.db')
   # .dbPF <- '/home/sy522/project/covid-19_movement/processed_data/mosey_swap_mod.db'
-  .datPF <- file.path(.wd,'raw_data/')
+  # .datPF <- file.path(.wd,'raw_data/covid_movement_full_repo/raw_data/')
+  .datPF <- file.path('/home/julietcohen/covid_movement_full_repo/raw_data/')
   .outPF <- file.path(.wd,'out/event-cbg-intersection/')
 }
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -70,14 +71,9 @@ suppressWarnings(
     library(RSQLite)
     library(data.table)
     library(sf)
+    library(assertthat)
+    library(dplyr)
   }))
-
-#---- Collect arguments ----#
-args = commandArgs(trailingOnly = TRUE)
-
-start_ix <- as.numeric(args[1])
-end_ix <- as.numeric(args[2])
-n <- as.numeric(args[3])
 
 #---- Initialize database ----#
 
@@ -94,25 +90,30 @@ cbg_sf <- read_sf(paste0(.datPF,"safegraph_open_census_data_2010_to_2019_geometr
 # read in event table
 message("reading in event table...")
 
-evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_final2') %>%
+evt_sf <- dbGetQuery(db,'SELECT event_id,lat,lon from event_final') %>%
   st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
 #evt_sf <- dbGetQuery(db,'SELECT * from event_clean') %>%
 #  collect() %>%
 #  st_as_sf(coords = c("lon", "lat"), crs="+proj=longlat +datum=WGS84")
 
-
-evt_sf <- evt_sf[start_ix:end_ix,]
-
 # intersect event table with census block group geometries
 message("intersecting events with census block groups...")
-evt_cbg <- st_intersection(evt_sf,cbg_sf) %>%
-  rename(cbg_2010 = CensusBlockGroup) %>%
-  st_drop_geometry()
+evt_cbg <- st_join(evt_sf, 
+                   cbg_sf, 
+                   join = st_intersects, 
+                   left = FALSE) %>% # do not retain points that do not intersect any CBG
+          rename(cbg_2010 = CensusBlockGroup) %>%
+          st_drop_geometry() %>%
+          # if a point falls within multiple cbg polygons, keep the first observation
+          group_by(event_id) %>%
+          slice(1) %>%
+          ungroup()
 
 # write out new table with annotations
+# TODO: add step where it checks if the out/even-cbg-intersection subdir exists, and creates it first if not 
 message("writing out csv...")
-fwrite(evt_cbg, paste0(.outPF,"event-cbg-intersection-",n,".csv"))
+fwrite(evt_cbg, paste0(.outPF,"event-cbg-intersection.csv"))
 
 dbDisconnect(db)
 

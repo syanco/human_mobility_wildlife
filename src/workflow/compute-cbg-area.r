@@ -2,22 +2,12 @@
 #
 # DESCRIPTION #
 #
-# This script determines the administrative units for records for the COVID-19 Animal Movement Project
+# This script calculates the area size for the administrative units (census 
+# block groups) that contain animal locations for the COVID-19 Animal Movement 
+# Project. These areas are stored in an output CSV.
 # See project documentation for details about anticipated directory structure.
 #
-# Major tasks of this script:
-#   * Annotate event dataset with:
-#     * CensusBlockGroup (12 digit FIPS code)
-#     * BlockGroup (1 digit FIPS code)
-#     * TractCode (6 digit FIPS)
-#     * CountyFIPS (3 digit FIPS)
-#     * StateFIPS (2 digit FIPS)
-#     * County (character string)
-#     * State (2 character code)
-#   *write out csv with administrative info
-#
 # This script implements the breezy philosophy: github.com/benscarlson/breezy
-
 
 # ==== Breezy setup ====
 
@@ -55,11 +45,13 @@ if(interactive()) {
   # .script <-  thisfile()
   # rd <- is_rstudio_project$make_fix_file(.script)
   
-  .datPF <- file.path(.wd,'raw_data/')
+  # census block group data is stored in the raw_data dir
+  # .datPF <- file.path(.wd,'raw_data/covid_movement_full_repo/raw_data/')
+  .datPF <- file.path('/home/julietcohen/covid_movement_full_repo/raw_data/')
   .outPF <- file.path(.wd,'out/event-annotation/')
 }
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({

@@ -1,4 +1,4 @@
-#Runs annotation script for each study in study.csv and environmental variable 
+# Runs annotation script for each study in study.csv and environmental variable 
 # in envs array
 
 #argv[0]  <geePtsP> Folder holding the gee point datasets
@@ -22,8 +22,13 @@ EOF
 
 #How to pass array to bash script
 #https://stackoverflow.com/questions/17232526/how-to-pass-an-array-argument-to-the-bash-script
-geePtsP=${argv[0]}
-gcsOutP=${argv[1]}
+# geePtsP=${argv[0]}
+# gcsOutP=${argv[1]}
+# change syntax for bash instead of zsh
+geePtsP=$1
+gcsOutP=$2
+# geePtsp=$geePtsP
+# gcsOutP=$gcsOutP
 #TODO: make this an optional argument. If passed in, don't read envs.csv
 #TODO: don't allow passing in multiple, to keep it simple. multiple, use envs.csv
 #envs=(${argv[2]}) 
@@ -38,10 +43,10 @@ gcsOutP=${argv[1]}
 studyIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/study.csv | tail -n +2))
 # indIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/individual.csv | tail -n +2))
 
-#envs.csv
-envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id analysis/ctfs/env.csv | tail -n +2))
-bands=($(mlr --csv --opprint filter '$run == 1' then cut -f band analysis/ctfs/env.csv | tail -n +2))
-colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name analysis/ctfs/env.csv | tail -n +2))
+#env.csv
+envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id ctfs/env.csv | tail -n +2))
+bands=($(mlr --csv --opprint filter '$run == 1' then cut -f band ctfs/env.csv | tail -n +2))
+colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name ctfs/env.csv | tail -n +2))
 
 # Remove \r suffix
 studyIds=( ${studyIds[@]%$'\r'} )
@@ -91,7 +96,7 @@ do
     
     echo Annotating "env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
     # $MOSEYENV_SRC/gee_anno.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}
-    $MOSEYENV_SRC/gee_anno.r $points $out $studyId ${envs[$i]} ${colnames[$i]} ${bands[$i]}
+    $MOSEYENV_SRC/gee_anno.r $points $out $studyId ${envs[$i]} ${colnames[$i]} ${bands[$i]} #&> logs/GEE_anno.log
   done
 
 done

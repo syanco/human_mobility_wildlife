@@ -41,7 +41,7 @@ if(interactive()) {
   .iter  <- ag$iter
   .thin <- ag$thin
   
-  source(file.path(.wd,'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd,'src/funs/input_parse.r'))
   
   .datPF <- makePath(ag$dat)
   .outP <- makePath(ag$out)
@@ -54,7 +54,7 @@ if(interactive()) {
 
 t0 <- Sys.time()
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -67,7 +67,7 @@ suppressWarnings(
     library(doMC)
     
   }))
-
+options(scipen = 999)
 # Manage package conflicts
 conflict_prefer("accumulate", "foreach")
 conflict_prefer("ar", "brms")
@@ -79,7 +79,7 @@ conflict_prefer("pack", "tidyr")
 conflict_prefer("unpack", "tidyr")
 
 # load breezy functions
-source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
+source(file.path(.wd,'src/funs/auto/breezy_funs.r'))
 
 # check arg inputs
 .minsp <- ifelse(is.null(.minsp), 10, as.numeric(.minsp))
@@ -92,11 +92,10 @@ message("Loading data...")
 # load and process data
 size <- read_csv("out/dbbmm_size.csv") %>%
   filter(study_id != 351564596) %>%
-  filter(study_id != 1891587670) %>% 
+  filter(study_id != 1891587670) %>% # snail kite data has errors - should be exluded 
   mutate(ind_f = as.factor(ind_id))%>%  # create factor version of ind for REs)
   mutate(species = case_when( # correct species names
     study_id == 1442516400 ~ "Anser caerulescens",
-    study_id == 1233029719 ~ "Odocoileus virginianus",
     study_id == 1631574074 ~ "Ursus americanus",
     study_id == 1418296656 ~ "Numenius americanus",
     study_id == 474651680  ~ "Odocoileus virginianus",
@@ -105,15 +104,21 @@ size <- read_csv("out/dbbmm_size.csv") %>%
   ))%>% 
   mutate(species = case_when(
     species == "Chen caerulescens" ~ "Anser caerulescens",
+    species == "Chen rossii" ~ "Anser rossii",
     TRUE ~ species
-  )) %>% 
-  distinct()
+  )) %>%
+  # exclude some individuals per data owner's request
+  filter(individual != 3418130234, 
+        individual != 3418130244, 
+        individual != 3418130245, 
+        individual != 3418130249) %>%
+  distinct() 
 
 # get ind count per species
 sp_sum <- size %>%
   group_by(species) %>%
   summarize(nind = length(unique(ind_f))) %>%
-  filter(nind > .minsp) #require a minimum of 10 individuals
+  filter(nind >= .minsp) #require a minimum of 3 individuals
 
 # ==== Start cluster and register backend ====
 registerDoMC(.cores)
@@ -162,10 +167,11 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
     form,
     data = dat,
     family = student(),
-    inits = 0,
+    init = 0,
     cores = 1,
     iter = .iter,
-    thin = .thin
+    thin = .thin,
+    control = list(adapt_delta = 0.95)
   )
 
   #stash results into named list

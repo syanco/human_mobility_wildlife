@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #----
-#---- Downloads annotated data from gcs and imports into mosey database
+#---- Downloads annotated data from GCS and imports into local mosey database
 #----
 
 eval "$(docopts -h - : "$@" <<EOF
@@ -29,9 +29,13 @@ EOF
 # annoP=data/anno
 # db=$pd/analysis/main/data/mosey.db
 
-gcsOutURL=${argv[0]}
-annoP=${argv[1]}
-db=${argv[2]}
+# gcsOutURL=${argv[0]}
+# annoP=${argv[1]}
+# db=${argv[2]}
+# change syntax for bash instead of zsh
+gcsOutURL=$1
+annoP=$2
+db=$3
 
 echo gcsOutURL: $gcsOutURL
 echo annoP: $annoP
@@ -59,14 +63,14 @@ mkdir -p $annoP
 entity=study
 
 #study.csv
-names=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id analysis/ctfs/$entity.csv | tail -n +2))
+names=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/$entity.csv | tail -n +2))
 # names=($(mlr --csv --opprint filter '$run == 1' then cut -f name ctfs/$entity.csv | tail -n +2))
 # names=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
 echo ${names[@]}
 
 #envs.csv
-envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id analysis/ctfs/env.csv | tail -n +2))
-colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name analysis/ctfs/env.csv | tail -n +2))
+envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id ctfs/env.csv | tail -n +2))
+colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name ctfs/env.csv | tail -n +2))
 
 echo $envs[@]
 echo $colnames[@]
@@ -88,7 +92,7 @@ do
 
   #NOTE zsh starts at 1! updated the loop, test
   # use for loop to read all values and indexes
-  for (( i=0; i<=${n}; i++ ));
+  for (( i=0; i<${n}; i++ ));
   do
 
 		#Note zsh arrays start at 1!

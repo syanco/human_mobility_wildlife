@@ -1,40 +1,30 @@
 #!/usr/bin/env Rscript 
-# Plot model summary sheet
+# Plot model summary sheet (PDF) for niche models. Select either the additive
+# or interactive model based on significance.
 
 
 #---- Input Parameters ----#
 if(interactive()) {
-  library(here)
   
-  .wd <- getwd()
-  
-  .datP <- file.path(.wd,'out/single_species_models')
-  .outPF <- file.path(.wd,'figs/area_fig.png')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .wd <- "/home/julietcohen/repositories/human_mobility_wildlife"
+  .datP <- file.path(.wd,'out/single_species_models_final')
+  .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
   
 } else {
+
   library(docopt)
-  # library(rprojroot)
-  
-  # ag <- docopt(doc, version = '0.1\n')
+
   .wd <- getwd()
-  
-  
-  source('analysis/src/funs/input_parse.r')
-  
-  #.list <- trimws(unlist(strsplit(ag$list,',')))
-  # .datP <- makePath(ag$dat)
-  # .outPF <- makePath(ag$out)
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
-  # vector of probabilities foer conditional estimates
-  prob_vec <- c(0.2,0.8)
+  source('src/funs/input_parse.r')
+  .datP <- file.path(.wd,'out/single_species_models')
+  .dbPF <- '/tmp/mosey_mod.db'
 }
 
 
 #---- Initialize Environment ----#
 t0 <- Sys.time()
 
-source('analysis/src/startup.r')
+source('src/startup.r')
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -53,10 +43,11 @@ suppressWarnings(
     library(sf)
     library(ggsflabel)
     library(janitor)
+    library(glue)
   }))
 
 #Source all files in the auto load funs directory
-list.files('analysis/src/funs/auto',full.names=TRUE) %>%
+list.files('src/funs/auto',full.names=TRUE) %>%
   walk(source)
 
 palnew <- c("#F98177", "#8895BF")
@@ -82,17 +73,11 @@ add_modlist_full <- list.files(path=file.path(.datP, "niche_additive/"),
                                full.names = T)
 add_sp <- word(add_modlist, 1, sep = "_")
 
-
-
-#check that lists are same
+# check that lists are same
 int_sp == add_sp
-
-# add_sp <- append(add_sp, "NULL", after = 24)
-# add_modlist_full <- append(add_modlist_full, "NULL", after = 24)
 
 # Get US Background
 us <- ne_states(country = "United States of America", returnclass = "sf")
-
 
 #---- Initialize database ----#
 message("Connecting to database...")
@@ -104,13 +89,10 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 #---- Perform analysis ----#
 
-# dbListTables(db)
-
 #-- Load Cleaned Data
 evt0 <- tbl(db, 'event_clean') %>% collect()
 std0 <- tbl(db, 'study_clean') %>% 
   collect() 
-beepr::beep()
 
 # Init lists to store results
 pred_out <- list()
@@ -149,8 +131,9 @@ for(i in 1:length(int_modlist_full)){
         data_sum_tbl <- out_add$data %>% 
           group_by(studyid) %>% 
           summarize(num_inds = n_distinct(ind_f),
-                    num_weeks = n()) %>%
-          mutate(obs_per_ind = num_weeks/num_inds) %>% 
+                    #num_weeks = n_distinct(wk),
+                    num_obs = n()) %>%
+          mutate(obs_per_ind = num_obs/num_inds) %>% 
           adorn_totals() %>% 
           tableGrob()
         
@@ -253,9 +236,11 @@ for(i in 1:length(int_modlist_full)){
             geom_sf(data = us)+
             geom_sf(data = evt_daily, inherit.aes = F, aes(color = ind_f))+
             # geom_sf_label_repel(data = std_sf, aes(label = species), force_pull = 0, force = 10) +
-            coord_sf() + 
-            xlim(xrange) +
-            ylim(yrange)+
+            coord_sf(xlim = xrange, 
+                    ylim = yrange, 
+                    lims_method = "geometry_bbox") + 
+            #xlim(xrange) +
+            #ylim(yrange)+
             ggtitle("Individual Daily Positions")+
             theme(legend.position = "none") )
         
@@ -271,18 +256,29 @@ for(i in 1:length(int_modlist_full)){
                     study_name = study_name[1]) %>% 
           st_centroid()
         
-        # Get bouding box of centroids to set plot lims
+        # Get bounding box of centroids to set plot lims
         stdbb <- st_bbox(std_sf)
+
+        # ensure CRS match before plotting
+        CRS_same <- st_crs(us) == st_crs(std_sf)
+        if (CRS_same) {
+          message("CRS of std_sf and us is the same.")
+        } else {
+          us <- st_transform(us, st_crs(std_sf))
+          message("Transformed CRS of us polygons to CRS of std_sf")
+        }
         
         # make plot
         study_plot <- ggplot()+
           geom_sf(data = us)+
           geom_sf(data = std_sf, inherit.aes = F)+
-          xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
-          ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
+          #xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
+          #ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
           ggtitle("Study Centroids") +
           geom_sf_label_repel(data = std_sf, aes(label = study_name), force_pull = 0, force = 10) +
-          coord_sf()
+          coord_sf(xlim = c(stdbb['xmin']-1, stdbb['xmax']+1),
+                  ylim = c(stdbb['ymin']-1, stdbb['ymax']+1),
+                  lims_method = "geometry_bbox")
         
         
         #---- Assemble Plots ---#
@@ -335,8 +331,9 @@ for(i in 1:length(int_modlist_full)){
       data_sum_tbl <- out_int$data %>% 
         group_by(studyid) %>% 
         summarize(num_inds = n_distinct(ind_f),
-                  num_weeks = n()) %>%
-        mutate(obs_per_ind = num_weeks/num_inds) %>% 
+                  #num_weeks = n_distinct(wk),
+                  num_obs = n()) %>%
+        mutate(obs_per_ind = num_obs/num_inds) %>% 
         adorn_totals() %>% 
         tableGrob()
       
@@ -444,9 +441,11 @@ for(i in 1:length(int_modlist_full)){
           geom_sf(data = us)+
           geom_sf(data = evt_daily, inherit.aes = F, aes(color = ind_f))+
           # geom_sf_label_repel(data = std_sf, aes(label = species), force_pull = 0, force = 10) +
-          coord_sf() + 
-          xlim(xrange) +
-          ylim(yrange)+
+          coord_sf(xlim = xrange, 
+                    ylim = yrange, 
+                    lims_method = "geometry_bbox") + 
+          #xlim(xrange) +
+          #ylim(yrange)+
           ggtitle("Individual Daily Positions")+
           theme(legend.position = "none") )
       
@@ -469,11 +468,13 @@ for(i in 1:length(int_modlist_full)){
       study_plot <- ggplot()+
         geom_sf(data = us)+
         geom_sf(data = std_sf, inherit.aes = F)+
-        xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
-        ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
+        #xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
+        #ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
         ggtitle("Study Centroids") +
         geom_sf_label_repel(data = std_sf, aes(label = study_name), force_pull = 0, force = 10) +
-        coord_sf()
+        coord_sf(xlim = c(stdbb['xmin']-1, stdbb['xmax']+1),
+                  ylim = c(stdbb['ymin']-1, stdbb['ymax']+1),
+                  lims_method = "geometry_bbox")
       
       
       #---- Assemble Plots ---#
@@ -531,8 +532,9 @@ for(i in 1:length(int_modlist_full)){
       data_sum_tbl <- out_add$data %>% 
         group_by(studyid) %>% 
         summarize(num_inds = n_distinct(ind_f),
-                  num_weeks = n()) %>%
-        mutate(obs_per_ind = num_weeks/num_inds) %>% 
+                  #num_weeks = n_distinct(wk),
+                  num_obs = n()) %>%
+        mutate(obs_per_ind = num_obs/num_inds) %>% 
         adorn_totals() %>% 
         tableGrob()
       
@@ -633,9 +635,11 @@ for(i in 1:length(int_modlist_full)){
           geom_sf(data = us)+
           geom_sf(data = evt_daily, inherit.aes = F, aes(color = ind_f))+
           # geom_sf_label_repel(data = std_sf, aes(label = species), force_pull = 0, force = 10) +
-          coord_sf() + 
-          xlim(xrange) +
-          ylim(yrange)+
+          coord_sf(xlim = xrange, 
+                    ylim = yrange, 
+                    lims_method = "geometry_bbox") + 
+          #xlim(xrange) +
+          #ylim(yrange)+
           ggtitle("Individual Daily Positions")+
           theme(legend.position = "none") )
       
@@ -658,11 +662,13 @@ for(i in 1:length(int_modlist_full)){
       study_plot <- ggplot()+
         geom_sf(data = us)+
         geom_sf(data = std_sf, inherit.aes = F)+
-        xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
-        ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
+        #xlim(c(stdbb['xmin']-1, stdbb['xmax']+1)) +
+        #ylim(c(stdbb['ymin']-1, stdbb['ymax']+1))+
         ggtitle("Study Centroids") +
         geom_sf_label_repel(data = std_sf, aes(label = study_name), force_pull = 0, force = 10) +
-        coord_sf()
+        coord_sf(xlim = c(stdbb['xmin']-1, stdbb['xmax']+1),
+                  ylim = c(stdbb['ymin']-1, stdbb['ymax']+1),
+                  lims_method = "geometry_bbox")
       
       
       #---- Assemble Plots ---#
@@ -706,5 +712,5 @@ for(i in 1:length(int_modlist_full)){
 }# i 
 
 dbDisconnect(db)
-beepr::beep()
+
 message("all done....")

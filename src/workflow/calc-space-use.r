@@ -34,16 +34,11 @@ Options:
 if(interactive()) {
   library(here)
   
-  # .wd <- '/gpfs/loomis/pi/jetz/sy522/covid-19_movement'
-  .wd <- getwd()
-  # rd <- here::here
-  
-  .outPF <- file.path(.wd,'out')
-  .dbPF <- file.path(.wd,'processed_data/mosey_mod_2023.db')
+  .wd <- '/home/julietcohen/repositories/human_mobility_wildlife'
+  .outPF <- file.path(.wd,'out_size_test')
+  .dbPF <- file.path(.wd,'processed_data/intermediate_db_copies/mosey_mod_clean-movement_complete.db')
   .ctf <- file.path(.wd, "out/dbbmm_log.csv")
   .continue = T
-  
-  .nc <- 4
   
 } else {
   library(docopt)
@@ -52,7 +47,7 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd, 'src/funs/input_parse.r'))
   
   .outPF <- makePath(ag$out)
   .dbPF <- makePath(ag$db)
@@ -67,7 +62,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -85,7 +80,7 @@ suppressWarnings(
   }))
 
 #Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'), full.names=TRUE) %>%
+list.files(file.path(.wd,'src/funs/auto'), full.names=TRUE) %>%
   walk(source)
 
 
@@ -96,23 +91,9 @@ invisible(assert_that(file.exists(.dbPF)))
 db <- dbConnect(RSQLite::SQLite(), .dbPF, `synchronous` = NULL)
 invisible(assert_that(length(dbListTables(db))>0))
 
-# evt_sg <- tbl(db, "event_sg") %>% 
-#   collect()
-
-# evt_cen <- tbl(db, "event_census") %>% 
-#   collect()
-
 ind <- tbl(db,'individual_clean') %>% 
   collect() %>% 
   pull(individual_id)
-
-# dbDisconnect(db)
-# 
-# invisible(assert_that(file.exists(.dbPF)))
-# db <- dbConnect(RSQLite::SQLite(), 
-#                 file.path(.wd,'processed_data/mosey_mod_anno.db'), 
-#                 `synchronous` = NULL)
-# invisible(assert_that(length(dbListTables(db))>0))
 
 evt_anno <- tbl(db, "event_clean") %>% 
   collect()
@@ -158,7 +139,7 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
   
   if(.continue){
     if(nrow(out_check) == 0){
-      message(glue("Starting ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
+      message(glue("Starting {ctf$species[i]} ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
       tryCatch({
         load(glue("{.outPF}/dbbmms/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
         
@@ -170,8 +151,10 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
         # plot(UDr)
         for(j in 1:nlayers(UDr)){
           
-          # Get UD area
+          # Get UD area:
+          # 1. create a binary raster with threshold at 95%
           ud95 <- UDr[[j]]<=.95
+          # 2. calculate total area in square meters (UD units are already meters)
           a <- sum(values(ud95))*res(ud95)[1]*res(ud95)[1]
           
           # get week number
@@ -244,20 +227,20 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                           m_error),
                         nrow = 1)
           
-          message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, 
+          message(glue("Writing info for {ctf$species[i]} ind {ctf$ind_id[i]}, year {ctf$year[i]}, 
                    week {week}"))
           write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, 
                       row.names = F, col.names = F, sep = ",")
           
         } #j
       }, error = function(e){cat(glue("ERROR: Size calulation failed for individual 
-                                  {ctf$ind_id[i]}, year {ctf$year[i]}", 
+                                  {ctf$species[i]} {ctf$ind_id[i]}, year {ctf$year[i]}", 
                                   "\n"))})
     # if file hasn't been written
       } else {message(glue("Metrics for individual {ctf$ind_id[i]} already calculated and continue is set to T, gotta keep movin' on..."))}
   } else { # if continue is set to false, just do the thing
     # TODO:  this is a lot of duplicated code, should probably just make it a function but lazy...
-    message(glue("Starting ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
+    message(glue("Starting {ctf$species[i]} ind {ctf$ind_id[i]}, year {ctf$year[i]}"))
     tryCatch({
       load(glue("{.outPF}/dbbmms/dbbmm_{ctf$ind_id[i]}_{ctf$year[i]}.rdata"))
       
@@ -343,14 +326,14 @@ foreach(i = 1:nrow(ctf), .errorhandling = "pass", .inorder = F) %dopar% {
                         m_error),
                       nrow = 1)
         
-        message(glue("Writing info for ind {ctf$ind_id[i]}, year {ctf$year[i]}, 
+        message(glue("Writing info for {ctf$species[i]} ind {ctf$ind_id[i]}, year {ctf$year[i]}, 
                    week {week}"))
         write.table(out, glue("{.outPF}/dbbmm_size.csv"), append = T, 
                     row.names = F, col.names = F, sep = ",")
         
       } #j
     }, error = function(e){cat(glue("ERROR: Size calulation failed for individual 
-                                  {ctf$ind_id[i]}, year {ctf$year[i]}", 
+                                  {ctf$species[i]} {ctf$ind_id[i]}, year {ctf$year[i]}", 
                                   "\n"))})
     # if file hasn't been written
   }

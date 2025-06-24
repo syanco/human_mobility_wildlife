@@ -2,13 +2,15 @@
 
 # DESCRIPTION #
 # 
-# This script cleans data for the COVID-19 Animal Movement Project
-
+# This script cleans data for the COVID-19 Animal Movement Project 
+# including excluding values that exceeded the 95th quantile for 
+# turn angle, bearing, and velocity.
 
 '
 Prep and clean data for the COVID-19 Animal Movement Project
 See project documentation for details about anticipated directory structure.
-Expects db to be of format mosey_db, with a table named "event"
+Expects db to be of format mosey_db, with a table named "event_final" that was 
+written to db by filter_data_mins.R
 
 Usage:
 clean_movement.r [--db=<db>] 
@@ -39,7 +41,7 @@ if(interactive()) {
   ag <- docopt(doc, version = '0.1\n')
   .wd <- getwd()
   
-  source(file.path(.wd, 'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd, 'src/funs/input_parse.r'))
   
   .dbPF <- makePath(ag$db)
   
@@ -51,7 +53,7 @@ if(interactive()) {
 t0 <- Sys.time()
 
 # Run startup
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 # Load packages
 suppressWarnings(
@@ -63,13 +65,13 @@ suppressWarnings(
   }))
 
 #Source all files in the auto load funs directory
-list.files(file.path(.wd,'analysis/src/funs/auto'),full.names=TRUE) %>%
+list.files(file.path(.wd,'src/funs/auto'),full.names=TRUE) %>%
   walk(source)
 
 `%notin%` <- Negate(`%in%`)
 
 #---- Load control files ----#
-periods <- read_csv(file.path(.wd,'analysis/ctfs/dates.csv'),
+periods <- read_csv(file.path(.wd,'ctfs/dates.csv'),
                     col_types=list("date" = col_date(format = "%m/%d/%Y"))) 
 
 #---- Initialize database ----#
@@ -87,9 +89,9 @@ invisible(assert_that(length(dbListTables(db))>0))
 
 #-- Clean Outliers
 
-evt_trm <- tbl(db,'event_final2') %>%  collect()
-ind <- tbl(db, "individual") %>%  collect()
-std <- tbl(db, "study") %>%  collect()
+evt_trm <- tbl(db,'event_final') %>%  collect()
+ind <- tbl(db, "individual_final") %>%  collect()
+std <- tbl(db, "study_final") %>%  collect()
 # beepr::beep()
 
 cnt <- evt_trm %>% 
@@ -160,7 +162,7 @@ dbWriteTable(conn = db, name = "study_clean", value = std_out, append = FALSE, o
 
 
 
-#-- Generate Sample Size Sumaries
+#-- Generate Sample Size Summaries
 
 # No of species
 (no_sp <- evt_out %>% pull(species) %>% unique() %>% length())
@@ -178,7 +180,7 @@ dbWriteTable(conn = db, name = "study_clean", value = std_out, append = FALSE, o
 
 message("Writing out sample size report...")
 
-sink("out/sample_report_after_data_clean.txt")
+sink("out/sample_report_after_clean_movement.txt")
 print(glue("Description of sample sizes after all data cleaning, prior to estimating dBBMMs and MVNH Niche Breadths"))
 print(glue("\n ##########################################################"))
 

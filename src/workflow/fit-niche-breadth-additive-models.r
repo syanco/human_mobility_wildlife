@@ -21,17 +21,16 @@ Options:
 ' -> doc
 
 if(interactive()) {
-  
-  .wd <- getwd()
-  
+
+  .wd <- '/home/julietcohen/repositories/human_mobility_wildlife'
   .datPF <- file.path(.wd,'out/niche_determinant_anthropause.csv')
   .varPF <- file.path(.wd, "out/dbbmm_size.csv")
   .outP <- file.path(.wd,'out/single_species_models/niche')
   
-  .cores <- 20
-  .minsp <- 10
-  .iter <- 5000
-  .thin <- 4
+  .cores <- 1
+  .minsp <- 3
+  .iter <- 1000
+  .thin <- 5
   
 } else {
   library(docopt)
@@ -44,7 +43,7 @@ if(interactive()) {
   .iter  <- ag$iter
   .thin <- ag$thin
   
-  source(file.path(.wd,'analysis/src/funs/input_parse.r'))
+  source(file.path(.wd,'src/funs/input_parse.r'))
   
   .datPF <- makePath(ag$nichedat)
   .varPF <- makePath(ag$vardat)
@@ -58,7 +57,7 @@ if(interactive()) {
 
 t0 <- Sys.time()
 
-source(file.path(.wd,'analysis/src/startup.r'))
+source(file.path(.wd,'src/startup.r'))
 
 suppressWarnings(
   suppressPackageStartupMessages({
@@ -71,7 +70,7 @@ suppressWarnings(
     library(doMC)
     
   }))
-
+options(scipen = 999)
 # Manage package conflicts
 conflict_prefer("accumulate", "foreach")
 conflict_prefer("ar", "brms")
@@ -83,7 +82,7 @@ conflict_prefer("pack", "tidyr")
 conflict_prefer("unpack", "tidyr")
 
 # load breezy functions
-source(file.path(.wd,'analysis/src/funs/auto/breezy_funs.r'))
+source(file.path(.wd,'src/funs/auto/breezy_funs.r'))
 
 # check arg inputs
 .minsp <- ifelse(is.null(.minsp), 10, as.numeric(.minsp))
@@ -96,7 +95,6 @@ message("Loading data...")
 dbbmms <- read_csv(.varPF) %>% 
   mutate(species = case_when( # correct species names
     study_id == 1442516400 ~ "Anser caerulescens",
-    study_id == 1233029719 ~ "Odocoileus virginianus",
     study_id == 1631574074 ~ "Ursus americanus",
     study_id == 1418296656 ~ "Numenius americanus",
     study_id == 474651680  ~ "Odocoileus virginianus",
@@ -105,6 +103,7 @@ dbbmms <- read_csv(.varPF) %>%
   ))%>% 
   mutate(species = case_when(
     species == "Chen caerulescens" ~ "Anser caerulescens",
+    species == "Chen rossii" ~ "Anser rossii",
     TRUE ~ species
   ))
 
@@ -112,7 +111,6 @@ dbbmms <- read_csv(.varPF) %>%
 breadth <- read_csv(.datPF) %>%
   mutate(scientificname = case_when( # correct species names
     studyid == 1442516400 ~ "Anser caerulescens",
-    studyid == 1233029719 ~ "Odocoileus virginianus",
     studyid == 1631574074 ~ "Ursus americanus",
     studyid == 1418296656 ~ "Numenius americanus",
     studyid == 474651680  ~ "Odocoileus virginianus",
@@ -121,6 +119,7 @@ breadth <- read_csv(.datPF) %>%
   ))%>% 
   mutate(scientificname = case_when(
     scientificname == "Chen caerulescens" ~ "Anser caerulescens",
+    scientificname == "Chen rossii" ~ "Anser rossii",
     TRUE ~ scientificname
   )) %>% 
   distinct() %>%
@@ -136,13 +135,18 @@ breadth <- read_csv(.datPF) %>%
                            "individual" = "ind_id", 
                            "year" = "year", 
                            "studyid" = "study_id", 
-                           "week" = "wk"))
+                           "week" = "wk")) %>%
+  # exclude some individuals per data owner's request
+  filter(individual != 3418130234, 
+        individual != 3418130244, 
+        individual != 3418130245, 
+        individual != 3418130249)
 
 # get ind count per species
 sp_sum <- breadth %>%
   group_by(scientificname) %>%
   summarize(nind = length(unique(ind_f))) %>%
-  filter(nind > .minsp) #require a minimum of 10 individuals
+  filter(nind > .minsp) #require a minimum of 3 individuals
 
 # ==== Start cluster and register backend ====
 registerDoMC(.cores)
@@ -195,10 +199,11 @@ foreach(i = 1:nrow(sp_sum), .errorhandling = "pass", .inorder = F) %dopar% {
     form,
     data = dat,
     # family = Gamma(link = "log"),
-    inits = 0,
+    init = 0,
     cores = 1,
     iter = .iter,
-    thin = .thin
+    thin = .thin,
+    control = list(adapt_delta = 0.95)
   )
   
   #stash results into named list
