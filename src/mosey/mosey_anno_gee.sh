@@ -16,19 +16,17 @@ mosey_anno_gee 0.1
 EOF
 )"
 
-#For testing
-#geePtsP=users/benscarlson/projects/covid/tracks
-#gcsOutP=benc/projects/covid/annotated
-
 #How to pass array to bash script
 #https://stackoverflow.com/questions/17232526/how-to-pass-an-array-argument-to-the-bash-script
 # geePtsP=${argv[0]}
 # gcsOutP=${argv[1]}
-# change syntax for bash instead of zsh
+
+# use bash syntax instead of zsh
 geePtsP=$1
 gcsOutP=$2
 # geePtsp=$geePtsP
 # gcsOutP=$gcsOutP
+
 #TODO: make this an optional argument. If passed in, don't read envs.csv
 #TODO: don't allow passing in multiple, to keep it simple. multiple, use envs.csv
 #envs=(${argv[2]}) 
@@ -39,36 +37,29 @@ gcsOutP=$2
 
 #----Load variables from control files
 
-#study.csv
+# study.csv
 studyIds=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/study.csv | tail -n +2))
-# indIds=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/individual.csv | tail -n +2))
 
-#env.csv
+# env.csv
 envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id ctfs/env.csv | tail -n +2))
 bands=($(mlr --csv --opprint filter '$run == 1' then cut -f band ctfs/env.csv | tail -n +2))
 colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name ctfs/env.csv | tail -n +2))
 
 # Remove \r suffix
 studyIds=( ${studyIds[@]%$'\r'} )
-# indIds=( ${indIds[@]%$'\r'} )
 envs=( ${envs[@]%$'\r'} )
 bands=( ${bands[@]%$'\r'} )
 colnames=( ${colnames[@]%$'\r'} )
 
-# echo Annotating ${#studyIds[@]} studies.
 echo Annotating ${#studyIds[@]} studies.
 
 for studyId in "${studyIds[@]}"
-# for indId in "${indIds[@]}"
+
 do 
   echo "*******"
   echo "Start processing study ${studyId}"
   echo "*******"
   
-  #studyId=10763606 #LifeTrack White Stork Poland (419 rows)
-  #studyId=8863543 #HUJ MPIAB White Stork E-Obs (3 million rows)
-  #studyId=${studyIds[0]}
-  # points=$geePtsP/$indId
   points=$geePtsP/$studyId
   
   # get length of an array
@@ -77,8 +68,6 @@ do
   # use for loop to read all values and indexes
   for (( i=0; i<${n}; i++ ));
   do
-  
-    #i=0
     
     #TODO: do this as default if user doesn't pass in col_name info
     #envN=${env##*/} #gets the name (w/o path) of the env variable
@@ -91,12 +80,12 @@ do
     #TODO: need to handle band, colname as optional parameters
     # if column is not present don't pass parameters
 
-    #echo "index: $i, env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
-    out=$gcsOutP/${studyId}_${colnames[$i]} #do not include url, bucket, or file extension
+    # echo "index: $i, env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
+    out=$gcsOutP/${studyId}_${colnames[$i]} #d o not include url, bucket, or file extension
     
     echo Annotating "env: ${envs[$i]}, band: ${bands[$i]}, col name: ${colnames[$i]}"
-    # $MOSEYENV_SRC/gee_anno.r $points ${envs[$i]} $out -b ${bands[$i]} -c ${colnames[$i]}
-    $MOSEYENV_SRC/gee_anno.r $points $out $studyId ${envs[$i]} ${colnames[$i]} ${bands[$i]} #&> logs/GEE_anno.log
+    
+    $MOSEYENV_SRC/gee_anno.r $points $out $studyId ${envs[$i]} ${colnames[$i]} ${bands[$i]}
   done
 
 done

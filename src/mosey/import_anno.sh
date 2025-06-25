@@ -18,21 +18,14 @@ EOF
 
 
 #TODO: make a test to make sure group subsetting is happening correctly
-#   could set group size to small value, use a small dataset, make sure values are updated from both 
-#   groups
-
-# pd=~/projects/ms2
-# wd=$pd/analysis/poc/mosey_env/mosey_env1
-# cd $wd
-# 
-# gcsOutURL=gs://mol-playground/benc/projects/ms2/poc/mosey_env/mosey_env1/anno #This is the url to the output folder (includes bucket)
-# annoP=data/anno
-# db=$pd/analysis/main/data/mosey.db
+#   could set group size to small value, use a small dataset, make sure values 
+# are updated from both groups
 
 # gcsOutURL=${argv[0]}
 # annoP=${argv[1]}
 # db=${argv[2]}
-# change syntax for bash instead of zsh
+
+# use bash syntax instead of zsh
 gcsOutURL=$1
 annoP=$2
 db=$3
@@ -44,13 +37,9 @@ echo db: $db
 #TODO: pass in as a single value, not an array. For multiple, use envs.csv
 #envs=(${argv[3]})
 
-#Set defaults
+# Set defaults
 [[ -z "$table" ]] && table="event_trim"
 [[ -z "$clean" ]] && clean="false"
-
-# echo $gcsOutURL
-# echo $annoP
-# echo $db
 
 #TODO: pass in "rollback", if true, set endTx=rollback. else if empty endTx=commit
 endTx=commit
@@ -62,24 +51,17 @@ mkdir -p $annoP
 
 entity=study
 
-#study.csv
+# study.csv
 names=($(mlr --csv --opprint filter '$run == 1' then cut -f study_id ctfs/$entity.csv | tail -n +2))
-# names=($(mlr --csv --opprint filter '$run == 1' then cut -f name ctfs/$entity.csv | tail -n +2))
-# names=($(mlr --csv --opprint filter '$run == 1' then cut -f individual_id ctfs/$entity.csv | tail -n +2))
+
 echo ${names[@]}
 
-#envs.csv
+# envs.csv
 envs=($(mlr --csv --opprint filter '$run == 1' then cut -f env_id ctfs/env.csv | tail -n +2))
 colnames=($(mlr --csv --opprint filter '$run == 1' then cut -f col_name ctfs/env.csv | tail -n +2))
 
 echo $envs[@]
 echo $colnames[@]
-
-#Remove \r suffix
-#NOTE: I don't think I need these anymore when using zsh
-# studyIds=( ${studyIds[@]%$'\r'} )
-# envs=( ${envs[@]%$'\r'} )
-# colnames=( ${colnames[@]%$'\r'} )
 
 for name in "${names[@]}"
 do
@@ -90,13 +72,8 @@ do
 	# get length of an array
   n=${#envs[@]}
 
-  #NOTE zsh starts at 1! updated the loop, test
-  # use for loop to read all values and indexes
   for (( i=0; i<${n}; i++ ));
   do
-
-		#Note zsh arrays start at 1!
-    #i=1
 
     echo "Importing ${colnames[$i]}"
     
@@ -144,11 +121,6 @@ do
 			.mode csv temp_annotated
 
 			.import $annoPF temp_annotated
-
-			# update $table
-			# set ${colnames[$i]} = t.${colnames[$i]}
-			# from temp_annotated t
-			# where t.anno_id = ${table}.event_id;
       
 			update $table
 			set ${colnames[$i]} = t.${colnames[$i]}
