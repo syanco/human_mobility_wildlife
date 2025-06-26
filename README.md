@@ -43,25 +43,6 @@ Data are stored as a [mosey_db](https://github.com/benscarlson/mosey_db), which 
 
 Raw wildlife movement data associated with this project includes data for species that pose conservation concerns and therefore cannot be released publicly. Aggregated data products at the individual-year-week scale, model files and plots, and tabular model results are publicly available [here on Open Science Framework](https://osf.io/3ua2c/files/osfstorage).
 
-## Citation
-
-This project is led by:
-
-Walter Jetz (PI)<sup>1</sup>  
-Ruth Oliver<sup>1</sup>  
-Diego Ellis-Soto<sup>1</sup>  
-Scott Yanco<sup>1</sup>  
-Brett Jesmer<sup>1, 2</sup>  
-
-<sup>1</sup>Center for Biodiversity and Global Change  
-Department of Ecology and Evolutionary Biology  
-Yale University  
-New Haven, CT, USA  
-
-<sup>2</sup>Department of Fish and Wildlife Conservation  
-Virginia Tech   
-Blacksburg, VA, USA  
-
 ## Additional Information & Resources
 
 Published comment article describing the research opportunity: [https://www.nature.com/articles/s41559-020-1237-z](https://www.nature.com/articles/s41559-020-1237-z (open access))
